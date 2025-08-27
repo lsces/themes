@@ -10,13 +10,13 @@
 global $gBitUser, $gBitSystem, $gBitSmarty;
 
 // Global menu
-//	$gBitSystem->registerAppMenu( 'global', NULL, NULL, 'bitpackage:kernel/menu_global.tpl' );
+//	$gBitSystem->registerAppMenu( 'global', null, null, 'bitpackage:kernel/menu_global.tpl' );
 
 // Application menu
 uasort( $gBitSystem->mAppMenu, "mAppMenu_sort" );
 
 // Admin menu
-$adminMenu = array();
+$adminMenu = [];
 foreach( array_keys( $gBitSystem->mPackages ) as $package ) {
 	if( $gBitUser->hasPermission( 'p_'.$package.'_admin' ) ) {
 		$package = strtolower( $package );
@@ -30,7 +30,7 @@ foreach( array_keys( $gBitSystem->mPackages ) as $package ) {
 
 if( !empty( $adminMenu ) ) {
 	ksort( $adminMenu );
-	$gBitSmarty->assignByRef( 'adminMenu', $adminMenu );
+	$gBitSmarty->assign( 'adminMenu', $adminMenu );
 }
 
 /**

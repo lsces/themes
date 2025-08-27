@@ -10,7 +10,7 @@
  */
 global $gBitThemes;
 $change_theme = $gBitSystem->getConfig('users_themes');
-$_template->tpl_vars['change_theme'] = new Smarty_variable( $change_theme);
+$gBitSmarty->assign( 'change_theme', $change_theme);
 $style = $gBitThemes->getStyle();
 
 if( $change_theme == 'y' ) {
@@ -22,12 +22,11 @@ if( $change_theme == 'y' ) {
 		$style = $_COOKIE['bw-theme'];
 	}
 
-	$styles = $gBitThemes->getStyles( NULL, TRUE );
+	$styles = $gBitThemes->getStyles( null, true );
 	$stylesList = $gBitThemes->getStyles();
 
-	$_template->tpl_vars['styleslist'] = new Smarty_variable($stylesList);
+	$gBitSmarty->assign( 'styleslist', $stylesList );
 	if(isset($style)){
-		$_template->tpl_vars['style'] = new Smarty_variable( $style);
+		$gBitSmarty->assign( 'style', $style);
 	}
 }
-?>
