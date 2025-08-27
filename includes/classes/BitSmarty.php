@@ -10,12 +10,12 @@
  * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See http://www.gnu.org/copyleft/lesser.html for details.
  */
 
-/**
+ /**
  * required setup
  */
-
-require_once( EXTERNAL_LIBS_PATH.'smarty/libs/Smarty.class.php' );
-
+namespace Bitweaver\Themes;
+use Bitweaver\KernelTools;
+require_once EXTERNAL_LIBS_PATH.'smarty/libs/Smarty.class.php';
 
 /**
  * PermissionCheck
@@ -34,76 +34,77 @@ class PermissionCheck {
  *
  * @package kernel
  */
+class BitSmarty extends \Smarty\Smarty {
 
-class BitSmarty extends Smarty {
-
-	protected $mCompileRsrc;
+	public $mCompileRsrc;
 
 	/**
 	 * BitSmarty initiation
 	 *
-	 * @access public
 	 * @return void
 	 */
-	function __construct() {
+	public function __construct() {
 		global $smarty_force_compile, $smarty_debugging;
 		parent::__construct();
-		$this->mCompileRsrc = NULL;
+		$this->mCompileRsrc = null;
 		$this->config_dir = "configs/";
-		// $this->caching = TRUE;
-		$this->force_compile = //$smarty_force_compile;
-		$this->debugging = isset($smarty_debugging) && $smarty_debugging;
+		// $this->caching = true;
+		$this->force_compile = isset($smarty_force_compile) && $smarty_force_compile;
+		$this->debugging = isset($smarty_debugging) ? $smarty_debugging : false;
 		$this->assign( 'app_name', 'bitweaver' );
-		$this->addPluginsDir( EXTERNAL_LIBS_PATH.'smarty/libs/sysplugins' );
-		$this->addPluginsDir( THEMES_PKG_PATH . "smartyplugins" );
-		$this->registerFilter('pre', "add_link_ticket" );
-		$this->error_reporting = E_ALL & ~E_NOTICE & ~E_STRICT;
+		$this->error_reporting = E_ALL; //  & ~E_DEPRECATED & ~E_NOTICE;
 		
 		global $permCheck;
 		$permCheck = new PermissionCheck();
-// SMARTY3	$this->register_object( 'perm', $permCheck, array(), TRUE, array( 'autoComplete' ));
-		$this->assignByRef( 'perm', $permCheck );
+		$this->assign( 'perm', $permCheck );
 	}
 
-	function scanPackagePluginDirs() {
+	public function scanPackagePluginDirs() {
 		global $gBitSystem;
 		foreach( $gBitSystem->mPackages as &$packageHash ) {
 			if( $packageHash['dir'] != THEMES_PKG_DIR && file_exists( $packageHash['path'].'smartyplugins' ) ) {
-				$this->addPluginsDir( $packageHash['path'].'smartyplugins' );
+//				$this->addPluginsDir( $packageHash['path'].'smartyplugins' );
 			}
 		}
 	}
 
+    /**
+     * Override the fetch method to add custom behavior.
+     *
+     * @param string $resource_name The template resource name.
+     * @param string|null $cache_id The cache ID.
+     * @param string|null $compile_id The compile ID.
+     * @return string The output of the template.
+     */
     public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false) {
 		global $gBitSystem;
-
 		if( strpos( $template, ':' )) {
 			list( $resource, $location ) = explode( ':', $template);
 			if( $resource == 'bitpackage' ) {
 				list( $package, $tpl ) = explode( '/', $location );
 				// exclude temp, as it contains nexus menus
 				if( !$gBitSystem->isPackageActive( $package ) && $package != 'temp' ) {
-					return '';
+				    return '';
 				}
 			}
 		}
 
-		if( defined( 'TEMPLATE_DEBUG' ) && TEMPLATE_DEBUG == TRUE ) {
+		if( defined( 'TEMPLATE_DEBUG' ) && TEMPLATE_DEBUG == true ) {
 			echo "\n<!-- - - - {$template} - - - -->\n";
 		}
-
-		return parent::fetch($template, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
+		$this->debugging = false;
+		$templateObject = parent::fetch($template, $cache_id, $compile_id);
+		return $templateObject;
 	}
 
 	/**
 	 * getModuleConfig
 	 *
-	 * @access public
-	 * @return hash of config values set in sibling .cfg file
+	 * @return array hash of config values set in sibling .cfg file
 	 */
-	function getModuleConfig( $pModuleRsrc ) {
+	public function getModuleConfig( $pModuleRsrc ) {
 		global $moduleConfig;
-		$moduleConfig = array();
+		$moduleConfig = [];
 		$moduleConfigFile = str_replace( '.tpl', '.cfg', $pModuleRsrc );
 		$this->includeSiblingFile( $moduleConfigFile );
 		return $moduleConfig;
@@ -114,12 +115,11 @@ class BitSmarty extends Smarty {
 	 * should not need to be invoked from anywhere except within this class
 	 *
 	 * @param string $pFile file to be included, should be of the form "bitpackage:<packagename>/<templatename>"
-	 * @return TRUE if a sibling php file was included
-	 * @access private
+	 * @return bool true if a sibling php file was included
 	 */
-	function includeSiblingFile( $pFile, $pIncludeVars=NULL ) {
+	private function includeSiblingFile( $pFile, $pIncludeVars=null ) {
 		global $gBitThemes;
-		$ret = FALSE;
+		$ret = false;
 		if( strpos( $pFile, ':' )) {
 			list( $resource, $location ) = explode( ':', $pFile );
 			if( $resource == 'bitpackage' ) {
@@ -131,7 +131,7 @@ class BitSmarty extends Smarty {
 					$includeFile = "$path$subdir/$modFile";
 					if( file_exists( $includeFile )) {
 						global $gBitSmarty, $gBitSystem, $gBitUser, $gQueryUserId, $moduleParams;
-						$moduleParams = array();
+						$moduleParams = [];
 						if( !empty( $pIncludeVars['module_params'] ) ) {
 							// module_params were passed through via the {include},
 							// e.g. {include file="bitpackage:foobar/mod_list_foo.tpl" module_params="user_id=`$gBitUser->mUserId`&sort_mode=created_desc"}
@@ -140,12 +140,13 @@ class BitSmarty extends Smarty {
 							// Module Params were passed in from the template, like kernel/dynamic.tpl
 							$moduleParams = $this->getTemplateVars( 'moduleParams' );
 						}
-						include( $includeFile );
-						$ret = TRUE;
+						include $includeFile;
+						$ret = true;
 					}
 				}
 			}
 		}
+		return $ret;
 	}
 
 	/**
@@ -154,28 +155,25 @@ class BitSmarty extends Smarty {
 	 * @access public
 	 * @return void
 	 */
-	function verifyCompileDir() {
+	public function verifyCompileDir(): void {
 		global $gBitThemes, $gBitLanguage, $bitdomain;
-		if( !defined( "TEMP_PKG_PATH" )) {
-			$temp = BIT_ROOT_PATH . "temp/";
-		} else {
-			$temp = TEMP_PKG_PATH;
-		}
+
+		$temp = !defined( "TEMP_PKG_PATH" ) ? BIT_ROOT_PATH . "temp/" : TEMP_PKG_PATH;
 
 		$endPath = $bitdomain.'/'.$gBitThemes->getStyle().'/'.$gBitLanguage->mLanguage;
 
 		// Compile directory
 		$compDir = $temp . "templates_c/$endPath";
 		$compDir = str_replace( '//', '/', $compDir );
-		$compDir = clean_file_path( $compDir );
-		mkdir_p( $compDir );
+		$compDir = KernelTools::clean_file_path( $compDir );
+		KernelTools::mkdir_p( $compDir );
 		$this->setCompileDir( $compDir );
 
 		// Cache directory
 		$cacheDir = $temp . "cache/$endPath";
 		$cacheDir = str_replace( '//', '/', $cacheDir );
-		$cacheDir = clean_file_path( $cacheDir );
-		mkdir_p( $cacheDir );
+		$cacheDir = KernelTools::clean_file_path( $cacheDir );
+		KernelTools::mkdir_p( $cacheDir );
 		$this->setCacheDir( $cacheDir );
 	}
 }
@@ -185,28 +183,27 @@ class BitSmarty extends Smarty {
  *
  * @param array $pTplSource source of template
  * @access public
- * @return ammended template source
+ * @return string ammended template source
  */
 function add_link_ticket( $pTplSource ) {
 	global $gBitUser;
 
 	if( is_object( $gBitUser ) && $gBitUser->isRegistered() ) {
-//		$from = '#href="(.*PKG_URL.*php)\?(.*)&(.*)"#i';
-//		$to = 'href="\\1?\\2&amp;tk={$gBitUser->mTicket}&\\3"';
-//		$pTplSource = preg_replace( $from, $to, $pTplSource );
+		$from = '#href="(.*PKG_URL.*php)\?(.*)&(.*)"#i';
+		$to = 'href="\\1?\\2&amp;tk={$gBitUser->mTicket}&\\3"';
+		$pTplSource = preg_replace( $from, $to, $pTplSource );
 		$from = '#<form([^>]*)>#i';
 		// div tag is for stupid XHTML compliance.
-		$to = '<form\\1><div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}"></div>';
+		$to = '<form\\1><div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}" /></div>';
 		$pTplSource = preg_replace( $from, $to, $pTplSource );
 		if( strpos( $pTplSource, '{form}' )) {
-			$pTplSource = str_replace( '{form}', '{form}<div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}"></div>', $pTplSource );
+			$pTplSource = str_replace( '{form}', '{form}<div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}" /></div>', $pTplSource );
 		} elseif( strpos( $pTplSource, '{form ' ) ) {
 			$from = '#\{form(\}| [^\}]*)\}#i';
-			$to = '{form\\1}<div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}"></div>';
+			$to = '{form\\1}<div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}" /></div>';
 			$pTplSource = preg_replace( $from, $to, $pTplSource );
 		}
 	}
 
 	return $pTplSource;
 }
-?>

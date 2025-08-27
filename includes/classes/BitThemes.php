@@ -6,7 +6,12 @@
 /**
  * Set-up
  */
-require_once( KERNEL_PKG_CLASS_PATH.'BitCache.php' );
+namespace Bitweaver\Themes;
+use Bitweaver\BitCache;
+use Bitweaver\BitSingleton;
+use Bitweaver\Users\RoleUser;
+use Bitweaver\KernelTools;
+
 /**
  * BitThemes
  *
@@ -15,48 +20,55 @@ require_once( KERNEL_PKG_CLASS_PATH.'BitCache.php' );
  */
 class BitThemes extends BitSingleton {
 	// Array that contains a full description of the current layout
-	public $mLayout = array();
+	public $mLayout = [];
 
 	// contains the currently active style
 	public $mStyle;
 
 	// an array with style information
-	public $mStyles = array();
+	public $mStyles = [];
 
 	// Ajax libraries needed by current Ajax framework (MochiKit libs, etc.)
-	public $mAjaxLibs = array();
+	public $mAjaxLibs = [];
 
 	// Auxiliary Javascript and Css Files
-	public $mAuxFiles = array(
-		'js'  => array(),
-		'css' => array()
-	);
+	public $mAuxFiles = [
+		'js'  => [],
+		'css' => []
+	];
 
 	// Raw Javascript and Css Files
-	public $mRawFiles = array(
-		'js'  => array(),
-		'css' => array()
-	);
+	public $mRawFiles = [
+		'js'  => [],
+		'css' => []
+	];
+	public $mUnloadFiles = [];
 
 	// Display Mode
 	public $mDisplayMode;
 
 	// When all modules are loaded they are loaded here
-	public $mModules = array();
+	public $mModules = [];
 
 	// Caching object
 	public $mThemeCache;
+
+	/**
+	 * Summary of mFormatHeader
+	 * @var 
+	 */
+	public $mFormatHeader;
 
 	/**
 	 * Initiate class
 	 *
 	 * @return void
 	 */
-	function __construct() {
+	public function __construct() {
 		parent::__construct();
 
 		// start up caching engine
-		$this->mThemeCache = new BitCache( 'themes', TRUE );
+		$this->mThemeCache = new BitCache( 'themes', true );
 	}
 
 	public static function isCacheableClass() {
@@ -64,7 +76,7 @@ class BitThemes extends BitSingleton {
 	}
 
 	public function __sleep() {
-		return array_merge( parent::__sleep(), array( 'mStyles', 'mThemeCache', 'mAjaxLibs', 'mAuxFiles', 'mRawFiles', 'mModules' ) );
+		return array_merge( parent::__sleep(), [ 'mStyles', 'mThemeCache', 'mAjaxLibs', 'mAuxFiles', 'mRawFiles', 'mModules' ] );
 	}
 
 	// {{{ =================== Styles ====================
@@ -82,7 +94,7 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @see BitSystem::preDisplay
 	 */
-	function preLoadStyle(){
+	public function preLoadStyle(){
 		// define style url and path
 		if( !defined( 'THEMES_STYLE_URL' ) ) {
 			define( 'THEMES_STYLE_URL', $this->getStyleUrl() );
@@ -100,11 +112,11 @@ class BitThemes extends BitSingleton {
 	 * @access public
 	 * @return void
 	 */
-	function loadStyle() {
+	public function loadStyle(): void {
 		global $gBitSystem;
 		// load default css files
 		if( empty( $this->mStyles['styleSheet'] )) {
-			$this->mStyles['styleSheet'] = $this->getStyleCssFile( NULL, TRUE );
+			$this->mStyles['styleSheet'] = $this->getStyleCssFile( '', true );
 		}
 
 		// load tpl files that need to be included
@@ -114,11 +126,11 @@ class BitThemes extends BitSingleton {
 		// join javascript files that have been loaded
 		$this->mStyles['joined_javascript'] = $this->joinAuxFiles( 'js' );
 
-		// layout is called as the viry first, package css is around pos 300 and theme / browser are called last
+		// layout is called as the very first, package css is around pos 300 and theme / browser are called last
 		// css inserted in <pkg>/html_head_inc.tpl is called before these files since these are inserted last
-//		$this->loadCss( $this->getLayoutCssFile(),       TRUE, 1,	TRUE, TRUE );
-		$this->loadCss( $this->getStyleCssFile(),        TRUE, 998,	TRUE, TRUE );
-		$this->loadCss( $this->getBrowserStyleCssFile(), TRUE, 999,	TRUE, TRUE );
+//		$this->loadCss( $this->getLayoutCssFile(),       true, 1,	true, true );
+		$this->loadCss( $this->getStyleCssFile(),        true, 998,	true, true );
+		$this->loadCss( $this->getBrowserStyleCssFile(), true, 999,	true, true );
 		// check for customized CSS file
 		if( file_exists( CONFIG_PKG_PATH.'css/config.css' ) ) {
 			$this->loadCss( CONFIG_PKG_PATH.'css/config.css' );
@@ -127,13 +139,11 @@ class BitThemes extends BitSingleton {
 	}
 
 	/**
-	 * figure out the current style
+	 * Get the current style from the config array
 	 *
-	 * @param string $ pScanFile file to be looked for
-	 * @return none
-	 * @access public
+	 * @return string
 	 */
-	function getStyle() {
+	public function getStyle() {
 		global $gBitSystem;
 		if( empty( $this->mStyle )) {
 			$this->mStyle = $gBitSystem->getConfig( 'style' );
@@ -145,36 +155,28 @@ class BitThemes extends BitSingleton {
 	 * figure out the current style
 	 *
 	 * @param string $ pScanFile file to be looked for
-	 * @return none
-	 * @access public
+	 * @return void
 	 */
-	function setStyle( $pStyle ) {
+	public function setStyle( $pStyle ): void {
 		global $gBitSmarty;
-		if( file_exists( CONFIG_PKG_PATH.'themes/'.$pStyle ) ) {
-			$this->mStyle = $pStyle;
-			$gBitSmarty->verifyCompileDir();
-		}
+		$this->mStyle = $pStyle;
+		$gBitSmarty->verifyCompileDir();
 	}
 
 	/**
-	 * figure out the current style
+	 * Get the location as either an absolute path or a URL for current theme style CSS
 	 *
-	 * @param string $ pScanFile file to be looked for
-	 * @return none
-	 * @access public
+	 * @param string $pStyle to be looked for
+	 * @param bool $pUrl 
+	 * @return string 
 	 */
-	function getStyleCssFile( $pStyle = NULL, $pUrl = FALSE ) {
+	public function getStyleCssFile( string  $pStyle = '', bool $pUrl = false ): string {
 		global $gBitSystem;
 		if( empty( $pStyle )) {
 			$pStyle = $this->getStyle();
 		}
 		$ret = '';
-
-		if( $pUrl ) {
-			$base = $this->getStyleUrl();
-		} else {
-			$base = $this->getStylePath();
-		}
+		$base = $pUrl ? $this->getStyleUrl() : $this->getStylePath();
 
 		if( $gBitSystem->getConfig( 'style_variation' ) && is_readable( $this->getStylePath().'alternate/'.$gBitSystem->getConfig( 'style_variation' ).'.css' )) {
 			$ret = $base.'alternate/'.$gBitSystem->getConfig( 'style_variation' ).'.css';
@@ -187,18 +189,13 @@ class BitThemes extends BitSingleton {
 	/**
 	 * get browser specific css file
 	 *
-	 * @param none
-	 * @return path to browser specific css file
-	 * @access public
+	 * @param bool $pUrl 
+	 * @return string path to browser specific css file
 	 */
-	function getBrowserStyleCssFile( $pUrl = FALSE ) {
+	public function getBrowserStyleCssFile( $pUrl = false ): string {
 		global $gSniffer;
 
-		if( $pUrl ) {
-			$base = $this->getStyleUrl();
-		} else {
-			$base = $this->getStylePath();
-		}
+		$base = $pUrl ? $this->getStyleUrl() : $this->getStylePath();
 		$subpath = $this->getStyle().'_'.$gSniffer->property( 'browser' );
 
 		// Allow us to split by major version with a fallback for others
@@ -207,46 +204,43 @@ class BitThemes extends BitSingleton {
 		} elseif( file_exists( $this->getStylePath().$subpath.'.css' )) {
 			$ret = $base.$subpath.'.css';
 		}
-		return !empty( $ret ) ? $ret : NULL;
+		return !empty( $ret ) ? $ret : '';
 	}
 
 	/**
 	 * get browser specific css file
 	 *
 	 * @param none
-	 * @return path to browser specific css file
-	 * @access public
+	 * @return string to browser specific css file
 	 */
-	function getLayoutCssFile() {
+	public function getLayoutCssFile(): string {
 		global $gBitSystem;
 		if( $gBitSystem->isFeatureActive( 'site_style_layout' )) {
 			$ret = realpath( THEMES_PKG_PATH."layouts/".$gBitSystem->getConfig( 'site_style_layout' ).".css" );
 		}
-		return !empty( $ret ) ? $ret : NULL;
+		return !empty( $ret ) ? $ret : '';
 	}
 
 	/**
 	 * figure out the current style URL
 	 *
-	 * @param string $ pScanFile file to be looked for
-	 * @return none
-	 * @access public
+	 * @param string $pScanFile file to be looked for
+	 * @return string 
 	 */
-	function getStyleUrl( $pStyle = NULL ) {
+	public function getStyleUrl( string $pStyle = '' ) {
 		if( empty( $pStyle )) {
 			$pStyle = $this->getStyle();
 		}
-		return CONFIG_PKG_URL.'themes/'.$pStyle.'/';
+        return CONFIG_PKG_URL.'themes/'.$pStyle.'/';
 	}
 
 	/**
 	 * figure out the current style URL
 	 *
-	 * @param string $ pScanFile file to be looked for
-	 * @return none
-	 * @access public
+	 * @param string $pScanFile file to be looked for
+	 * @return string
 	 */
-	function getStylePath( $pStyle = NULL ) {
+	public function getStylePath( string $pStyle = '' ) {
 		if( empty( $pStyle )) {
 			$pStyle = $this->getStyle();
 		}
@@ -256,19 +250,18 @@ class BitThemes extends BitSingleton {
 	/**
 	 * getStyles
 	 *
-	 * @param array $pDir
-	 * @param array $pNullOption
+	 * @param string $pDir
+	 * @param bool $pNullOption
 	 * @param array $bIncludeCustom
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return array List of installed themes
 	 */
-	function getStyles( $pDir = NULL, $pNullOption = NULL, $bIncludeCustom = FALSE ) {
+	public function getStyles( string $pDir = '', bool $pNullOption = true, bool $bIncludeCustom = false ): array {
 		global $gBitSystem, $gBitUser;
 
 		if( empty( $pDir )) {
 			$pDir = CONFIG_PKG_PATH.'themes/';
 		}
-		$ret = array();
+		$ret = [];
 
 		if( !empty( $pNullOption )) {
 			$ret[] = '';
@@ -294,18 +287,17 @@ class BitThemes extends BitSingleton {
 	/**
 	 * getStyleLayouts
 	 *
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function getStyleLayouts() {
-		$ret = array();
+	public function getStyleLayouts(): array {
+		$ret = [];
 
 		if( is_dir( THEMES_PKG_PATH.'layouts/' )) {
 			$h = opendir( THEMES_PKG_PATH.'layouts/' );
 			// collect all layouts
-			while( FALSE !== ( $file = readdir( $h ))) {
+			while( false !== ( $file = readdir( $h ))) {
 				if ( !preg_match( "/^\./", $file )) {
-					$ret[substr( $file, 0, ( strrpos( $file, '.' )))][substr( $file, ( strrpos( $file, '.' ) + 1 ))] = $file;
+					$ret[substr( $file, 0, strrpos( $file, '.' ))][substr( $file, 0 )] = $file;
 				}
 			}
 			closedir( $h );
@@ -323,21 +315,20 @@ class BitThemes extends BitSingleton {
 	}
 
 	/**
-	* @param $pSubDirs a subdirectory to scan as well - you can pass in multiple dirs using an array
+	 * @param $pSubDirs a subdirectory to scan as well - you can pass in multiple dirs using an array
 	 *
-	 * @param array $pDir
-	 * @param array $pNullOption
-	 * @param array $pSubDirs
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param string $pDir
+	 * @param bool $pNullOption
+	 * @param string|array|null $pSubDirs
+	 * @return array true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function getStylesList( $pDir = NULL, $pNullOption = NULL, $pSubDirs = NULL ) {
+	public function getStylesList( string $pDir = '', bool $pNullOption = true, string|array|null $pSubDirs = null ): array {
 		global $gBitSystem;
 
-		$ret = array();
+		$ret = [];
 
 		if( empty( $pSubDirs )) {
-			$subDirs[] = array( '' );
+			$subDirs[] = [ '' ];
 		} elseif( !is_array( $pSubDirs )) {
 			$subDirs[] = $pSubDirs;
 		} else {
@@ -348,7 +339,7 @@ class BitThemes extends BitSingleton {
 			$pDir = CONFIG_PKG_PATH.'themes/';
 		}
 
-		if( !empty( $pNullOption )) {
+		if( $pNullOption ) {
 			$ret[] = '';
 		}
 
@@ -356,7 +347,7 @@ class BitThemes extends BitSingleton {
 		if( is_dir( $pDir )) {
 			$h = opendir( $pDir );
 			// cycle through files / dirs
-			while( FALSE !== ( $file = readdir( $h ))) {
+			while( false !== ( $file = readdir( $h ))) {
 				if ( is_dir( $pDir.$file ) && ( $file != '.' && $file != '..' && $file != 'CVS' && $file != 'slideshows' && $file != 'blank' )) {
 					$ret[$file]['style'] = $file;
 					// check if we want to have a look in any subdirs
@@ -364,7 +355,7 @@ class BitThemes extends BitSingleton {
 						if( is_dir( $infoDir = $pDir.$file.'/'.$dir.'/' )) {
 							$dh = opendir( $infoDir );
 							// cycle through files / dirs
-							while( FALSE !== ( $f = readdir( $dh ))) {
+							while( false !== ( $f = readdir( $dh ))) {
 								if( is_readable( $infoDir.$f ) && ( $f != '.' &&  $f != '..' &&  $f != 'CVS' )) {
 									$ret[$file][$dir][preg_replace( "/\..*/", "", $f )] = CONFIG_PKG_URL.basename( dirname( dirname( $infoDir ))).'/'.$file.'/'.$dir.'/'.$f;
 
@@ -395,25 +386,17 @@ class BitThemes extends BitSingleton {
 	/**
 	 * get the icon cache path
 	 *
-	 * @access public
-	 * @return absolute path on where the system should store it's icons
+	 * @return string absolute path on where the system should store it's icons
 	 */
-	function getIconCachePath() {
+	public function getIconCachePath(): string {
 		global $gSniffer, $gBitSystem, $gBitLanguage;
 
 		// use bitweaver version as dir in case there has been changes since the last version
-		$version = $gBitSystem->getBitVersion( FALSE );
+		$version = $gBitSystem->getBitVersion( false );
 
-		// some browsers need special treatment due to different biticon feed.
-		if( $gSniffer->_browser_info['browser'] == 'ie' ) {
-			$browser = $gSniffer->_browser_info['browser'].$gSniffer->_browser_info['maj_ver'];
-		} else {
-			$browser = 'default';
-		}
-
-		$cachedir = TEMP_PKG_PATH.'themes/biticon/'.$version.'/'.$gBitSystem->getConfig( 'site_icon_style', DEFAULT_ICON_STYLE ).'/'.$gBitLanguage->getLanguage().'/'.$browser.'/';
+		$cachedir = TEMP_PKG_PATH.'themes/biticon/'.$version.'/'.$gBitSystem->getConfig( 'site_icon_style', DEFAULT_ICON_STYLE ).'/'.$gBitLanguage->getLanguage().'/default/';
 		if( !is_dir( $cachedir )) {
-			mkdir_p( $cachedir );
+			KernelTools::mkdir_p( $cachedir );
 		}
 		return $cachedir;
 	}
@@ -425,10 +408,9 @@ class BitThemes extends BitSingleton {
 	 * load current layout into mLayout
 	 *
 	 * @param  $pParamHash
-	 * @return none
-	 * @access public
+	 * @return void
 	 */
-	function loadLayout( $pParamHash = NULL ) {
+	public function loadLayout( $pParamHash = null ): void {
 		global $gBitSystem;
 		if( !empty( $pParamHash ) || empty( $this->mLayout ) || !count( $this->mLayout )) {
 			$this->mLayout = $this->getLayout( $pParamHash );
@@ -440,7 +422,7 @@ class BitThemes extends BitSingleton {
 			 *     <display_mode>_hide_<area>_col
 			 *     <package>_<display_mode>_hide_<area>_col
 			 */
-			$areas = array( 't' => 'top', 'l' => 'left', 'r' => 'right', 'b' => 'bottom' );
+			$areas = [ 't' => 'top', 'l' => 'left', 'r' => 'right', 'b' => 'bottom' ];
 			foreach( $areas as $layout => $area ) {
 				if(
 					$gBitSystem->isFeatureActive( "{$this->mDisplayMode}_hide_{$area}_col" ) ||
@@ -453,19 +435,20 @@ class BitThemes extends BitSingleton {
 		}
 	}
 
-	function hasColumnModules( $pColumn ) {
+	public function hasColumnModules( string $pColumn ): bool {
 		return !empty( $this->mLayout[$pColumn] );
 	}
 
-	function displayLayoutColumn( $pColumn ) {
+	public function displayLayoutColumn( string $pColumn ): void {
 		if( $colHtml = $this->fetchLayoutColumn( $pColumn ) ) {
-			print $colHtml;
+            print $colHtml;
 		}
 	}
 
-	function fetchLayoutColumn( $pColumn ) {
+	public function fetchLayoutColumn( string $pColumn ): string {
 		global $gBitSmarty, $gBitSystem;
 		$ret = '';
+// vd($this->mLayout);
 		if( !empty( $this->mLayout[$pColumn] ) ) {
 			for ($i = 0; $i < count( $this->mLayout[$pColumn] ); $i++) {
 				$r = &$this->mLayout[$pColumn][$i];
@@ -482,7 +465,7 @@ class BitThemes extends BitSingleton {
 							// each module is different for each language because of the strings
 							$cacheDir = TEMP_PKG_PATH.'modules/cache/';
 							if( !is_dir( $cacheDir )) {
-								mkdir_p( $cacheDir );
+								KernelTools::mkdir_p( $cacheDir );
 							}
 							$cachefile = $cacheDir.'_custom.'.$gBitLanguage->mLanguage.'.'.$template.'.tpl.cache';
 
@@ -494,7 +477,7 @@ class BitThemes extends BitSingleton {
 							} else {
 								if( $moduleParams = $this->getCustomModule( $template )) {
 									$moduleParams = array_merge( $r, $moduleParams );
-									$gBitSmarty->assignByRef( 'moduleParams', $moduleParams );
+									$gBitSmarty->assign( 'moduleParams', $moduleParams );
 									$ret .= $gBitSmarty->fetch( 'bitpackage:themes/custom_module.tpl' );
 
 									if( !empty( $r["cache_time"] ) ) {
@@ -510,18 +493,17 @@ class BitThemes extends BitSingleton {
 						} else {
 							$explosion = explode( '/', $r['module_rsrc'] );
 							$template = array_pop( $explosion );
-
+							
 							// using $module_rows, $module_params and $module_title is deprecated. please use $moduleParams hash instead
 							global $module_rows, $module_params, $module_title, $gBitLanguage;
 
 							$cacheDir = TEMP_PKG_PATH.'modules/cache/';
 							if( !is_dir( $cacheDir )) {
-								mkdir_p( $cacheDir );
+								KernelTools::mkdir_p( $cacheDir );
 							}
 
 							// include tpl name and module id to uniquely identify
 							$cachefile = $cacheDir.'_module_'.$r['module_id'].'.'.$gBitLanguage->mLanguage.'.'.$template.'.cache';
-
 							// if the time is right get the cache else get it fresh
 							if( !empty( $r["cache_time"] ) && file_exists( $cachefile ) && filesize( $cachefile ) && !(( $gBitSystem->getUTCTime() - filemtime( $cachefile )) > $r["cache_time"] ) ) {
 								$fp = fopen( $cachefile, "r" );
@@ -536,18 +518,19 @@ class BitThemes extends BitSingleton {
 								}
 
 								// if there's no custom title, get one from file name
-								if( !$r['title'] = ( isset( $r['title'] ) ? tra( $r['title'] ) : NULL )) {
+								if( !$r['title'] = isset( $r['title'] ) ? KernelTools::tra( $r['title'] ) : null ) {
 									$pattern[0] = "/.*\/mod_(.*)\.tpl/";
 									$replace[0] = "$1";
 									$pattern[1] = "/_/";
 									$replace[1] = " ";
-									$r['title'] = ( !empty( $r['title'] ) ? tra( $r['title'] ) : tra( ucwords( preg_replace( $pattern, $replace, $r['module_rsrc'] ))));
+									$r['title'] = !empty( $r['title'] ) ? KernelTools::tra( $r['title'] ) : KernelTools::tra( ucwords( preg_replace( $pattern, $replace, $r['module_rsrc'] )));
 								}
 
 								// moduleParams are extracted in BitSmarty::getSiblingAttachments() and passed on the the module php file
 								$moduleParams = $r;
-								//$_template->tpl_vars['moduleParams'] = new Smarty_variable( $moduleParams );
-								$gBitSmarty->assignByRef( 'moduleParams', $moduleParams );
+								//$gBitSmarty->assign( 'moduleParams', $moduleParams );
+								$gBitSmarty->assign( 'moduleParams', $moduleParams );
+								$gBitSmarty->assign( 'moduleTitle', $moduleParams['title'] );
 								// assign the custom module title
 								$ret .= $gBitSmarty->fetch( $r['module_rsrc'] );
 
@@ -561,7 +544,7 @@ class BitThemes extends BitSingleton {
 							}
 							unset( $moduleParams );
 						}
-					} catch( Exception $e ) {
+					} catch( \Exception $e ) {
 						print( '<div class="alert alert-warning">'.$e->getMessage() ).'</div>';
 					}
 				}
@@ -570,21 +553,20 @@ class BitThemes extends BitSingleton {
 				$ret = '<div class="panel-group col-xs-12">'.$ret.'</div>';
 			}
 		}
-		return $ret;
+        return $ret;
 	}
 
 	/**
 	 * get the current layout from the database, layouts are fetched in this order in this order until one is successfully loaded: 'layout', 'fallback_layout', ACTIVE_PACKGE, DEFAULT_PACKAGE"
 	 *
 	 * @param array $pParamHash
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return array true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function getLayout( $pParamHash = NULL ) {
+	public function getLayout( ?array $pParamHash = null ): array {
 		global $gCenterPieces, $gBitUser, $gBitSystem, $gBitSmarty;
-		$ret = array( 'l' => NULL, 'c' => NULL, 'r' => NULL );
+		$ret = [ 'l' => null, 'c' => null, 'r' => null ];
 
-		$layouts =  array();
+		$layouts =  [];
 		if( !empty( $pParamHash['layout'] )) {
 			$layouts[] = $pParamHash['layout'];
 		}
@@ -607,14 +589,11 @@ class BitThemes extends BitSingleton {
 		if( !empty( $result ) && $result->RecordCount() ) {
 			$row = $result->fetchRow();
 			// Check to see if we have active package modules at the top of the results
-			if( isset( $row['layout'] ) && ( $row['layout'] != DEFAULT_PACKAGE ) && ( $gBitSystem->getActivePackage() != DEFAULT_PACKAGE )) {
-				$skipDefaults = TRUE;
-			} else {
-				$skipDefaults = FALSE;
-			}
+			$skipDefaults = isset( $row['layout'] ) && ( $row['layout'] != DEFAULT_PACKAGE ) && ( $gBitSystem->getActivePackage() != DEFAULT_PACKAGE )
+				? true : false;
 
 			if ( !is_array( $gCenterPieces ) ){
-				$gCenterPieces = array();
+				$gCenterPieces = [];
 			}
 			while( $row ) {
 				if( $skipDefaults && $row['layout'] == DEFAULT_PACKAGE ) {
@@ -626,25 +605,25 @@ class BitThemes extends BitSingleton {
 					// transform roles to managable array
 					if( empty( $row["roles"] )) {
 						// default is that module is visible at all times
-						$row["visible"] = TRUE;
-						$row["module_roles"] = array();
+						$row["visible"] = true;
+						$row["module_roles"] = [];
 					} else {
 						$row['module_roles'] = $this->parseRoles( $row['roles'] );
 
 						if( $gBitUser->isAdmin() ) {
 							if ( $gBitSystem->isFeatureActive('site_mods_req_admn_grp') ) {
 								if( in_array(1, $row['module_roles']) ) {
-									$row['visible'] = TRUE;
+									$row['visible'] = true;
 								}
 							}
 							else {
-								$row["visible"] = TRUE;
+								$row["visible"] = true;
 							}
 						} else {
 							// Check for the right roles
 							foreach( $row["module_roles"] as $modRoleId ) {
 								if( $gBitUser->isInRole( $modRoleId )) {
-									$row["visible"] = TRUE;
+									$row["visible"] = true;
 									break; // no need to continue looping
 								}
 							}
@@ -654,25 +633,24 @@ class BitThemes extends BitSingleton {
 					// transform groups to managable array
 					if( empty( $row["groups"] )) {
 						// default is that module is visible at all times
-						$row["visible"] = TRUE;
-						$row["module_groups"] = array();
+						$row["visible"] = true;
+						$row["module_groups"] = [];
 					} else {
-						$row['module_groups'] = $this->parseGroups( $row['groups'] );
-
+						$row['module_groups'] = !empty($row['groups']) ? $this->parseGroups( $row['groups'] ) : null;
 						if( $gBitUser->isAdmin() ) {
 							if ( $gBitSystem->isFeatureActive('site_mods_req_admn_grp') ) {
 								if( in_array(1, $row['module_groups']) ) {
-									$row['visible'] = TRUE;
+									$row['visible'] = true;
 								}
 							}
 							else {
-								$row["visible"] = TRUE;
+								$row["visible"] = true;
 							}
 						} else {
 							// Check for the right groups
 							foreach( $row["module_groups"] as $modGroupId ) {
 								if( $gBitUser->isInGroup( $modGroupId )) {
-									$row["visible"] = TRUE;
+									$row["visible"] = true;
 									break; // no need to continue looping
 								}
 							}
@@ -681,10 +659,10 @@ class BitThemes extends BitSingleton {
 				}
 
 				if( empty( $ret[$row['layout_area']] )) {
-					$ret[$row['layout_area']] = array();
+					$ret[$row['layout_area']] = [];
 				}
 
-				$row['module_params'] = $this->parseString( $row['params'] );
+				$row['module_params'] = !empty($row['params']) ? $this->parseString( $row['params']) : null;
 
 				if( !empty( $pParamHash['load_config'] ) ) {
 					global $moduleParams;
@@ -712,16 +690,16 @@ class BitThemes extends BitSingleton {
 	 * @param string $pModuleResource the module resource
 	 * @param string $pArea optionally specify the area the module should be found in
 	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return bool true on success, false on failure
 	 */
-	function isModuleLoaded( $pModuleResource, $pArea = NULL ) {
+	public function isModuleLoaded( $pModuleResource, $pArea = null ) {
 		// load the layout if it hasn't been done yet
 		$this->loadLayout();
 
 		if( !$this->verifyArea( $pArea ) && !empty( $this->mLayout[$pArea] )) {
 			foreach( $this->mLayout[$pArea] as $module ) {
 				if( $pModuleResource == $module['module_rsrc'] ) {
-					return TRUE;
+					return true;
 				}
 			}
 		} else {
@@ -729,27 +707,27 @@ class BitThemes extends BitSingleton {
 				if( !empty( $this->mLayout[$area] )) {
 					foreach( $this->mLayout[$area] as $module ) {
 						if( $pModuleResource == $module['module_rsrc'] ) {
-							return TRUE;
+							return true;
 						}
 					}
 				}
 			}
 		}
-		return FALSE;
+		return false;
 	}
 
 	/**
 	 * fix postional data in database using increments of 10 to make it easy for inserting new modules
 	 *
-	 * @access public
+	 * @param string 
 	 * @return void
 	 */
-	function fixPositions( $pLayout = NULL ) {
+	public function fixPositions( string $pLayout = ''): void {
 		$layouts = $this->getAllLayouts();
 
 		// if we only want to fix the positions of a given layout, strip down the hash
 		if( !empty( $pLayout ) && !empty( $layouts[$pLayout] )) {
-			$layouts = array( $layouts[$pLayout] );
+			$layouts = [$layouts[$pLayout]];
 		}
 
 		foreach( $layouts as $layout ) {
@@ -766,17 +744,16 @@ class BitThemes extends BitSingleton {
 	/**
 	 * get a brief summary of set layouts
 	 *
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return array true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function getAllLayouts() {
-		$layouts = array();
+	public function getAllLayouts() {
+		$layouts = [];
 		$modules = $this->mDb->getAll( "SELECT tl.* FROM `".BIT_DB_PREFIX."themes_layouts` tl ORDER BY ".$this->mDb->convertSortmode( "pos_asc" ));
 		foreach( $modules as $module ) {
 			if( defined ( 'ROLE_MODEL') ) {
-				$module['module_roles'] = $this->parseRoles( $module['roles'] );
+				$module['module_roles'] = $this->parseRoles( $module['roles'] ?? '' );
 			} else {
-				$module['module_groups'] = $this->parseGroups( $module['groups'] );
+				$module['module_groups'] = $this->parseGroups( $module['groups'] ?? '' );
 			}
 			$layouts[$module['layout']][$module['layout_area']][] = $module;
 		}
@@ -793,39 +770,35 @@ class BitThemes extends BitSingleton {
 	/**
 	 * cloneLayout
 	 *
-	 * @param array $pFromLayout
-	 * @param array $pToLayout
-	 * @access public
-	 * @return boolean TRUE
+	 * @param string $pFromLayout
+	 * @param string $pToLayout
+	 * @return void
 	 */
-	function cloneLayout( $pFromLayout, $pToLayout ) {
+	public function cloneLayout( string $pFromLayout, string $pToLayout ): void {
 		global $gBitSystem;
 		if( !empty( $pFromLayout ) && !empty( $pToLayout ) ) {
 			// nuke existing layout
-			$this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `layout`=?", array( $pToLayout ));
+			$this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `layout`=?", [$pToLayout]);
 			// get requested layout
 			$team = defined('ROLE_MODEL') ? 'roles' : 'groups';
-			if( $layout = $this->mDb->getAll( "
+			$layout = $this->mDb->getAll( "
 				SELECT `title`, `layout_area`, `module_rows`, `module_rsrc`, `params`, `cache_time`, `$team`, `pos`
-				FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `layout`=?", array( $pFromLayout )) ) {
-				foreach( $layout as $module ) {
-					$module['layout'] = $pToLayout;
-					$this->storeModule( $module );
-				}
+				FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `layout`=?", [$pFromLayout] );
+			foreach( $layout as $module ) {
+				$module['layout'] = $pToLayout;
+				$this->storeModule( $module );
 			}
 		}
-		return TRUE;
 	}
 
 	/**
 	 * expungeLayout
 	 *
-	 * @param array $pLayout
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param string $pLayout
+	 * @return void
 	 */
-	function expungeLayout( $pLayout = NULL ) {
-		$bindVars = array();
+	public function expungeLayout( string $pLayout = ''): void {
+		$bindVars = [];
 		if( !empty( $pLayout )) {
 			$whereSql = "WHERE `layout`=?";
 			$bindVars[] = $pLayout;
@@ -836,21 +809,20 @@ class BitThemes extends BitSingleton {
 	/**
 	 * transform groups string to handy array
 	 *
-	 * @param array $pParseString either space separated list of groups or serialised array
-	 * @access public
+	 * @param string $pParseString either space separated list of groups or serialised array
 	 * @return array of groups
 	 */
-	function parseGroups( $pParseString ) {
-		$ret = array();
+	public function parseGroups( string $pParseString ): array {
+		$ret = [];
 		// convert groups string to hash
-		if( preg_match( '/[A-Za-z]/', $pParseString )) {
+		if( !empty($pParseString) && preg_match( '/[A-Za-z]/', $pParseString )) {
 			// old style serialized group names
 			if( $grps = @unserialize( $pParseString )) {
 				foreach( $grps as $grp ) {
 					global $gBitUser;
 					if( !( $groupId = array_search( $grp, $gBitUser->mGroups ))) {
 						if( $gBitUser->isAdmin() ) {
-							$ret[] = $gBitUser->groupExists( $grp, '*' );
+							$ret[] = $gBitUser->groupExists( $grp );
 						}
 					}
 
@@ -861,7 +833,7 @@ class BitThemes extends BitSingleton {
 			}
 		} else {
 			// new imploded style
-			$ret = explode( ' ', $pParseString );
+			$ret = explode( ' ', $pParseString ?? '' );
 		}
 		return $ret;
 	}
@@ -869,21 +841,20 @@ class BitThemes extends BitSingleton {
 	/**
 	 * transform roles string to handy array
 	 *
-	 * @param array $pParseString either space separated list of roles or serialised array
-	 * @access public
+	 * @param string $pParseString either space separated list of roles or serialised array
 	 * @return array of roles
 	 */
-	function parseRoles( $pParseString ) {
-		$ret = array();
+	public function parseRoles( string $pParseString ): array {
+		$ret = [];
 		// convert role string to hash
-		if( preg_match( '/[A-Za-z]/', $pParseString )) {
+		if( !empty($pParseString) && preg_match( '/[A-Za-z]/', $pParseString )) {
 			// old style serialized role names
 			if( $grps = @unserialize( $pParseString )) {
 				foreach( $grps as $grp ) {
 					global $gBitUser;
 					if( !( $roleId = array_search( $grp, $gBitUser->mRoles ))) {
 						if( $gBitUser->isAdmin() ) {
-							$ret[] = $gBitUser->rollExists( $grp, '*' );
+							$ret[] = $gBitUser->roleExists( $grp, 0 );
 						}
 					}
 
@@ -894,7 +865,7 @@ class BitThemes extends BitSingleton {
 			}
 		} else {
 			// new imploded style
-			$ret = explode( ' ', $pParseString );
+			$ret = explode( ' ', $pParseString ?? '' );
 		}
 		return $ret;
 	}
@@ -906,13 +877,12 @@ class BitThemes extends BitSingleton {
 	 * Verfiy module parameters when storing a new module
 	 *
 	 * @param array $pHash
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function verifyModuleParams( &$pHash ) {
+	public function verifyModuleParams( array &$pHash ): bool {
 		// we need at least a module_id or a module_rsrc
 		if( empty( $pHash['module_id'] ) && empty( $pHash['module_rsrc'] )) {
-			$this->mErrors['module_rsrc'] = tra( 'No module id or module file given.' );
+			$this->mErrors['module_rsrc'] = KernelTools::tra( 'No module id or module file given.' );
 		} elseif( !empty( $pHash['module_id'] )) {
 			$pHash['store']['module_id'] = $pHash['module_id'];
 		} elseif( !empty( $pHash['module_rsrc'] )) {
@@ -920,27 +890,23 @@ class BitThemes extends BitSingleton {
 		}
 
 		// if we don't have a valid area, we'll just shove it in the left column
-		if( $this->verifyArea( $pHash['layout_area'] )) {
-			$pHash['store']['layout_area'] = $pHash['layout_area'];
-		} else {
-			$pHash['store']['layout_area'] = 'l';
-		}
+		$pHash['store']['layout_area'] = $this->verifyArea( $pHash['layout_area'] ) ? $pHash['layout_area'] : 'l';
 
-		$pHash['store']['title']         = ( !empty( $pHash['title'] )             ? $pHash['title']         : NULL );
-		$pHash['store']['params']        = ( !empty( $pHash['params'] )            ? $pHash['params']        : NULL );
-		$pHash['store']['layout']        = ( !empty( $pHash['layout'] )            ? $pHash['layout']        : DEFAULT_PACKAGE );
-		$pHash['store']['module_rows']   = ( @is_numeric( $pHash['module_rows'] )  ? $pHash['module_rows']   : NULL );
-		$pHash['store']['cache_time']    = ( @is_numeric( $pHash['cache_time'] )   ? $pHash['cache_time']    : NULL );
-		$pHash['store']['pos']           = ( @is_numeric( $pHash['pos'] )          ? $pHash['pos']           : 1 );
+		$pHash['store']['title']         = !empty( $pHash['title'] )             ? $pHash['title']         : null;
+		$pHash['store']['params']        = !empty( $pHash['params'] )            ? $pHash['params']        : null;
+		$pHash['store']['layout']        = !empty( $pHash['layout'] )            ? $pHash['layout']        : DEFAULT_PACKAGE;
+		$pHash['store']['module_rows']   = @is_numeric( $pHash['module_rows'] )  ? $pHash['module_rows']   : null;
+		$pHash['store']['cache_time']    = @is_numeric( $pHash['cache_time'] )   ? $pHash['cache_time']    : null;
+		$pHash['store']['pos']           = @is_numeric( $pHash['pos'] )          ? $pHash['pos']           : 1;
 
 		if( !empty( $pHash['roles'] ) && is_array( $pHash['roles'] )) {
 			$pHash['store']['roles'] = implode( ' ', $pHash['roles'] );
 		} elseif( !empty( $pHash['groups'] ) && is_array( $pHash['groups'] )) {
 			$pHash['store']['groups'] = implode( ' ', $pHash['groups'] );
 		} elseif (defined('ROLE_MODEL') ) {
-			$pHash['store']['roles'] = NULL;
+			$pHash['store']['roles'] = null;
 		} else {
-			$pHash['store']['groups'] = NULL;
+			$pHash['store']['groups'] = null;
 		}
 
 		if( !empty( $pHash['config'] ) ) {
@@ -949,10 +915,10 @@ class BitThemes extends BitSingleton {
 				$pHash['store']['params'] .= $paramName.'='.urlencode( $paramValue ).'&';
 			}
 		} else {
-			$pHash['store']['params']        = ( !empty( $pHash['params'] )            ? $pHash['params']        : NULL );
+			$pHash['store']['params']        = !empty( $pHash['params'] )            ? $pHash['params']        : null;
 		}
 
-		return( count( $this->mErrors ) == 0 );
+		return count( $this->mErrors ) == 0;
 	}
 
 	/**
@@ -960,13 +926,13 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @param array $pHash
 	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function storeModule( &$pHash ) {
+	public function storeModule( &$pHash ) {
 		if( $this->verifyModuleParams( $pHash )) {
 			$table = BIT_DB_PREFIX."themes_layouts";
 
-			if( @BitBase::verifyId( $pHash['store']['module_id'] )) {
+			if( \Bitweaver\BitBase::verifyId( $pHash['store']['module_id'] ?? 0 )) {
 				// if we've been passed a module_id, we are updating an entry in the DB
 				$result = $this->mDb->associateUpdate( $table, $pHash['store'], array( 'module_id' => $pHash['store']['module_id'] ));
 			} else {
@@ -975,62 +941,59 @@ class BitThemes extends BitSingleton {
 				$result = $this->mDb->associateInsert( $table, $pHash['store'] );
 			}
 		}
-		return( count( $this->mErrors ) == 0 );
+		return count( $this->mErrors ) == 0;
 	}
 
 	/**
 	 * getModuleData
 	 *
-	 * @param array $pModuleId
-	 * @access public
-	 * @return module details of the requested module id
+	 * @param mixed $pModuleId
+	 * @return array module details of the requested module id
 	 */
-	function getModuleData( $pModuleId ) {
-		if( @BitBase::verifyId( $pModuleId )) {
+	public function getModuleData( mixed $pModuleId ): array {
+		$ret = [];
+		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
 			$ret = $this->mDb->getRow( "SELECT tl.* FROM `".BIT_DB_PREFIX."themes_layouts` tl WHERE `module_id`=? ", array( $pModuleId ));
-			$ret['module_params'] = $this->parseString( $ret['params'] );
-			return $ret;
+			$ret['module_params'] = !empty($ret['params']) ? $this->parseString( $ret['params']) : null;
 		}
+		return $ret;
 	}
 
 	/**
 	 * moduleUp
 	 *
-	 * @param array $pModuleId
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param mixed $pModuleId
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function moveModuleUp( $pModuleId ) {
-		if( @BitBase::verifyId( $pModuleId )) {
+	public function moveModuleUp( mixed $pModuleId ): bool {
+		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
 			$this->moveModule( $pModuleId, 'up' );
 		}
-		return( count( $this->mErrors ) == 0 );
+		return count( $this->mErrors ) == 0;
 	}
 
 	/**
 	 * moduleDown
 	 *
-	 * @param array $pModuleId
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param mixed $pModuleId
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function moveModuleDown( $pModuleId ) {
-		if( @BitBase::verifyId( $pModuleId )) {
+	public function moveModuleDown( mixed $pModuleId ): bool {
+		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
 			$this->moveModule( $pModuleId, 'down' );
 		}
-		return( count( $this->mErrors ) == 0 );
+		return count( $this->mErrors ) == 0;
 	}
 
 	/**
 	 * generic function to move module up or down
 	 *
-	 * @param array $pModuleId
+	 * @param mixed $pModuleId
 	 * @param string $pOrientation
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function moveModule( $pModuleId, $pDirection = 'down' ) {
-		if( @BitBase::verifyId( $pModuleId )) {
+	public function moveModule( mixed $pModuleId, string $pDirection = 'down' ): bool {
+		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
 			// first we get next module we want to swap with
 			$moduleData = $this->getModuleData( $pModuleId );
 			if( $pDirection == 'up' ) {
@@ -1055,20 +1018,20 @@ class BitThemes extends BitSingleton {
 				}
 			}
 		}
-		return( count( $this->mErrors ) == 0 );
+		return count( $this->mErrors ) == 0;
 	}
 
 	/**
 	 * setModulePosition
 	 *
-	 * @param array $pModuleId
+	 * @param mixed $pModuleId
 	 * @param array $pPos
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param array $pCol
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function setModulePosition( $pModuleId, $pPos, $pCol=NULL ) {
-		if( @BitBase::verifyId( $pModuleId )) {
-			$bindVars = array();
+	public function setModulePosition( mixed $pModuleId, array $pPos, ?array $pCol = null ): bool {
+		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
+			$bindVars = [];
 			$updateSql = '';
 			if( !empty( $pCol ) ) {
 				$updateSql .= ' `layout_area`=?, ';
@@ -1079,27 +1042,27 @@ class BitThemes extends BitSingleton {
 			$query = "UPDATE `".BIT_DB_PREFIX."themes_layouts` SET ".$updateSql." `pos`=? WHERE `module_id`=?";
 			$result = $this->mDb->query( $query, $bindVars );
 		}
-		return TRUE;
+		return true;
 	}
 
 	/**
 	 * moveModuleToArea
 	 *
-	 * @param array $pModuleId
+	 * @param mixed $pModuleId
 	 * @param array $pArea
 	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function moveModuleToArea( $pModuleId, $pArea ) {
+	public function moveModuleToArea( mixed $pModuleId, $pArea ) {
 		if( !$this->verifyArea( $pArea )) {
 			$pArea = 'l';
 		}
 
-		if( @BitBase::verifyId( $pModuleId )) {
+		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
 			$query = "UPDATE `".BIT_DB_PREFIX."themes_layouts` SET `layout_area`=? WHERE `module_id`=?";
 			$result = $this->mDb->query( $query, array( $pArea, $pModuleId ));
 		}
-		return TRUE;
+		return true;
 	}
 
 	/**
@@ -1107,17 +1070,17 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @param array $pModuleId can be a module id or a resource path. if it is a resource path, all modules with that resource will be removed
 	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function unassignModule( $pModuleMixed ) {
-		$ret = FALSE;
-		if( @BitBase::verifyId( $pModuleMixed )) {
+	public function unassignModule( $pModuleMixed ) {
+		$ret = false;
+		if( \Bitweaver\BitBase::verifyId( $pModuleMixed )) {
 			if( $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `module_id`=?", array( $pModuleMixed ))) {
-				$ret = TRUE;
+				$ret = true;
 			}
 		} elseif( !empty( $pModuleMixed )) {
 			if( $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `module_rsrc`=?", array( $pModuleMixed ))) {
-				$ret = TRUE;
+				$ret = true;
 			}
 		}
 		return $ret;
@@ -1126,22 +1089,20 @@ class BitThemes extends BitSingleton {
 	/**
 	 * if the specified area doesn't make any sense, we just dump it in the left column
 	 *
-	 * @param array $pArea l --> left       r --> right       c --> center       b --> bottom       t --> top
-	 * @access public
-	 * @return valid area
+	 * @param string $pArea l --> left       r --> right       c --> center       b --> bottom       t --> top
+	 * @return string with valid area
 	 */
-	function verifyArea( &$pArea ) {
-		return( !empty( $pArea ) && preg_match( '/^[lrctb]$/', $pArea ));
+	public function verifyArea( string &$pArea ): string {
+		return !empty( $pArea ) && preg_match( '/^[lrctb]$/', $pArea ) ? $pArea : 'l';
 	}
 
 	/**
 	 * generates module names on full hash by reference
 	 *
 	 * @param array $p2DHash layout hash
-	 * @access public
 	 * @return void
 	 */
-	function generateModuleNames( &$p2DHash ) {
+	public function generateModuleNames( array &$p2DHash ): void {
 		if( is_array( $p2DHash )) {
 			// Generate human friendly names
 			foreach( array_keys( $p2DHash ) as $col ) {
@@ -1170,10 +1131,9 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @param string $pDir
 	 * @param string $pPrefix
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return array
 	 */
-	function getAllModules( $pDir='modules', $pPrefix='mod_' ) {
+	public function getAllModules( $pDir='modules', $pPrefix='mod_' ) {
 		global $gBitSystem;
 		// @TODO MODULE UPGRADE
 		// hash for carrying references to modules:
@@ -1183,9 +1143,9 @@ class BitThemes extends BitSingleton {
 
 		if(( $modules = $this->getCustomModuleList() ) && $pPrefix == 'mod_' ) {
 			foreach( $modules as $m ) {
-				$this->mModules[$pDir][$pPrefix][tra( 'Custom Modules' )]['_custom:custom/'.$m["name"]] = array( 'title' => $m["name"] );
+				$this->mModules[$pDir][$pPrefix][KernelTools::tra( 'Custom Modules' )]['_custom:custom/'.$m["name"]] = array( 'title' => $m["name"] );
 			}
-			asort( $this->mModules[$pDir][$pPrefix][tra( 'Custom Modules' )] );
+			asort( $this->mModules[$pDir][$pPrefix][KernelTools::tra( 'Custom Modules' )] );
 		}
 
 		// iterate through all packages and look for all possible modules
@@ -1197,18 +1157,18 @@ class BitThemes extends BitSingleton {
 					if( $h ) {
 						while (($file = readdir($h)) !== false) {
 							// match on legacy module files which require a prefix
-							if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
+						    if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
 								$this->mModules[$pDir][$pPrefix][ucfirst( $key )]['bitpackage:'.$key.'/'.$file] = array( 'title' => str_replace( '_', ' ', $match[1] ),
 																														 'template' => $file,
 																														);
 							}
 							// loop over nested directories which contain modern modules
 							// these modules are only accessible from gBitThemes
-							elseif ( !in_array( $file, array('.','..','CVS') ) && @is_dir( $loc.'/'.$file ) ){
+							elseif ( !in_array( $file, ['.','..','CVS'] ) && @is_dir( $loc.'/'.$file ) ){
 								$conf_file = $loc.'/'.$file.'/config_inc.php';
 								// we expect a configuration file
 								if( @is_file( $conf_file ) ){
-									require_once( $conf_file );
+									require_once $conf_file;
 								}
 							}
 						}
@@ -1225,7 +1185,7 @@ class BitThemes extends BitSingleton {
 						$h = opendir( $loc );
 						if( $h ) {
 							while (($file = readdir($h)) !== false) {
-								if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
+							    if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
 									$this->mModules[$pDir][$pPrefix][ucfirst( $key )]['bitpackage:temp/'.$key.'/'.$file] = array( 'title' => str_replace( '_', ' ', $match[1] ),
 																																  'template' => $file,
 																																);
@@ -1243,7 +1203,7 @@ class BitThemes extends BitSingleton {
 		return $this->mModules[$pDir][$pPrefix];
 	}
 
-	function registerModule( $pMixed ){
+	public function registerModule( array $pMixed ): void{
 		$pkg = $pMixed['package'];
 		$dir = $pMixed['directory'];
 		$tpl = $pMixed['template'];
@@ -1254,10 +1214,10 @@ class BitThemes extends BitSingleton {
 
 	// utility function for other packages when they upgrade their modules to the new module system
 	// see themes/admin/upgrades/3.0.0.php for an example of usages
-	function upgradeModulesPaths(){
+	public function upgradeModulesPaths(){
 		$this->getAllModules();
-		$legacy_mods = array();
-		$upgrade_mods = array();
+		$legacy_mods = [];
+		$upgrade_mods = [];
 
 		foreach( $this->mModules['modules']['mod_'] as $pkg => $modules ){
 			foreach( $modules as $modulepath => $module ){
@@ -1293,13 +1253,13 @@ class BitThemes extends BitSingleton {
 	 * @access public
 	 * @return array or parameters
 	 */
-	function getModuleParameters( $pModuleId ) {
-		$ret = array();
-		if( @BitBase::verifyId( $pModuleId )) {
+	public function getModuleParameters( $pModuleId ) {
+		$ret = [];
+		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
 			$module = $this->getModuleData( $pModuleId );
 			$ret = $module['module_params'];
 		} else {
-			deprecated( 'Please use the module parameters found in vd( $moduleParams[\'module_params\'] ); or pass in the module id for a database lookup.' );
+			KernelTools::deprecated( 'Please use the module parameters found in vd( $moduleParams[\'module_params\'] ); or pass in the module id for a database lookup.' );
 		}
 		return $ret;
 	}
@@ -1307,16 +1267,16 @@ class BitThemes extends BitSingleton {
 	/**
 	 * parse URL-like parameter string
 	 *
-	 * @param array $pParseString
+	 * @param string $pParseString
 	 * @access public
 	 * @return array or parameters
 	 */
-	function parseString( $pParseString ) {
-		$ret = array();
+	public function parseString( string $pParseString ): array {
+		$ret = [];
 		if( !empty( $pParseString )) {
 			// only call crazy regex when params are too complex for parse_str()
 			if( strpos( trim( $pParseString ), ' ' )) {
-				$ret = parse_xml_attributes( $pParseString );
+				$ret =  KernelTools::parse_xml_attributes( $pParseString );
 			} else {
 				parse_str( $pParseString, $ret );
 			}
@@ -1332,15 +1292,15 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @param array $pParamHash
 	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function verifyCustomModule( &$pParamHash ) {
+	public function verifyCustomModule( &$pParamHash ) {
 		if( !empty( $pParamHash['name'] ) && preg_match( "/[a-zA-Z]/", $pParamHash['name'] )) {
 			$pParamHash['store']['name'] = substr( strtolower( preg_replace( "/[^\w]*/", "", $pParamHash['name'] )), 0, 40 );
 		}
 
 		if( empty( $pParamHash['store']['name'] )) {
-			$this->mErrors[] = tra( 'You need to provide a name for your custom module. Only alphanumeric characters are allowed and you need to use at least one letter.' );
+			$this->mErrors[] = KernelTools::tra( 'You need to provide a name for your custom module. Only alphanumeric characters are allowed and you need to use at least one letter.' );
 		}
 
 		if( !empty( $pParamHash['title'] )) {
@@ -1351,7 +1311,7 @@ class BitThemes extends BitSingleton {
 			$pParamHash['store']['data'] = $pParamHash['data'];
 		}
 
-		return( count( $this->mErrors ) == 0 );
+		return count( $this->mErrors ) == 0;
 	}
 
 	/**
@@ -1359,70 +1319,68 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @param array $pParamHash
 	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function storeCustomModule( $pParamHash ) {
+	public function storeCustomModule( $pParamHash ) {
 		if( $this->verifyCustomModule( $pParamHash )) {
 			$table = "`".BIT_DB_PREFIX."themes_custom_modules`";
 			$result = $this->mDb->query( "DELETE FROM $table WHERE `name`=?", array( $pParamHash['store']['name'] ));
 			$result = $this->mDb->associateInsert( $table, $pParamHash['store'] );
 		}
-		return( count( $this->mErrors ) == 0 );
+		return count( $this->mErrors ) == 0;
 	}
 
 	/**
 	 * getCustomModule
 	 *
-	 * @param array $pName
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param string $pName
+	 * @return array true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function getCustomModule( $pName ) {
+	public function getCustomModule( string $pName ): array {
 		if( !empty( $pName )) {
-			return $this->mDb->getRow( "SELECT * FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", array( $pName ));
+			return $this->mDb->getRow( "SELECT * FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", [$pName] );
+		} else {
+			return [];
 		}
 	}
 
 	/**
 	 * getCustomModuleList
 	 *
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return array
 	 */
-	function getCustomModuleList() {
-		return( $this->mDb->getAll( "SELECT * FROM `".BIT_DB_PREFIX."themes_custom_modules`" ));
+	public function getCustomModuleList(): array {
+		return $this->mDb->getAll( "SELECT * FROM `".BIT_DB_PREFIX."themes_custom_modules`" );
 	}
 
 	/**
 	 * expungeCustomModule
 	 *
-	 * @param array $pName
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param string $pName
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function expungeCustomModule( $pName ) {
+	public function expungeCustomModule( $pName ): bool {
 		if( !empty( $pName )) {
 			$this->unassignModule( '_custom:custom/'.$pName );
 			$result = $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", array( $pName ));
 		}
-		return TRUE;
+		return true;
 	}
 
 	/**
 	 * isCustomModule
 	 *
-	 * @param array $pMixed either name of module or the rsrc of a module
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @param string $pMixed either name of module or the rsrc of a module
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function isCustomModule( $pMixed ) {
-		if( strpos( $pMixed, "_custom:custom" ) !== FALSE ) {
-			return TRUE;
-		} elseif( strpos( $pMixed, "bitpackage:" ) !== FALSE ) {
-			return FALSE;
+	public function isCustomModule( string $pMixed ): bool {
+		if( strpos( $pMixed, "_custom:custom" ) !== false ) {
+			return true;
+		} elseif( strpos( $pMixed, "bitpackage:" ) !== false ) {
+			return false;
 		} else {
 			$result = $this->mDb->getOne( "SELECT `name` FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", array( $pMixed ));
-			return( !empty( $result ));
+			return !empty( $result );
 		}
 	}
 
@@ -1432,36 +1390,34 @@ class BitThemes extends BitSingleton {
 	/**
 	 * Statically callable function to see if browser supports javascript
 	 * determined by cookie set in bitweaver.js
-	 * @access public
 	 */
-	function isJavascriptEnabled() {
+	public function isJavascriptEnabled() {
 	//	return( !empty( $_COOKIE['javascript_enabled'] ) && $_COOKIE['javascript_enabled'] == 'y' );
-		return TRUE; // This function is fuckt as cookie is empty for first query. And cookie privacy browsers are perfjects JS enabled
+		return true; // This function is fuckt as cookie is empty for first query. And cookie privacy browsers are perfjects JS enabled
 	}
 
 	/**
 	 * Statically callable function to determine if the current call was made using Ajax
 	 *
-	 * @access public
 	 */
-	function isAjaxRequest() {
-		return(( !empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' ) || !empty( $_REQUEST['ajax_api'] ));
+	public function isAjaxRequest() {
+		return !empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' || !empty( $_REQUEST['ajax_xml'] );
 	}
 
 	// {{{ Javascript and CSS load methods
 	/**
 	 * Load Ajax libraries
 	 *
-	 * @param array $pAjaxLib Name of the library we want to use e.g.: prototype or mochikit
+	 * @param string $pAjaxLib Name of the library we want to use e.g.: prototype or mochikit
 	 * @param array $pLibHash Array of additional libraries we need to load
+	 * @param array $pLibPath Array of additional libraries we need to load
 	 * @param boolean $pPack Set to true if you want to pack the javascript file
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
-	function loadAjax( $pAjaxLib, $pLibHash=NULL, $pLibPath=NULL, $pPack = FALSE ) {
+	public function loadAjax( string $pAjaxLib, ?array $pLibHash = null, ?array $pLibPath = null, bool $pPack = false ): bool {
 		global $gBitSystem, $gBitSmarty, $gSniffer;
-		$ret = FALSE;
-		$joined = TRUE;
+		$ret = false;
+		$joined = true;
 		$ajaxLib = strtolower( $pAjaxLib );
 		if( $this->isJavascriptEnabled() ) {
 			// set the javascript lib path if not set yet
@@ -1482,7 +1438,7 @@ class BitThemes extends BitSingleton {
 				}
 			}
 
-			if( !$this->isAjaxLoaded( $ajaxLib )) {
+			if( !$this->isAjaxLoaded( $ajaxLib ) ) {
 				// load core javascript files for ajax libraries
 				$jqueryMin = $gBitSystem->isLive() ? '.min' : '';
 				$bootstrapSrc = CONFIG_PKG_PATH.'themes/bootstrap/js/bootstrap'.$jqueryMin.'.js';
@@ -1505,17 +1461,38 @@ class BitThemes extends BitSingleton {
 						$gBitSmarty->assign( 'jquerySrc', $jquerySrc );
 						break;
 					case 'jquerylocal':
-						$joined = FALSE;
-//						$jquerySrc = THEMES_PKG_PATH.'js/jquery'.$jqueryMin.'.js';
-//						$jqueryUiSrc = THEMES_PKG_PATH.'js/jquery-ui-1.10.3.custom'.$jqueryMin.'.js';
-						$jquerySrc = UTIL_PKG_PATH.'javascript/jquery/jquery'.$jqueryMin.'.js';
-						$jqueryUiSrc = UTIL_PKG_PATH.'javascript/jquery/jquery-ui'.$jqueryMin.'.js';
-						$this->loadJavascript( $jquerySrc, FALSE, $pos++, $joined );
-						$this->loadJavascript( $jqueryUiSrc, FALSE, $pos++, $joined );
-						$this->loadJavascript( $bootstrapSrc, FALSE, $pos++, $joined );
+						$joined = false;
+						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-3.7.1.js', false, $pos++, $joined );
+//						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-ui-14.1.js', false, $pos++, $joined );
+//						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-migrate-3.5.2.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/bootstrap'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/bootstrap-cookie-consent'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap-3.2/colourstrap/colourstrap-full'.$jqueryMin.'.css', false, $pos++, $joined );
+//						$this->loadCss( THEMES_PKG_PATH.'js/jquery-ui'.$jqueryMin.'.css', false, $pos++, $joined );
+						break;
+					case 'jqueryold':
+						$joined = false;
+						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-ui-1.10.3.custom'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/bootstrap'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/moment'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/datetimepicker/js/bootstrap-datetimepicker'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/assets/numeric-1.2.6.min.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/assets/bezier.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/jquery.signaturepad'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'formvalidation/dist/js/formValidation'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadJavascript( EXTERNAL_LIBS_PATH.'formvalidation/dist/js/framework/bootstrap'.$jqueryMin.'.js', false, $pos++, $joined );
+						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap/colourstrap/colourstrap.css', false, $pos++, $joined );
+						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap/colourstrap/colourstrap-icons.css', false, $pos++, $joined );
+						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap/datetimepicker/css/bootstrap-datetimepicker'.$jqueryMin.'.css', false, $pos++, $joined );
+						$this->loadCSs( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/assets/jquery.signaturepad.css', false, $pos++, $joined );
+						$this->loadCss( EXTERNAL_LIBS_PATH.'formvalidation/dist/css/formValidation'.$jqueryMin.'.css', false, $pos++, $joined );
+						break;
+					case 'yui':
+						$this->loadJavascript( $pLibPath.'yuiloader-dom-event/yuiloader-dom-event.js', false, $pos++ );
 						break;
 				}
-				$this->mAjaxLibs[$ajaxLib] = TRUE;
+				$this->mAjaxLibs[$ajaxLib] = true;
 			}
 
 			if( is_array( $pLibHash )) {
@@ -1525,7 +1502,7 @@ class BitThemes extends BitSingleton {
 				}
 			}
 
-			$ret = TRUE;
+			$ret = true;
 		}
 		return $ret;
 	}
@@ -1533,35 +1510,34 @@ class BitThemes extends BitSingleton {
 	/**
 	 * check to see if a given ajax library is loaded
 	 *
-	 * @param array $pAjaxLib
-	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @param string $pAjaxLib
+	 * @return bool true on success, false on failure
 	 */
-	function isAjaxLoaded( $pAjaxLib ) {
+	public function isAjaxLoaded( string $pAjaxLib ): bool {
 		if( !empty( $this->mAjaxLibs ) && !empty( $pAjaxLib )) {
 			return in_array( strtolower( $pAjaxLib ), array_keys( $this->mAjaxLibs ));
-		}
+		} else { return false; }
 	}
 
 	/**
 	 * scan packages for <pkg>/templates/html_head_inc.tpl or footer_inc.tpl files
 	 *
 	 * @param string $pFilename Name of template file we want to scan for and collect
-	 * @access private
 	 * @return void
 	 */
-	function loadTplFiles( $pFilename ) {
+	public function loadTplFiles( $pFilename ) {
 		global $gBitSystem;
 		// these package templates will be included last
-		$prepend = array( 'kernel' );
-		$append = array( 'themes' );
-		$anti = $mid = $post = array();
+		$prepend = [ 'kernel' ];
+		$append = [ 'themes' ];
+		$anti = $mid = $post = [];
+//debug vd($gBitSystem->mPackages);
 		foreach( $gBitSystem->mPackages as $package => $info ) {
-			if( !empty( $info['path'] )) {
+        if( !empty( $info['path'] )) {
 				$file = "{$info['path']}templates/{$pFilename}.tpl";
 				$out = "bitpackage:{$package}/{$pFilename}.tpl";
 				if( is_readable( $file )) {
-					if( in_array( $package, $prepend )) {
+                    if( in_array( $package, $prepend )) {
 						$anti[] = $out;
 					} elseif( in_array( $package, $append )) {
 						$post[] = $out;
@@ -1572,21 +1548,22 @@ class BitThemes extends BitSingleton {
 			}
 		}
 		$this->mAuxFiles['templates'][$pFilename] = array_merge( $anti, $mid, $post );
+//debug vd($this->mAuxFiles['templates']);
 	}
 
 	/**
 	 * loadAuxFile will add a file to the mAuxFiles hash for later processing
 	 *
-	 * @param array $pFile Full path to the file in question
+	 * @param string $pFile Full path to the file in question
 	 * @param string $pType specifies what files to join. typical values include 'js', 'css'
-	 * @param numeric $pPosition Specify the position of the javascript file in the load process.
+	 * @param int $pPosition Specify the position of the javascript file in the load process.
 	 *                           If the selected position is occupied, it will search for the next free position in the hash.
 	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return bool true on success, false on failure
 	 */
-	function loadAuxFile( $pFile = NULL, $pType = NULL, $pPosition = 1, $pAuxFile = TRUE ) {
+	public function loadAuxFile( string $pFile = '', string $pType = '', int $pPosition = 1, bool $pAuxFile = true ) {
 		if( !empty( $pFile ) && !empty( $pType )) {
-//			if( $pFile = realpath( $pFile )) {
+			if( is_readable( $pFile ) ) {
 				if( $pAuxFile ) {
 					$fileHash =& $this->mAuxFiles;
 				} else {
@@ -1602,12 +1579,12 @@ class BitThemes extends BitSingleton {
 						// ensure that hash is sorted correctly
 						ksort( $fileHash[$pType] );
 
-						return TRUE;
+						return true;
 					}
 				}
-//			}
+			}
 		}
-		return FALSE;
+		return false;
 	}
 
 	/**
@@ -1621,11 +1598,11 @@ class BitThemes extends BitSingleton {
 	 *  - ajax javascript libraries use position numbers between 100 and 599
 	 *  - by default all loaded javascript files are after 600.
 	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return bool true on success, false on failure
 	 */
-	function loadJavascript( $pJavascriptFile, $pPack = FALSE, $pPosition = 600, $pJoined = TRUE ) {
+	public function loadJavascript( $pJavascriptFile, $pPack = false, $pPosition = 600, $pJoined = true ) {
 		global $gBitSystem;
-		$ret = FALSE;
+		$ret = false;
 		if( !empty( $pJavascriptFile )) {
 			if( $pPack && $gBitSystem->isFeatureActive( 'themes_packed_js_css' ) && function_exists( 'shell_exec' ) && shell_exec( 'which java' ) ) {
 				if( is_file( $pJavascriptFile )) {
@@ -1648,7 +1625,7 @@ class BitThemes extends BitSingleton {
 				}
 			}
 
-			$ret = $this->loadAuxFile( $pJavascriptFile, 'js', $pPosition, ( $pJoined && $gBitSystem->isFeatureActive( 'themes_joined_js_css' )));
+			$ret = $this->loadAuxFile( $pJavascriptFile, 'js', $pPosition, $pJoined && $gBitSystem->isFeatureActive( 'themes_joined_js_css' ));
 		}
 		return $ret;
 	}
@@ -1656,23 +1633,23 @@ class BitThemes extends BitSingleton {
 	/**
 	 * Load an additional CSS file
 	 *
-	 * @param array $pCssFile Full path to CSS file
-	 * @param numeric $pPosition Specify the position of the javascript file in the load process
+	 * @param string $pCssFile Full path to CSS file
+	 * @param boolean $pPack Specify if minimized version fo file to be loaded
+	 * @param int $pPosition Specify the position of the javascript file in the load process
 	 * @param boolean $pJoined Adds the file to the list of files to be concatenated into a single file
 	 * @param boolean $pForce Forces the css file to always be loaded, should only be used by active style
-	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return bool true on success, false on failure
 	 */
-	function loadCss( $pCssFile, $pPack = TRUE, $pPosition = 300, $pJoined = TRUE, $pForce = FALSE ) {
+	public function loadCss( string $pCssFile, bool $pPack = true, int $pPosition = 300, bool $pJoined = true, bool $pForce = false ): bool {
 		global $gBitSystem;
-		$ret = FALSE;
+		$ret = false;
 		if( !empty( $pCssFile ) && ( !$gBitSystem->isFeatureActive( 'themes_disable_pkg_css' ) || $pForce )) {
 			// only manipulate css file if we're joining or packing the files
 			if(( $pJoined && $gBitSystem->isFeatureActive( 'themes_joined_js_css' )) || ( $pPack && $gBitSystem->isFeatureActive( 'themes_packed_js_css' ))) {
-				$pCssFile = $this->packCss( $pCssFile, ( $pPack && $gBitSystem->isFeatureActive( 'themes_packed_js_css' )));
+				$pCssFile = $this->packCss( $pCssFile, $pPack && $gBitSystem->isFeatureActive( 'themes_packed_js_css' ));
 			}
 
-			$ret = $this->loadAuxFile( $pCssFile, 'css', $pPosition, ( $pJoined && $gBitSystem->isFeatureActive( 'themes_joined_js_css' )));
+			$ret = $this->loadAuxFile( $pCssFile, 'css', $pPosition, $pJoined && $gBitSystem->isFeatureActive( 'themes_joined_js_css' ));
 		}
 		return $ret;
 	}
@@ -1680,12 +1657,12 @@ class BitThemes extends BitSingleton {
 	/**
 	 * simply pack css file by removing excess whitespace and comments
 	 *
-	 * @param array $pCssFile full path to css file
-	 * @access private
-	 * @return TRUE on success, FALSE on failure
+	 * @param string $pCssFile full path to css file
+	 * @param bool $pPack use packed version of file
+	 * @return string empty string if not found
 	 */
-	function packCss( $pCssFile, $pPack = TRUE ) {
-		$ret = FALSE;
+	public function packCss( string $pCssFile, bool $pPack = true ): string {
+		$ret = '';
 		if( !empty( $pCssFile ) && is_readable( $pCssFile )) {
 			$cachefile = md5( $pCssFile ).'.css';
 
@@ -1705,9 +1682,9 @@ class BitThemes extends BitSingleton {
 				// if we have an @import(), we fetch that file and insert it
 				if( preg_match_all( "#@import([^;]*);#", $content, $imports )) {
 					foreach( $imports[1] as $key => $import ) {
-						if( $file = $this->relativeToAbsolute( $import, $pCssFile, FALSE )) {
+						if( $file = $this->relativeToAbsolute( $import, $pCssFile, false )) {
 							// since we're packing later on, we don't pack here, otherwise the same sections will be packed multiple times
-							$content = str_replace( $imports[0][$key], file_get_contents( $this->packCss( $file, FALSE )), $content );
+							$content = str_replace( $imports[0][$key], file_get_contents( $this->packCss( $file, false )), $content );
 						}
 					}
 				}
@@ -1745,10 +1722,10 @@ class BitThemes extends BitSingleton {
 	 * @param string $pCssFile full path to the css file calling the url()
 	 * @param boolean $pReturnUrl return URL or path to file
 	 * @access private
-	 * @return URL/path on success, FALSE on failure
+	 * @return mixed URL/path on success, false on failure
 	 */
-	function relativeToAbsolute( $pUrl, $pCssFile, $pReturnUrl = TRUE ) {
-		$ret = FALSE;
+	public function relativeToAbsolute( $pUrl, $pCssFile, $pReturnUrl = true ) {
+		$ret = '';
 		if( !empty( $pUrl ) && !empty( $pCssFile )) {
 			// clean up url
 			if( preg_match( "#url\s*\(#", $pUrl )) {
@@ -1768,7 +1745,7 @@ class BitThemes extends BitSingleton {
 			}
 
 			if( $pReturnUrl ) {
-				if (is_windows() ) {
+				if ( KernelTools::is_windows() ) {
 					$ret = str_replace( '\\', '/',  $ret );
 					// Put first forward slash back
 					$ret = substr_replace($ret, '\\', 2, 1 );
@@ -1779,7 +1756,7 @@ class BitThemes extends BitSingleton {
 				} else {
 					$ret = str_replace( BIT_ROOT_PATH, BIT_ROOT_URL, $ret );
 				}
-			} else if (is_windows() ) {
+			} else if ( KernelTools::is_windows() ) {
 				$ret = str_replace(  '/', '\\', $ret );
 			}
 		}
@@ -1791,11 +1768,11 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @param string $pType specifies what files to join. typical values include 'js', 'css'
 	 * @access private
-	 * @return url to cached file
+	 * @return string url to cached file
 	 */
-	function joinAuxFiles( $pType ) {
+	public function joinAuxFiles( $pType ) {
 		global $gBitSystem;
-		$ret = FALSE;
+		$ret = false;
 
 		// remove conflicting aux files
 		$this->cleanAuxFiles( $pType );
@@ -1830,7 +1807,7 @@ class BitThemes extends BitSingleton {
 
 			$ret = $this->mThemeCache->getCacheUrl( $cachefile );
 		}
-		return $ret;
+        return $ret;
 	}
 
 	/**
@@ -1838,12 +1815,12 @@ class BitThemes extends BitSingleton {
 	 *
 	 * @param string $pType specifies what files to clean up. typical values include 'js', 'css'
 	 * @access private
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 * @return void
 	 * @note  It is regrettable that we have this method here but our previous
 	 *        use of prototype requires this cleanup and might be needed in the
 	 *        future as well
 	 */
-	function cleanAuxFiles( $pType ) {
+	public function cleanAuxFiles( string $pType ): void {
 		// unload files that are not wanted by users
 		if( !empty( $this->mUnloadFiles[$pType] )) {
 			foreach( $this->mUnloadFiles[$pType] as $file ) {
@@ -1878,17 +1855,17 @@ class BitThemes extends BitSingleton {
 		// convert full file path to URL in mRawFiles hash
 		if( !empty( $this->mRawFiles[$pType] )) {
 			foreach( $this->mRawFiles[$pType] as $pos => $file ) {
-				if (is_windows() ) {
+				if ( KernelTools::is_windows() ) {
 					$file = str_replace( '\\', '/',  $file );
 					// Put first forward slash back
 					$file = substr_replace( $file, '\\', 2, 1 );
 					$winBitRootPath = str_replace( '\\', '/',  BIT_ROOT_PATH );
 					// Put first forward slash back
 					$winBitRootPath = substr_replace($winBitRootPath, '\\', 2, 1 );
-					if ( strpos( $file, $winBitRootPath ) !== FALSE ) {
+					if ( strpos( $file, $winBitRootPath ) !== false ) {
 						$this->mRawFiles[$pType][$pos] = BIT_ROOT_URL.substr( $file, strlen( $winBitRootPath ));
 					}
-				} else if ( strpos( $file, BIT_ROOT_PATH ) !== FALSE ) {
+				} else if ( strpos( $file, BIT_ROOT_PATH ) !== false ) {
 					$this->mRawFiles[$pType][$pos] = BIT_ROOT_URL.substr( $file, strlen( BIT_ROOT_PATH ));
 					if( file_exists( $file ) && ($cacheTime = filemtime( $file )) ) {
 						$this->mRawFiles[$pType][$pos] .= (strpos('?',$file) ? '&' : '?' ).$cacheTime;
@@ -1904,11 +1881,10 @@ class BitThemes extends BitSingleton {
 	 * unloadAuxFile
 	 *
 	 * @param string $pType specifies what files to clean up. typical values include 'js', 'css'
-	 * @param array $pFile Full path to the file in question
-	 * @access private
+	 * @param string $pFile Full path to the file in question
 	 * @return void
 	 */
-	function unloadAuxFile( $pType, $pFile ) {
+	public function unloadAuxFile( string $pType, string $pFile ) {
 		if( !empty( $pType ) && !empty( $pFile ) && is_file( $pFile )) {
 			$this->mUnloadFiles[$pType][] = $pFile;
 		}
@@ -1917,23 +1893,21 @@ class BitThemes extends BitSingleton {
 	/**
 	 * unloadCss
 	 *
-	 * @param array $pFile Full path to the file in question
-	 * @access public
+	 * @param string $pFile Full path to the file in question
 	 * @return void
 	 */
-	function unloadCss( $pFile ) {
-		return $this->unloadAuxFile( 'css', $pFile );
+	public function unloadCss( string $pFile ): void {
+		$this->unloadAuxFile( 'css', $pFile );
 	}
 
 	/**
 	 * unloadJvascript
 	 *
-	 * @param array $pFile Full path to the file in question
-	 * @access public
+	 * @param string $pFile Full path to the file in question
 	 * @return void
 	 */
-	function unloadJavascript( $pFile ) {
-		return $this->unloadAuxFile( 'js', $pFile );
+	public function unloadJavascript( string $pFile ): void {
+		$this->unloadAuxFile( 'js', $pFile );
 	}
 
 	// }}}
@@ -1942,23 +1916,22 @@ class BitThemes extends BitSingleton {
 	 * overrideAuxFile Override an aux file
 	 *
 	 * @param string $pType specifies what files to clean up. typical values include 'js', 'css'
-	 * @param array $pOriginalFile Path to old file
-	 * @param array $pNewFile Path to new file
-	 * @access private
-	 * @return boolean TRUE on success, FALSE on failure
+	 * @param string $pOriginalFile Path to old file
+	 * @param string $pNewFile Path to new file
+	 * @return bool true on success, false on failure
 	 * @note This can only be used after the original file has been loaded since we're swapping the original one with a new one
 	 */
-	function overrideAuxFile( $pType, $pOriginalFile, $pNewFile ) {
-		$ret = FALSE;
+	public function overrideAuxFile( string $pType, string $pOriginalFile, string $pNewFile ): bool {
+		$ret = false;
 		if( is_file( $pNewFile )) {
 			if( $key = array_search( $pOriginalFile, $this->mAuxFiles[$pType] )) {
 				$this->mAuxFiles[$pType][$key] = $pNewFile;
-				$ret = TRUE;
+				$ret = true;
 			}
 
 			if( $key = array_search( $pOriginalFile, $this->mRawFiles[$pType] )) {
 				$this->mRawFiles[$pType][$key] = $pNewFile;
-				$ret = TRUE;
+				$ret = true;
 			}
 		}
 		return $ret;
@@ -1967,26 +1940,24 @@ class BitThemes extends BitSingleton {
 	/**
 	 * overrideCss
 	 *
-	 * @param array $pOriginalFile Path to old file
-	 * @param array $pNewFile Path to new file
-	 * @access public
-	 * @return boolean TRUE on success, FALSE on failure
+	 * @param string $pOriginalFile Path to old file
+	 * @param string $pNewFile Path to new file
+	 * @return bool true on success, false on failure
 	 * @note See overrideAuxFile note
 	 */
-	function overrideCss( $pOriginalFile, $pNewFile ) {
+	public function overrideCss( string $pOriginalFile, string $pNewFile ): bool {
 		return $this->overrideAuxFile( 'css', $pOriginalFile, $pNewFile );
 	}
 
 	/**
 	 * overrideJavascript
 	 *
-	 * @param array $pOriginalFile Path to old file
-	 * @param array $pNewFile Path to new file
-	 * @access public
-	 * @return boolean TRUE on success, FALSE on failure
+	 * @param string $pOriginalFile Path to old file
+	 * @param string $pNewFile Path to new file
+	 * @return bool true on success, false on failure
 	 * @note See overrideAuxFile note
 	 */
-	function overrideJavascript( $pOriginalFile, $pNewFile ) {
+	public function overrideJavascript( string $pOriginalFile, string $pNewFile ): bool {
 		return $this->overrideAuxFile( 'js', $pOriginalFile, $pNewFile );
 	}
 	// }}}
@@ -1994,12 +1965,13 @@ class BitThemes extends BitSingleton {
 	/**
 	 * isAuxFile
 	 *
-	 * @param array $pFile Full path to file
+	 * @param string $pFile Full path to file
 	 * @param string $pType specifies what files to check. typical values include 'js', 'css'
+	 * @param bool $pAuxFile use AuxFile list rather than Raw list
 	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return bool true on success, false on failure
 	 */
-	function isAuxFile( $pFile = NULL, $pType = NULL, $pAuxFile = TRUE ) {
+	public function isAuxFile( string $pFile = '', string $pType = '', bool $pAuxFile = true ): bool {
 		if( $pAuxFile ) {
 			$fileHash =& $this->mAuxFiles;
 		} else {
@@ -2007,8 +1979,8 @@ class BitThemes extends BitSingleton {
 		}
 
 		if( !empty( $pFile ) && !empty( $pType ) && !empty( $fileHash[$pType] )) {
-			return( in_array( $pFile, $fileHash[$pType] ));
-		}
+			return in_array( $pFile, $fileHash[$pType] );
+		} else { return false; }
 	}
 
 
@@ -2021,7 +1993,7 @@ class BitThemes extends BitSingleton {
 	 * @access public
 	 * @return void
 	 */
-	function setDisplayMode( $pDisplayMode ) {
+	public function setDisplayMode( $pDisplayMode ) {
 		if( !empty( $pDisplayMode )) {
 			$this->mDisplayMode = $pDisplayMode;
 		}
@@ -2033,7 +2005,7 @@ class BitThemes extends BitSingleton {
 	 * @param  $pFormat the output headers. Available options include: html, json, xml or none
 	 * @access public
 	 */
-	function setFormatHeader( $pFormat = 'html' ) {
+	public function setFormatHeader( $pFormat = 'html' ) {
 		// this will tell BitSystem::display what headers have been set in case it's been called independently
 		$this->mFormatHeader = $pFormat;
 
@@ -2048,7 +2020,7 @@ class BitThemes extends BitSingleton {
 				header( "Last-Modified: " . gmdate( "D, d M Y H:i:s" )." GMT" );
 				// HTTP/1.1
 				header( "Cache-Control: no-store, no-cache, must-revalidate" );
-				header( "Cache-Control: post-check=0, pre-check=0", FALSE );
+				header( "Cache-Control: post-check=0, pre-check=0", false );
 				// HTTP/1.0
 				header( "Pragma: no-cache" );
 				//XML Header
@@ -2077,7 +2049,7 @@ class BitThemes extends BitSingleton {
 	 * @access public
 	 * @return array Hash of default values
 	 */
-	function getGraphvizGraphAttributes( $pParams = array() ) {
+	public function getGraphvizGraphAttributes( $pParams = [] ) {
 		global $gBitSystem;
 		$ret = array(
 			'bgcolor'  => $gBitSystem->getConfig( 'graphviz_graph_bgcolor', 'transparent' ),
@@ -2108,7 +2080,7 @@ class BitThemes extends BitSingleton {
 	 * @access public
 	 * @return array Hash of default values
 	 */
-	function getGraphvizNodeAttributes( $pParams = array() ) {
+	public function getGraphvizNodeAttributes( $pParams = [] ) {
 		global $gBitSystem;
 		$ret = array(
 			'color'     => $gBitSystem->getConfig( 'graphviz_node_color', '#aaaaaa' ),
@@ -2142,7 +2114,7 @@ class BitThemes extends BitSingleton {
 	 * @access public
 	 * @return array Hash of default values
 	 */
-	function getGraphvizEdgeAttributes( $pParams = array() ) {
+	public function getGraphvizEdgeAttributes( $pParams = [] ) {
 		global $gBitSystem;
 		$ret = array(
 			'color'     => $gBitSystem->getConfig( 'graphviz_edge_color', '#888888' ),
@@ -2173,47 +2145,46 @@ class BitThemes extends BitSingleton {
 	/**
 	 * @deprecated deprecated since version 2.0.0
 	 */
-	function storeLayout() {
-		deprecated( 'Please remove this function and use storeModule instead' );
+	public function storeLayout() {
+		KernelTools::deprecated( 'Please remove this function and use storeModule instead' );
 	}
 	/**
 	 * @deprecated deprecated since version 2.0.0
 	 */
-	function storeModuleParameters($mod_rsrc, $user_id, $params) {
-		deprecated( 'This method does not work as expected due to changes in the layout schema. we have not found a suitable replacement yet.' );
+	public function storeModuleParameters($mod_rsrc, $user_id, $params) {
+		KernelTools::deprecated( 'This method does not work as expected due to changes in the layout schema. we have not found a suitable replacement yet.' );
 	}
 	/**
 	 * @deprecated deprecated since version 2.0.0
 	 */
-	function getModuleId($mod_rsrc) {
-		deprecated( 'This method does not work as expected due to changes in the layout schema. we have not found a suitable replacement yet.' );
+	public function getModuleId($mod_rsrc) {
+		KernelTools::deprecated( 'This method does not work as expected due to changes in the layout schema. we have not found a suitable replacement yet.' );
 	}
 	/**
 	 * @deprecated deprecated since version 2.0.0
 	 */
-	function getStyleCss( $pStyle = NULL ) {
-		deprecated( 'Please use: BitThemes::getStyleCssFile()' );
-		return $this->getStyleCssFile( $pStyle, TRUE );
+	public function getStyleCss( $pStyle = null ) {
+		KernelTools::deprecated( 'Please use: BitThemes::getStyleCssFile()' );
+		return $this->getStyleCssFile( $pStyle, true );
 	}
 	// }}}
 }
 
 function themes_feedback_to_html( $params ) {
 
-	detoxify( $params );
+	KernelTools::detoxify( $params );
 	if( !empty( $params['hash'] ) ) {
 		$hash = &$params['hash'];
 	} else {
 		// maybe params were passed in separately
 		$hash = &$params;
 	}
+	$feedback = '';
 	$i = 0;
 	$color = isset( $hash['color'] )?$hash['color']:"000000";
-
-	$output = array();
 	foreach( $hash as $key => $val ) {
 		if( $val ) {
-			$keys = array( 'warning', 'success', 'error', 'important', 'note' );
+			$keys = [ 'warning', 'success', 'error', 'important', 'note' ];
 			if( in_array( $key, $keys )) {
 				switch( $key ) {
 					case 'success':
@@ -2233,16 +2204,16 @@ function themes_feedback_to_html( $params ) {
 				}
 
 				if( !is_array( $val ) ) {
-					$val = array( $val );
+					$val = [ $val ];
 				}
 
 				foreach( $val as $valText ) {
 					if( is_array( $valText ) ) {
 						foreach( $valText as $text ) {
-							$output[$alertClass][] = $text;
+							$feedback .= '<span class="inline-block '.$alertClass.'">'.$text.'</span>';
 						}
 					} else {
-						$output[$alertClass][] = $valText;
+						$feedback .= '<span class="inline-block '.$alertClass.'">'.$valText.'</span>';
 					}
 				}
 
@@ -2254,10 +2225,10 @@ function themes_feedback_to_html( $params ) {
 				if ( $key != 'color' ) {
 					if( is_array( $val ) ) {
 						foreach( $val as $text ) {
-							$output[$key][] = $text;
+							$feedback .= '<span class="'.$key.'">'.$text.'</span>';
 						}
 					} else {
-						$output[$key][] = $val;
+						$feedback .= '<span class="'.$key.'">'.$val.'</span>';
 					}
 				}
 			}
@@ -2265,19 +2236,8 @@ function themes_feedback_to_html( $params ) {
 	}
 
 	$html = '';
-	foreach( $output as $cssClass => $messages ) {
-		$html .= '<span class="inline-block '.$cssClass.'">';
-		if( count( $messages ) == 1 ) {
-			$html .= current( $messages );
-		} else {
-			$html .= '<ul>';
-			foreach( $messages as $msgText ) {
-				$html .= '<li>'.$msgText.'</li>';
-			}
-			$html .= '</ul>';
-		}
-		
-		$html .= '</span>';
+	if( !empty( $feedback ) ) {
+		$html .= $feedback;
 	}
 	return $html;
 }
@@ -2285,11 +2245,10 @@ function themes_feedback_to_html( $params ) {
 /**
  * load content specific theme picked by user
  *
- * @param array $pContent
- * @access public
+ * @param object $pContent
  * @return void
  */
-function themes_content_display( $pContent ) {
+function themes_content_display( object $pContent ): void {
 	global $gBitSystem, $gBitSmarty, $gBitThemes, $gBitUser, $gQueryUser;
 
 	// users_themes='u' is for all users content
@@ -2303,7 +2262,7 @@ function themes_content_display( $pContent ) {
 					$theme = $userStyle;
 				}
 			} else {
-				$theme = BitUser::getUserPreference( 'theme', NULL, $pContent->getField( 'user_id' ) );
+				$theme = RoleUser::getUserPreference( 'theme', null, $pContent->getField( 'user_id' ) );
 			}
 		}
 	}
@@ -2312,10 +2271,10 @@ function themes_content_display( $pContent ) {
 		$gBitThemes->setStyle( $theme );
 		if( !is_object( $gQueryUser ) ) {
 			$userClass = $gBitSystem->getConfig( 'user_class', 'BitPermUser' );
-			require_once( USERS_PKG_CLASS_PATH.$userClass.'.php' );
+			require_once USERS_PKG_CLASS_PATH.$userClass.'.php';
 			$gQueryUser = new $userClass( $pContent->getField( 'user_id' ) );
 			$gQueryUser->load();
-			$gBitSmarty->assignByRef( 'gQueryUser', $gQueryUser );
+			$gBitSmarty->assign( 'gQueryUser', $gQueryUser );
 		}
 	}
 }
@@ -2339,7 +2298,7 @@ function themes_content_list( $pContent, $pListHash ) {
 					$theme = $userStyle;
 				}
 			} else {
-				$theme = BitUser::getUserPreference( 'theme', NULL, $pListHash['user_id'] );
+				$theme = RoleUser::getUserPreference( 'theme', null, $pListHash['user_id'] );
 			}
 		}
 	}
@@ -2347,13 +2306,9 @@ function themes_content_list( $pContent, $pListHash ) {
 		$gBitThemes->setStyle( $theme );
 		if( !is_object( $gQueryUser ) ) {
 			$userClass = $gBitSystem->getConfig( 'user_class', 'BitPermUser' );
-			require_once( USERS_PKG_CLASS_PATH.$userClass.'.php' );
 			$gQueryUser = new $userClass( $pListHash['user_id'] );
 			$gQueryUser->load();
-			$gBitSmarty->assignByRef( 'gQueryUser', $gQueryUser );
+			$gBitSmarty->assign( 'gQueryUser', $gQueryUser );
 		}
 	}
 }
-
-/* vim: :set fdm=marker : */
-?>
