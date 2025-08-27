@@ -8,14 +8,10 @@
 /**
  * Setup
  */
-require_once( '../kernel/includes/setup_inc.php' );
-include_once( KERNEL_PKG_CLASS_PATH.'BitBase.php' );
+require_once '../kernel/includes/setup_inc.php';
+use Bitweaver\BitBase;
 
-if (isset($_SERVER['HTTP_REFERER'])) {
-	$orig_url = $_SERVER['HTTP_REFERER'];
-} else {
-	$orig_url = $bit_index;
-}
+$orig_url = $_SERVER['HTTP_REFERER'] ?? $bit_index;
 
 if (isset($_GET['theme']) && $gBitSystem->getConfig('users_themes') == 'y'){
 	$new_theme = $_GET['theme'];
@@ -32,4 +28,3 @@ if (isset($_GET['theme']) && $gBitSystem->getConfig('users_themes') == 'y'){
 
 header("location: $orig_url");
 exit;
-?>

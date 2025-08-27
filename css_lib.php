@@ -66,7 +66,7 @@ class cssLib extends BitBase {
 	}
 
 	function parse_css($data) {
-		$back = array();
+		$back = [];
 
 		$index = 0;
 		$type = '';
@@ -80,8 +80,8 @@ class cssLib extends BitBase {
 
 					$index++;
 					$back["$index"]["comment"] = '';
-					$back["$index"]["items"] = array();
-					$back["$index"]["attributes"] = array();
+					$back["$index"]["items"] = [];
+					$back["$index"]["attributes"] = [];
 				} elseif (($type == "comment") and ($line == "*/")) {
 					$type = "";
 				} elseif ($type == "comment") {
@@ -102,8 +102,8 @@ class cssLib extends BitBase {
 
 					$index++;
 					$back["$index"]["comment"] = '';
-					$back["$index"]["items"] = array();
-					$back["$index"]["attributes"] = array();
+					$back["$index"]["items"] = [];
+					$back["$index"]["attributes"] = [];
 				} elseif ($type == "attributes") {
 					$parts = split(":", str_replace(";", "", $line));
 

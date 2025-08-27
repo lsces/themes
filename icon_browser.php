@@ -13,13 +13,14 @@
 /**
  * Setup
  */
-require_once( "../kernel/includes/setup_inc.php" );
+use Bitweaver\KernelTools;
+require_once "../kernel/includes/setup_inc.php";
 
 if( !$gBitUser->isRegistered() ) {
 	$gBitSystem->fatalError( "You need to be registered to view this page." );
 }
 
-$iconUsage = array(
+$iconUsage = [
 	"dialog-ok"                => "Success / Accept",
 	"document-open"            => "Import",
 	"document-properties"      => "Configuration",
@@ -50,16 +51,12 @@ $iconUsage = array(
 	"folder"                   => "Folder",
 	"dialog-error"             => "Error",
 	"dialog-information"       => "Information",
-);
+];
 $gBitSmarty->assign( 'iconUsage', $iconUsage );
 
-$iconList = array();
-$iconNames = array();
-if( !empty( $_REQUEST['icon_style'] ) ) {
-	$iconThemes = array( $_REQUEST['icon_style'] );
-} else {
-	$iconThemes = scandir( CONFIG_PKG_PATH."iconsets/" );
-}
+$iconList = [];
+$iconNames = [];
+$iconThemes = ( !empty( $_REQUEST['icon_style'] ) ) ? [ $_REQUEST['icon_style'] ] : scandir( CONFIG_PKG_PATH . "iconsets/" );
 
 foreach( $iconThemes as $iconStyle ) {
 	if( $icons = icon_fetcher( $iconStyle ) ) {
@@ -72,15 +69,15 @@ asort( $iconNames );
 $gBitSmarty->assign( 'iconNames', $iconNames );
 $gBitSmarty->assign( 'iconList', $iconList );
 
-$gBitSystem->display( 'bitpackage:themes/icon_browser.tpl', tra( 'Icon Listing' ) , array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:themes/icon_browser.tpl', KernelTools::tra( 'Icon Listing' ) , [ 'display_mode' => 'display' ]);
 
 function icon_fetcher( $pStyle = DEFAULT_ICON_STYLE ) {
-	$ret = array();
+	$ret = [];
 	if( strpos( $pStyle, '.' ) !== 0 && $pStyle != 'CVS' ) {
 		$stylePath = CONFIG_PKG_PATH."iconsets/".$pStyle;
 		if( is_dir( $stylePath."/large" )) {
 			$handle = opendir( $stylePath."/large" );
-			while( FALSE !== ( $icon = readdir( $handle ))) {
+			while( false !== ( $icon = readdir( $handle ))) {
 				if( preg_match( "#\.png$#", $icon ) && !preg_match( "#^process-working\.#", $icon )) {
 					$ret[str_replace( ".png", "", $icon )] = str_replace( ".png", "", $icon );
 				}
@@ -90,4 +87,3 @@ function icon_fetcher( $pStyle = DEFAULT_ICON_STYLE ) {
 	ksort( $ret );
 	return $ret;
 }
-?>

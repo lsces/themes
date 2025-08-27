@@ -22,7 +22,7 @@ include_once( THEMES_PKG_PATH.'css_lib.php' );
 
 function delete($dir, $pattern = "*.*")
 {
-	$deleted = false;
+	$deleted = null;
     $pattern = str_replace(array("\*","\?"), array(".*","."), preg_quote($pattern));
     if (substr($dir,-1) != "/") $dir.= "/";
     if (is_dir($dir)) {
@@ -89,15 +89,15 @@ function ls_a($wh)
 $gBitSystem->verifyFeature( 'themes_edit_css' );
 $gBitSystem->verifyPermission( 'bit_p_create_css' );
 
-$customCSSPath = $gBitUser->getStoragePath( NULL,$gBitUser->mUserId );	// Path to this user's storage directory
+$customCSSPath = $gBitUser->getStoragePath( null,$gBitUser->mUserId );	// Path to this user's storage directory
 $customCSSFile = $customCSSPath.'custom.css';	// Path to this user's custom stylesheet
-$customCSSImageURL = $gBitUser->getStorageURL( NULL,$gBitUser->mUserId ).'/images/';
-$gBitSmarty->assignByRef('customCSSImageURL',$customCSSImageURL);			
+$customCSSImageURL = $gBitUser->getStorageURL( null,$gBitUser->mUserId ).'/images/';
+$gBitSmarty->assign('customCSSImageURL',$customCSSImageURL);			
 // Create a custom.css for this user if they do not already have one
 if (!file_exists($customCSSFile)) {
 	if (!copy(THEMES_PKG_PATH.'/styles/basic/basic.css', $customCSSFile)) {
 		$gBitSmarty->assign('msg', tra("Unable to create a custom CSS file for you!"));
-		$gBitSystem->display( 'error.tpl' , NULL, array( 'display_mode' => 'edit' ));
+		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}
 }
@@ -109,7 +109,7 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 
 	if (!$fp) {
 		$gBitSmarty->assign('msg', tra("You dont have permission to write the style sheet"));
-		$gBitSystem->display( 'error.tpl' , NULL, array( 'display_mode' => 'edit' ));
+		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}
 	
@@ -134,7 +134,7 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 
 	if (!$fp) {
 		$gBitSmarty->assign('msg', tra("You dont have permission to write the style sheet"));
-		$gBitSystem->display( 'error.tpl' , NULL, array( 'display_mode' => 'edit' ));
+		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}
 	
@@ -171,10 +171,10 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 
 
 // Get the list of themes the user can choose to derive from (aka Reset to)
-$styles = $gBitThemes->getStyles( NULL, FALSE, FALSE );
-$gBitSmarty->assignByRef( 'styles', $styles );
+$styles = $gBitThemes->getStyles( null, false, false );
+$gBitSmarty->assign( 'styles', $styles );
 $assignStyle = 'basic';
-$gBitSmarty->assignByRef( 'assignStyle', $assignStyle);
+$gBitSmarty->assign( 'assignStyle', $assignStyle);
 
 
 // Read in this user's custom.css to display in the textarea
@@ -192,15 +192,15 @@ if (isset($errorMsg))
 
 // Get the list of images used by this user's custom theme
 $imageList = ls_a($customCSSPath.'images/');
-$themeImages = array();
+$themeImages = [];
 foreach ($imageList as $image) {
 	if (ereg(".JPG$|.PNG$|.GIF$|.BMP$",strtoupper($image))) {
 		$themeImages[] = $image;
 	}
 }
 
-$gBitSmarty->assignByRef('themeImages',$themeImages);	
+$gBitSmarty->assign('themeImages',$themeImages);	
 
-$gBitSystem->display( 'bitpackage:themes/edit_css.tpl', NULL, array( 'display_mode' => 'edit' ));
+$gBitSystem->display( 'bitpackage:themes/edit_css.tpl', null, array( 'display_mode' => 'edit' ));
 
 ?>
