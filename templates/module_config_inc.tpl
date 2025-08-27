@@ -17,17 +17,17 @@
 
 {strip}
 <strong>
-	{if !$smarty.request.nocollapse && !$condensed && $gBitThemes->isJavascriptEnabled()}<a href="javascript:BitBase.flipWithSign('id-{$modInfo.module_id}');"><span id="flipperid-{$modInfo.module_id}" class="monospace">[+]</span> {/if}
+	{if !$smarty.request.nocollapse|default:false && !$condensed && $gBitThemes->isJavascriptEnabled()}<a href="javascript:BitBase.flipWithSign('id-{$modInfo.module_id}');"><span id="flipperid-{$modInfo.module_id}" class="monospace">[+]</span> {/if}
 		{$modInfo.name}
 		<input type="hidden" name="modules[{$modInfo.module_id}][layout_area]" value="{$area}" />
 		<input type="hidden" name="modules[{$modInfo.module_id}][layout]" value="{$module_package}" />
-	{if !$smarty.request.nocollapse && !$condensed && $gBitThemes->isJavascriptEnabled()}</a>{/if}
+	{if !$smarty.request.nocollapse|default:false && !$condensed && $gBitThemes->isJavascriptEnabled()}</a>{/if}
 	<br />
 	{$smarty.capture.shared}
 </strong>
 
 {if !$condensed}
-	{if !$smarty.request.nocollapse && $gBitThemes->isJavascriptEnabled()}<div id="id-{$modInfo.module_id}" style="display:none;">{/if}
+	{if !$smarty.request.nocollapse|default:false && $gBitThemes->isJavascriptEnabled()}<div id="id-{$modInfo.module_id}" style="display:none;">{/if}
 		<table class="table data">
 			<tr>
 				<td class="alignright">{tr}Position{/tr}</td>
@@ -73,6 +73,6 @@
 				</td>
 			</tr>
 		</table>
-	{if !$smarty.request.nocollapse && $gBitThemes->isJavascriptEnabled()}</div>{/if}
+	{if !$smarty.request.nocollapse|default:false && $gBitThemes->isJavascriptEnabled()}</div>{/if}
 {/if}
 {/strip}

@@ -116,7 +116,7 @@
 						{foreach key=pkg item=modules from=$allModules}
 							<optgroup label="{$pkg}">
 								{foreach key=value item=module from=$modules}
-									<option value="{$value}" {if $fAssign.name eq $value}selected="selected"{/if}>{$module.title}</option>
+									<option value="{$value}" {if $fAssign.name|default:'' eq $value}selected="selected"{/if}>{$module.title|default:''}</option>
 								{/foreach}
 							</optgroup>
 						{/foreach}
@@ -131,12 +131,12 @@
 				{forminput}
 					<select name="fAssign[layout_area]" id="layout_area">
 						{if $gBitSystem->isFeatureActive('site_top_column')}
-							<option value="t" {if $fAssign.layout_area eq 't'}selected="selected"{/if}>{tr}Top{/tr}</option>
+							<option value="t" {if $fAssign.layout_area|default:'' eq 't'}selected="selected"{/if}>{tr}Top{/tr}</option>
 						{/if}
-						<option value="l" {if $fAssign.layout_area eq 'l'}selected="selected"{/if}>{tr}Left column{/tr}</option>
-						<option value="r" {if $fAssign.layout_area eq 'r'}selected="selected"{/if}>{tr}Right column{/tr}</option>
+						<option value="l" {if $fAssign.layout_area|default:'' eq 'l'}selected="selected"{/if}>{tr}Left column{/tr}</option>
+						<option value="r" {if $fAssign.layout_area|default:'' eq 'r'}selected="selected"{/if}>{tr}Right column{/tr}</option>
 						{if $gBitSystem->isFeatureActive('site_bottom_column')}
-							<option value="b" {if $fAssign.layout_area eq 'b'}selected="selected"{/if}>{tr}Bottom{/tr}</option>
+							<option value="b" {if $fAssign.layout_area|default:'' eq 'b'}selected="selected"{/if}>{tr}Bottom{/tr}</option>
 						{/if}
 					</select>
 					{formhelp note="Select the column this module should be displayed in."}
@@ -146,7 +146,7 @@
 			<div class="form-group">
 				{formlabel label="Title" for="title"}
 				{forminput}
-					<input type="text" size="48" name="fAssign[title]" id="title" value="{$fAssign.title|escape}" />
+					<input type="text" size="48" name="fAssign[title]" id="title" value="{$fAssign.title|default:''|escape}" />
 					{formhelp note="Here you can override the default title used by the module. This is global for layouts in all sections. If you want to add a title just for one section, enter a module parameter below such as: title=My Title"}
 				{/forminput}
 			</div>
@@ -156,7 +156,7 @@
 				{forminput}
 					<select name="fAssign[pos]" id="pos">
 						{section name=ix loop=$orders}
-							<option value="{$orders[ix]|escape}" {if $fAssign.pos eq $orders[ix]}selected="selected"{/if}>{$orders[ix]}</option>
+							<option value="{$orders[ix]|escape}" {if $fAssign.pos|default:0 eq $orders[ix]}selected="selected"{/if}>{$orders[ix]}</option>
 						{/section}
 					</select>
 					{formhelp note="Select where within the column the module should be displayed."}
@@ -166,7 +166,7 @@
 			<div class="form-group">
 				{formlabel label="Cache Time" for="cache_time"}
 				{forminput}
-					<input type="text" size="5" name="fAssign[cache_time]" id="cache_time" value="{$fAssign.cache_time|escape}" /> seconds
+					<input type="text" size="5" name="fAssign[cache_time]" id="cache_time" value="{$fAssign.cache_time|default:''|escape}" /> seconds
 					{formhelp note="This is the number of seconds the module is cached before the content is refreshed. The higher the value, the less load there is on the server. (optional)"}
 				{/forminput}
 			</div>
@@ -174,7 +174,7 @@
 			<div class="form-group">
 				{formlabel label="Rows" for="module_rows"}
 				{forminput}
-					<input type="text" size="5" name="fAssign[module_rows]" id="module_rows" value="{$fAssign.module_rows|escape}" />
+					<input type="text" size="5" name="fAssign[module_rows]" id="module_rows" value="{$fAssign.module_rows|default:0|escape}" />
 					{formhelp note="Select what the maximum number of items are displayed. (optional - default is 10)"}
 				{/forminput}
 			</div>
@@ -189,9 +189,9 @@
 						{if $module.params}
 							<table id="themes_params_help_{$value}" class="themes_params_help" style="display:none">
 								<tr>
-									<th colspan=2 style="text-align:left">Options for {$module.title}</th>
+									<th colspan=2 style="text-align:left">Options for {$module.title|default:''}</th>
 								</tr>
-								{foreach key=param item=data from=$module.params}
+								{foreach key=param item=data from=$module.params|default:[]}
 								{if $data.help}
 									<tr>
 										<td style="font-weight:bold; padding-right:4px">{$param}</td>

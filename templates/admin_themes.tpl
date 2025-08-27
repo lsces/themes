@@ -39,7 +39,7 @@
 			{forminput label="checkbox"}
 				{html_checkboxes name="$feature" values="y" checked=$gBitSystem->getConfig($feature) label=$output.label id=$feature}
 				{$output.label}
-				{formhelp note=$output.note page=$output.page}
+				{formhelp note=$output.note page=$output.page|default:''}
 			{/forminput}
 		</div>
 	{/foreach}

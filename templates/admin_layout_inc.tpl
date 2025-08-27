@@ -4,7 +4,7 @@
 			<div class="form-group">
 				{formlabel label="Adjust display" for=""}
 				{forminput}
-					{if !$smarty.request.nocollapse}
+					{if !$smarty.request.nocollapse|default:false}
 						<a href="{$smarty.const.KERNEL_PKG_URL}admin/index.php?page={$page}&amp;nocollapse=1">{booticon iname="fa-circle-plus" iexplain="Expand all modules"}</a>
 					{else}
 						<a href="{$smarty.const.KERNEL_PKG_URL}admin/index.php?page={$page}">{booticon iname="fa-circle-minus" iexplain="Collapse all modules"}</a>

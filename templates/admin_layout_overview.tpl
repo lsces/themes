@@ -5,7 +5,7 @@
 
 {form}
 	<input type="hidden" name="page" value="{$page}" />
-	<input type="hidden" name="nocollapse" value="{$smarty.request.nocollapse}" />
+	<input type="hidden" name="nocollapse" value="{$smarty.request.nocollapse|default:false}" />
 
 	{jstabs}
 		{foreach name=PkgLayouts from=$layouts item=layout key=module_package}
