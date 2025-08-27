@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use \Bitweaver\BitDate;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -21,8 +24,8 @@
 function smarty_function_html_select_time($params, &$gBitSmarty)
 {
     global $gBitSystem;
-    $gBitSmarty->loadPlugin( 'smarty_shared_make_timestamp' );
-    $gBitSmarty->loadPlugin( 'smarty_function_html_options' );
+//    $gBitSmarty->loadPlugin( 'smarty_shared_make_timestamp' );
+//    $gBitSmarty->loadPlugin( 'smarty_function_bit_html_options' );
     /* Default values. */
     $prefix             = "Time_";
     $time               = time();
@@ -71,10 +74,10 @@ function smarty_function_html_select_time($params, &$gBitSmarty)
             $html_result .= ' ' . $all_extra;
         }
         $html_result .= '>'."\n";
-        $html_result .= smarty_function_html_options(array('output'          => $hours,
-                                                           'values'          => $hours,
-                                                           'selected'      => $selected,
-                                                           'print_result' => false),
+        $html_result .= smarty_function_bit_html_options( [ 'output'          => $hours,
+                                                                'values'          => $hours,
+                                                                'selected'      => $selected,
+                                                                'print_result' => false ],
                                                      $gBitSmarty);
         $html_result .= "</select>\n";
     }
@@ -98,7 +101,7 @@ function smarty_function_html_select_time($params, &$gBitSmarty)
         }
         $html_result .= '>'."\n";
 
-        $html_result .= smarty_function_html_options(array('output'          => $minutes,
+        $html_result .= smarty_function_bit_html_options(array('output'          => $minutes,
                                                            'values'          => $minutes,
                                                            'selected'      => $selected,
                                                            'print_result' => false),
@@ -126,7 +129,7 @@ function smarty_function_html_select_time($params, &$gBitSmarty)
         }
         $html_result .= '>'."\n";
 
-        $html_result .= smarty_function_html_options(array('output'          => $seconds,
+        $html_result .= smarty_function_bit_html_options(array('output'          => $seconds,
                                                            'values'          => $seconds,
                                                            'selected'      => $selected,
                                                            'print_result' => false),
@@ -151,7 +154,7 @@ function smarty_function_html_select_time($params, &$gBitSmarty)
         }
         $html_result .= '>'."\n";
 
-        $html_result .= smarty_function_html_options(array('output'          => array('AM', 'PM'),
+        $html_result .= smarty_function_bit_html_options(array('output'          => array('AM', 'PM'),
                                                            'values'          => array('am', 'pm'),
                                                            'selected'      => $selected,
                                                            'print_result' => false),
@@ -170,5 +173,3 @@ function smarty_function_html_select_time($params, &$gBitSmarty)
 }
 
 /* vim: set expandtab: */
-
-?>

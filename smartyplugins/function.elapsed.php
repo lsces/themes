@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -17,5 +19,3 @@ function smarty_function_elapsed($params, &$gBitSmarty)
 }
 
 /* vim: set expandtab: */
-
-?>

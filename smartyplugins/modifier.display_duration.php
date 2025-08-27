@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * @package Smarty
  * @subpackage plugins
@@ -35,4 +37,3 @@ function smarty_modifier_display_duration( $pDuration ) {
 	$ret .= str_pad( $duration['hour'], 2, 0, STR_PAD_LEFT ).':'.str_pad( $duration['min'], 2, 0, STR_PAD_LEFT ).':'.str_pad( $duration['sec'], 2, 0, STR_PAD_LEFT );
 	return $ret;
 }
-?>

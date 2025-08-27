@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -18,7 +20,7 @@ function smarty_function_memusage($params, &$gBitSmarty) {
 		// If you need it to work for 2000 look at http://us2.php.net/manual/en/function.memory-get-usage.php#54642
 		if( substr( PHP_OS, 0, 3 ) == 'WIN' ) {
 			if( substr( PHP_OS, 0, 3 ) == 'WIN' ) {
-				$output = array();
+				$output = [];
 			}
 			exec( 'tasklist /FI "PID eq ' . getmypid() . '" /FO LIST', $output );
 			$memusage = preg_replace( '/[\D]/', '', $output[5] ) * 1024;
@@ -51,5 +53,3 @@ function smarty_function_memusage($params, &$gBitSmarty) {
 		print( number_format( $memusage, 2 ).$memunit );
 	}
 }
-
-?>

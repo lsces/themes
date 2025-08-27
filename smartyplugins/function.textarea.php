@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -14,7 +16,7 @@
  * Name: textarea 
  * ------------------------------------------------------------- 
  */ 
-function smarty_function_textarea( $pParams, &$pSmarty ) {
+function smarty_function_textarea( $pParams, &$pSmartyTemplate ) {
 	global $gBitSystem, $gContent, $gLibertySystem, $gBitSmarty;
 
 	$attributes = '';
@@ -28,10 +30,10 @@ function smarty_function_textarea( $pParams, &$pSmarty ) {
 		$class .= 'wysiwyg';
 	}
 	if (empty($pParams['rows'])) {
-		$pParams['rows'] = (empty($_COOKIE['rows']) ? $gBitSystem->getConfig('liberty_textarea_height', 20) : $_COOKIE['rows']);
+		$pParams['rows'] = empty($_COOKIE['rows']) ? $gBitSystem->getConfig('liberty_textarea_height', 20) : $_COOKIE['rows'];
 	}
 	if (empty($pParams['cols'])) {
-		$pParams['cols'] = (empty($_COOKIE['cols']) ? $gBitSystem->getConfig('liberty_textarea_width', 35) : $_COOKIE['rows']);
+		$pParams['cols'] = empty($_COOKIE['cols']) ? $gBitSystem->getConfig('liberty_textarea_width', 35) : $_COOKIE['rows'];
 	}
 	if (empty($pParams['id'])) {
 		$pParams['id'] = LIBERTY_TEXT_AREA;
@@ -54,7 +56,7 @@ function smarty_function_textarea( $pParams, &$pSmarty ) {
 		case 'error':
 		case 'required':
 		case 'maxchars':
-			$pSmarty->assign("textarea_".$_key, $_value);
+			$gBitSmarty->assign("textarea_".$_key, $_value);
 			break;
 		case 'class':
 			$class .= ' '.$_key;
@@ -63,16 +65,16 @@ function smarty_function_textarea( $pParams, &$pSmarty ) {
 			$style .= $_key;
 			break;
 		case 'formatguid':
-			$pSmarty->assign('formatGuid', $_value);
+			$gBitSmarty->assign('formatGuid', $_value);
 			break;
 		case 'langcode':
-			$pSmarty->assign('langCode', $_value);
+			$gBitSmarty->assign('langCode', $_value);
 			break;
 		case 'gContent':
 			// Trick out gContent
 			$oldContent = $gContent;
 			$gContent = $_value;
-			$pSmarty->assign('gContent', $_value);
+			$gBitSmarty->assign('gContent', $_value);
 			break;
 		default:
 			$attributes .= $_key.'="'.$_value.'" ';
@@ -84,31 +86,30 @@ function smarty_function_textarea( $pParams, &$pSmarty ) {
 	if ($gBitSystem->isPackageActive('bnspell')) {
 		$style .= (empty($style) ? '' : ';').'height:'.$pParams['rows'].'em;';
 	}
-	$pSmarty->assign('textarea_attributes', $attributes);
+	$gBitSmarty->assign('textarea_attributes', $attributes);
 
 	if (!empty($style)) {
-		$pSmarty->assign('textarea_style', 'style="'.$style.'"');
+		$gBitSmarty->assign('textarea_style', 'style="'.$style.'"');
 	}
-	$pSmarty->assign('textarea_class', 'class="form-control '.$class.'"');
-	$ret = $pSmarty->fetch("bitpackage:liberty/edit_textarea.tpl");
+	$gBitSmarty->assign('textarea_class', 'class="form-control '.$class.'"');
+	$ret = $gBitSmarty->fetch("bitpackage:liberty/edit_textarea.tpl");
 	if( is_object( $gContent ) ) {
 		if( $formatGuid = $gContent->getField( 'format_guid' ) ) {
-			$pSmarty->assign('formatGuid', $formatGuid);
+			$gBitSmarty->assign('formatGuid', $formatGuid);
 		}
 		if( $langCode = $gContent->getField( 'lang_code' ) ) {
-			$pSmarty->assign( 'langCode', $langCode );
+			$gBitSmarty->assign( 'langCode', $langCode );
 		}
 	}
 
 	// Restore gContent
 	if (isset($oldContent)) {
 		$gContent = $oldContent;
-		$pSmarty->assign('gContent', $oldContent);
+		$gBitSmarty->assign('gContent', $oldContent);
 	}
 
 	// since we have the funky {textarea} in play, we'll display the edit help tab
-	$pSmarty->assign( 'display_help_tab', TRUE );
+	$gBitSmarty->assign( 'display_help_tab', TRUE );
 
 	return $ret;
 }
-?>

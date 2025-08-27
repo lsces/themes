@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -20,12 +22,10 @@ function smarty_function_nexus( $params, &$gBitSmarty ) {
 		return;
 	}
 
-	require_once( NEXUS_PKG_PATH.'Nexus.php' );
-	$tmpNexus = new Nexus( $id );
+	$tmpNexus = new \Bitweaver\Nexus\Nexus( $id );
 	$nexusMenu = $tmpNexus->mInfo;
 
 	$gBitSmarty->assign( 'nexusMenu', $nexusMenu );
 	$gBitSmarty->assign( 'nexusId', $id );
 	$gBitSmarty->display('bitpackage:nexus/nexus_module.tpl');
 }
-?>

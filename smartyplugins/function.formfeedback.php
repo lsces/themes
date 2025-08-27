@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -13,10 +15,6 @@
  * Input:
  *           - warning, error or success are defined css styles, but you can feed it anything
  */
-function smarty_function_formfeedback( $params, &$gBitSmarty ) {
-	if( !empty( $params['pagekey'] ) ) {
-		$params = BitFeedback::get( $params['pagekey'] );
-	}
-	return themes_feedback_to_html( $params );
+function smarty_function_formfeedback( $params, &$gSmartyTemplate ) {
+	return \Bitweaver\Themes\themes_feedback_to_html( $params );
 }
-

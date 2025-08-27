@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * @package Plugins
  * @author Bimal Poudel
@@ -48,5 +50,3 @@ function smarty_modifier_plural($word = '', $counter = 0)
 
 	return $plural;
 }
-
-?>

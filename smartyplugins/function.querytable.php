@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -71,7 +73,3 @@ function smarty_function_querytable($params, &$gBitSmarty) {
 	return $output;
 
 }
-
-
-
-?>

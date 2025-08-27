@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\KernelTools;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -13,7 +16,8 @@
  * Input:    all parameters (except legend) that are passed in will be added as <input type="hidden" name=$name value=$value>. The 'legend' parameter will be used as the form legend, a string is expected.
  * Output:   a small form that allows you to search your table using $_REQUEST['find'] as search value
  */
-function smarty_function_minifind($params, &$gBitSmarty) {
+function smarty_function_minifind($params, &$gSmartyTemplate) {
+	global $gBitSmarty;
 	
 	if(isset($params['legend'])) {
 		$legend = $params['legend'];
@@ -23,15 +27,14 @@ function smarty_function_minifind($params, &$gBitSmarty) {
 	}
 
 	if( !empty( $params['find_name'] ) ) {
-		$gBitSmarty->assign( 'find_name', tra( $params['name'] ) );
+		$gBitSmarty->assign( 'find_name', KernelTools::tra( $params['name'] ) );
 	}
 	
 	if( !empty( $params['prompt'] ) ) {
-		$gBitSmarty->assign( 'prompt', tra( $params['prompt'] ).'...' );
+		$gBitSmarty->assign( 'prompt', KernelTools::tra( $params['prompt'] ).'...' );
 	}
 	
 	$gBitSmarty->assign( 'legend',$legend );
 	$gBitSmarty->assign( 'hidden',$params );
-	$gBitSmarty->display( 'bitpackage:kernel/minifind.tpl' );
+	return $gBitSmarty->fetch( 'bitpackage:kernel/minifind.tpl' );
 }
-?>

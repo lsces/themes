@@ -1,4 +1,8 @@
 <?php
+namespace Bitweaver\Plugins;
+
+use Bitweaver\BitCache;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -33,7 +37,6 @@ function smarty_function_jspack( $pParams, &$gBitSmarty ) {
 		// get a name for the cache file we're going to store
 		$cachefile = $pParams['ipackage'].'_'.str_replace( '/', '_', $pParams['ifile'] );
 
-		require_once( KERNEL_PKG_PATH.'BitCache.php' );
 		$bitCache = new BitCache( 'javascript', TRUE );
 
 		// if the file hasn't been packed and cached yet, we do that now.
@@ -56,9 +59,8 @@ function smarty_function_jspack( $pParams, &$gBitSmarty ) {
 		}
 
 		$defer = !empty( $pParams['defer'] ) ? " defer='".$pParams['defer']."'" : "";
-		return '<script'.$defer.' type="text/javascript" src="'.$bitCache->getCacheUrl( $cachefile ).'"></script>';
+		return '<script'.$defer.' src="'.$bitCache->getCacheUrl( $cachefile ).'"></script>';
 	} else {
 		return "<!-- ".tra( 'not a valid file: ' ).$pParams['ifile']." -->";
 	}
 }
-?>

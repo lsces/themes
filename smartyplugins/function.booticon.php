@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -9,19 +11,20 @@
 /**
  * Turn collected information into an html image
  *
- * @param boolean $pParams['url'] set to TRUE if you only want the url and nothing else
- * @param string $pParams['iexplain'] Explanation of what the icon represents
- * @param string $pParams['iforce'] takes following optins: icon, icon_text, text - will override system settings
- * @param string $pFile Path to icon file
- * @param string iforce  override site-wide setting how to display icons (can be set to 'icon', 'text' or 'icon_text')
+ * @param array $pParams parameter hash
+ * @var boolean $pParams['url'] set to TRUE if you only want the url and nothing else
+ * @var string $pParams['iexplain'] Explanation of what the icon represents
+ * @var string $pParams['iforce'] takes following optins: icon, icon_text, text - will override system settings
+ * @var string $pFile Path to icon file
+ * @var string iforce  override site-wide setting how to display icons (can be set to 'icon', 'text' or 'icon_text')
  * @access public
- * @return Full <img> on success
+ * @return string Full <img> on success
  */
 function smarty_function_booticon( $pParams ) {
 	global $gBitSystem;
 
 	if( empty( $pParams['iforce'] )) {
-		$pParams['iforce'] = NULL;
+		$pParams['iforce'] = '';
 	}
 
 	$outstr = '';
@@ -33,33 +36,17 @@ function smarty_function_booticon( $pParams ) {
 		$outstr .= '>';
 	}
 
-	$outstr .= '<span class="fa fal ';
-if( empty( $pParams["iname"] ) ) {
-	bit_error_log( 'missing iname', $pParams );
-}
-	if( strpos( $pParams["iname"], 'icon-' ) === 0 ) {
-		$pParams['iname'] = str_replace( 'icon-', 'fa-', $pParams['iname'] );
+	$outstr .= '<span class="';
+	if( isset( $pParams["iname"] ) ) {
+		$outstr .= $pParams['iname'];
 	}
-if( strpos( $pParams["iname"], 'fa-' ) !== 0 ) {
-	bit_error_log( 'missing fa '.$pParams["iname"] );
-}
-
-	$outstr .= str_replace( 'icon-', '', $pParams['iname'] );
-	
 	if( isset( $pParams["iclass"] ) ) {
 		$outstr .=  ' '.$pParams["iclass"].'';
 	}
 	if( isset( $pParams["class"] ) ) {
 		$outstr .=  ' '.$pParams["class"].'';
 	}
-	if( isset( $pParams["igroup"] ) ) {
-		$outstr .=  ' '.$pParams["igroup"].'';
-	}
 	$outstr .= '"';
-
-	if( isset( $pParams["style"] ) ) {
-		$outstr .=  ' style="'.$pParams["style"].'"';
-	}
 
 	if( isset( $pParams["id"] ) ) {
 		$outstr .=  ' id="'.$pParams['id'].'"';
@@ -88,4 +75,3 @@ if( strpos( $pParams["iname"], 'fa-' ) !== 0 ) {
 
 	return $outstr;
 }
-

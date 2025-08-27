@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -17,4 +19,3 @@
 function smarty_modifier_htmlToText( $string ) {
 	return preg_replace('/<.*>/U', '', $string);
 }
-?>

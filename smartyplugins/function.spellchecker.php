@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -19,4 +21,3 @@ function smarty_function_spellchecker( $params, &$gBitSmarty ) {
 		echo 'title="spellcheck_icons" accesskey="'.BNSPELL_PKG_URL.'spell_checker.php"';
 	}
 }
-?>

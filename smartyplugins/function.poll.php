@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -8,7 +10,7 @@
 /**
  * smarty_function_base
  */
-require_once( KERNEL_PKG_CLASS_PATH.'BitBase.php' );
+use Bitweaver\BitBase;
 
 /**
  * smarty_function_poll
@@ -18,8 +20,7 @@ function smarty_function_poll($params, &$gBitSmarty) {
 
     extract($params);
     // Param = zone
-	include_once( POLLS_PKG_INCLUDE_PATH.'poll_lib.php' );
-	include_once( LIBERTY_PKG_CLASS_PATH.'LibertyComment.php' );
+	include_once( POLLS_PKG_PATH.'poll_lib.php' );
 
     if (empty($id)) {
       $id = $polllib->get_random_active_poll();
@@ -39,6 +40,3 @@ function smarty_function_poll($params, &$gBitSmarty) {
     }
 }
 
-/* vim: set expandtab: */
-
-?>

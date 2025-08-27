@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -25,5 +27,3 @@ function smarty_modifier_dbg($string, $label = '')
 		return $string;
 	}
 }
-
-?>

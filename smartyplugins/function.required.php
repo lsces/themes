@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -10,17 +12,16 @@
  */
 function smarty_function_required( $pParams, &$pSmarty=NULL ) {
 	global $gBitSmarty;
-	$gBitSmarty->loadPlugin( 'smarty_function_biticon' );
+//	$gBitSmarty->loadPlugin( 'smarty_function_biticon' );
 	$biticon = array(
 		'ipackage' => 'icons',
 		'iname'    => 'emblem-important',
 		'iexplain' => 'Required',
 	);
-	$ret = smarty_function_biticon( $biticon );
+	$ret = \Bitweaver\Plugins\smarty_function_biticon( $biticon );
 
 	if( !empty( $pParams['legend'] )) {
 		$ret = "<p>$ret ".tra( "Elements marked with this symbol are required." )."</p>";
 	}
 	return $ret;
 }
-?>

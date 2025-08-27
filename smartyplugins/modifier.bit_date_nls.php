@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -9,13 +11,12 @@
  * required setup
  */
 global $gBitSmarty;
-$gBitSmarty->loadPlugin( 'smarty_modifier_bit_date_format' );
+// $gBitSmarty->loadPlugin( 'smarty_modifier_bit_date_format' );
 
 /**
  * smarty_modifier_bit_long_datetime
  */
 function smarty_modifier_bit_date_nls( $pString ) {
 	global $gBitSystem;
-	return smarty_modifier_bit_date_format( $pString, '%Y-%m-%d %H:%M', '%Y%m%d %H%M' );
+	return \Bitweaver\Plugins\smarty_modifier_bit_date_format( $pString, '%Y-%m-%d %H:%M', '%Y%m%d %H%M' );
 }
-?>

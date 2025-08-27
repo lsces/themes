@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -14,5 +16,3 @@ function smarty_modifier_times($n1,$n2)
 }
 
 /* vim: set expandtab: */
-
-?>

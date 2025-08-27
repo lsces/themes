@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -23,4 +25,3 @@ function smarty_modifier_display_bytes( $pSize, $pDecimalPlaces = 1 ) {
 	}
 	return round( $pSize, $pDecimalPlaces )." ".$iec[$i];
 }
-?>

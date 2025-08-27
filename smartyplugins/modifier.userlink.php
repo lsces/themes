@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -13,5 +15,3 @@ function smarty_modifier_userlink($user,$class='username') {
 }
 
 /* vim: set expandtab: */
-
-?>

@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty {libertypagination} function plugin
  *
@@ -24,7 +26,9 @@
 /**
  * Smarty {libertypagination} function plugin
  */
-function smarty_function_libertypagination($params, &$gBitSmarty) {
+function smarty_function_libertypagination($params, &$gSmartyTemplate) {
+	global $gBitSmarty;
+	
 	if( isset( $params['ihash'] ) && is_array( $params['ihash'] ) ) {
 		$params = array_merge( $params['ihash'], $params );
 		$params['ihash'] = NULL;
@@ -45,19 +49,15 @@ function smarty_function_libertypagination($params, &$gBitSmarty) {
 			$pgnHidden[$form_param] = $form_val;
 		}
 	}
-	$pgnVars .= ( !empty( $params['ianchor'] ) ? '#'.$params['ianchor'] : '' );
+	$pgnVars .= !empty( $params['ianchor'] ) ? '#'.$params['ianchor'] : '';
 
 	if( !empty( $params['numPages'] ) ) {
 		for( $pageCount = 1; $pageCount < $params['numPages']+1; $pageCount++ ) {
-			if( $pageCount != $params[$pgnName] ) {
-				if( !empty( $params['ajaxId'] ) ) {
-					$pages[] = '<a href="javascript:void(0);" onclick="BitAjax.updater(\''.$params['ajaxId']."','".$_SERVER['REQUEST_URI']."','".$pgnName.'='.$pageCount.$pgnVars.'\')'.'">'.( $pageCount ).'</a>';
-				} else {
-					$pages[] = '<a href="'.$_SERVER['SCRIPT_NAME'].'?'.$pgnName.'='.$pageCount.$pgnVars.'">'.( $pageCount ).'</a>';
-				}
-			} else {
-				$pages[] = '<strong>'.$pageCount.'</strong>';
-			}
+			$pages[] = $pageCount != $params[$pgnName]
+				? ( !empty( $params['ajaxId'] )
+					? '<a href="javascript:void(0);" onclick="BitAjax.updater(\''.$params['ajaxId']."','".$_SERVER['REQUEST_URI']."','".$pgnName.'='.$pageCount.$pgnVars.'\')'.'">'. $pageCount .'</a>'
+					: '<a href="'.$_SERVER['SCRIPT_NAME'].'?'.$pgnName.'='.$pageCount.$pgnVars.'">'. $pageCount .'</a>')
+					: '<strong>'.$pageCount.'</strong>';
 		}
 
 		$gBitSmarty->assign( 'pgnPage', $params[$pgnName] );
@@ -69,7 +69,6 @@ function smarty_function_libertypagination($params, &$gBitSmarty) {
 		if( !empty( $params['ajaxId'] ) ) {
 		    $gBitSmarty->assign( 'ajaxId', $params['ajaxId'] );
 		}
-	    $gBitSmarty->display( 'bitpackage:liberty/libertypagination.tpl' );
+	    return $gBitSmarty->fetch( 'bitpackage:liberty/libertypagination.tpl' );
 	}
 }
-?>

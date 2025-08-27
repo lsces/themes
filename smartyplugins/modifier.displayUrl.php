@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -81,7 +83,7 @@ function smarty_modifier_displayUrl($pMixed, $lib='') {
 			return $pMixed['display_url'];
 		}
 		if (!empty($pMixed['content_type_guid'])) {
-			$type =$gLibertySystem->mContentTypes[$pContentType];
+			$type =$gLibertySystem->mContentTypes[$pMixed['content_type_guid']];
 			if (!empty($type)) {
 				$lib = $type['handler_class'];
 				smarty_modifier_displayUrl_loadLib($type);
@@ -99,4 +101,3 @@ function smarty_modifier_displayUrl($pMixed, $lib='') {
 	}
 	return LibertyContent::getDisplayUrlFromHash( $pMixed );
 }
-?>

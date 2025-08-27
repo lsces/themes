@@ -1,4 +1,8 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\KernelTools;
+use Bitweaver\BitDate;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -9,7 +13,7 @@
  * required setup
  */
 global $gBitSmarty;
-$gBitSmarty->loadPlugin('smarty_shared_make_timestamp');
+// $gBitSmarty->loadPlugin('smarty_shared_make_timestamp');
 
 /**
  * Smarty plugin
@@ -30,26 +34,21 @@ function smarty_modifier_bit_date_format( $pString, $format = "%b %e, %Y", $pTra
 
 	// we translate the entire date format string for total control
 	if( $gBitSystem->getConfig( "bitlanguage", "en" ) != $gBitLanguage->mLanguage ) {
-		$format = tra( $pTraFormat );
+		$format = KernelTools::tra( $pTraFormat );
 	}
 
 	if( $gBitUser->getPreference( 'site_display_utc' ) == 'Fixed' && class_exists( 'DateTime' ) ) {
 		date_default_timezone_set( $gBitUser->getPreference( 'site_display_timezone', 'UTC' ) );
-		if ( is_numeric( $pString )) {
-			$dateTimeUser = new DateTime( '@'.(int)$pString );
-		} else  {
-			$dateTimeUser = new DateTime( $pString );
-		}
+		$dateTimeUser = is_numeric( $pString )
+			? new \DateTime( '@'.(int)$pString )
+			: new \DateTime( $pString );
 		$disptime = strtotime($dateTimeUser->format(DATE_W3C));
 		return $gBitSystem->mServerTimestamp->strftime( $format, $disptime );
 	} else {
-		 if( $gBitSystem->get_display_offset() ) {
-			$format = preg_replace( "/ ?%Z/",'', $format );
-		} else {
-			$format = preg_replace( "/%Z/", "UTC", $format );
-		}
+		$format = $gBitSystem->get_display_offset()
+			? preg_replace( "/ ?%Z/",'', $format )
+			: $format = preg_replace( "/%Z/", "UTC", $format );
 		$disptime = $gBitSystem->mServerTimestamp->getDisplayDateFromUTC( $pString );
 	}
 	return $gBitSystem->mServerTimestamp->strftime( $format, $disptime, TRUE );
 }
-?>

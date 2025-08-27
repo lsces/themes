@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -45,5 +47,3 @@ function smarty_modifier_truncate($string, $length = 80, $etc = '...', $break_wo
 }
 
 /* vim: set expandtab: */
-
-?>

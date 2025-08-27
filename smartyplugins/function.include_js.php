@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use \Bitweaver\BitCache;
+
 /**
  * Smarty plugin
  * @package Smarty

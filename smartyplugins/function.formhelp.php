@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\KernelTools;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -35,6 +38,7 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 		// maybe params were passed in separately
 		$hash = &$pParams;
 	}
+	$force = 'n';
 
 	// we need to do some hash modification if we're in the installer
 	if( !empty( $hash['is_installer'] )) {
@@ -43,8 +47,6 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 			unset( $hash['note']['upgrade'] );
 		}
 	}
-
-	$class = '';
 
 	foreach( $hash as $key => $val ) {
 		switch( $key ) {
@@ -58,7 +60,6 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 			case 'package':
 			case 'install':
 			case 'force':
-			case 'class':
 				$$key = $val;
 				break;
 			default:
@@ -87,15 +88,15 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 	if( $gBitSystem->isFeatureActive( 'site_online_help' ) || $gBitSystem->isFeatureActive( 'site_form_help' ) || $force == 'y' ) {
 		if( !empty( $rawHash ) ) {
 			if( !empty( $rawHash['page'] ) && ( $gBitSystem->isFeatureActive('site_online_help') || $force == 'y' ) ) {
-				$ret_page = '<strong>'.tra( 'Online help' ).'</strong>: <a class=\'external\' href=\'http://doc.bitweaver.org/wiki/index.php?page='.$rawHash['page'].'\'>'.$rawHash['page'].'</a><br />';
+				$ret_page = '<strong>'.KernelTools::tra( 'Online help' ).'</strong>: <a class=\'external\' href=\'http://doc.bitweaver.org/wiki/index.php?page='.$rawHash['page'].'\'>'.$rawHash['page'].'</a><br />';
 			}
 
 			if( !empty( $rawHash['link'] ) && ( $gBitSystem->isFeatureActive('site_online_help') || $force == 'y' ) ) {
 				if( is_array( $rawHash['link'] ) ) {
-					$ret_link  = '<strong>'.tra( 'IntraLink' ).'</strong>: ';
+					$ret_link  = '<strong>'.KernelTools::tra( 'IntraLink' ).'</strong>: ';
 					$ret_link .= '<a href=\'';
 					$ret_link .= constant( strtoupper( $rawHash['link']['package'] ).'_PKG_URL' ).$rawHash['link']['file'];
-					$ret_link .= '\'>'.tra( $rawHash['link']['title'] ).'</a>';
+					$ret_link .= '\'>'.KernelTools::tra( $rawHash['link']['title'] ).'</a>';
 				}
 			}
 
@@ -103,21 +104,21 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 				if( is_array( $rawHash['note'] ) ) {
 					foreach( $rawHash['note'] as $name => $value ) {
 						if( $name == 'install' ) {
-							$ret_install  = '<strong>'.tra( 'Install' ).'</strong>: '.tra( 'To use this package, you will first have to run the package specific installer' ).': ';
+							$ret_install  = '<strong>'.KernelTools::tra( 'Install' ).'</strong>: '.KernelTools::tra( 'To use this package, you will first have to run the package specific installer' ).': ';
 							$ret_install .= '<a href=\'';
 							$ret_install .= constant( strtoupper( $value['package'] ).'_PKG_URL' ).$value['file'];
 							$ret_install .= '\'>'.ucfirst( $value['package'] ).'</a>';
 						} else {
-							$ret_note .= '<strong>'.ucfirst( tra( $name ) ).'</strong>: '.tra( $value ).'<br />';
+							$ret_note .= '<strong>'.ucfirst( KernelTools::tra( $name ) ).'</strong>: '.KernelTools::tra( $value ).'<br />';
 						}
 					}
 				} else {
-					$ret_note .= tra( $rawHash['note'] ).'<br />';
+					$ret_note .= KernelTools::tra( $rawHash['note'] ).'<br />';
 				}
 			}
 
 			if( !empty( $rawHash['warning'] ) ) {
-				$ret_note .= '<span class="warning">'.tra( $rawHash['warning'] ).'</span><br />';
+				$ret_note .= '<span class="warning">'.KernelTools::tra( $rawHash['warning'] ).'</span><br />';
 			}
 
 			// join all the output content into one string
@@ -128,38 +129,38 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 			if( !empty( $content ) ) {
 				if( $gBitSystem->isFeatureActive('site_help_popup') ) {
 					global $gBitSmarty;
-					$gBitSmarty->loadPlugin( 'smarty_modifier_popup' );
-					$gBitSmarty->loadPlugin( 'smarty_function_biticon' );
+//					$gBitSmarty->loadPlugin( 'smarty_modifier_popup' );
+//					$gBitSmarty->loadPlugin( 'smarty_function_biticon' );
 
-					$gBitSmarty->assign( 'title',tra('Extended Help') );
+					$gBitSmarty->assign( 'title',KernelTools::tra('Extended Help') );
 
 					$gBitSmarty->assign( 'content', $content );
 					$gBitSmarty->assign( 'closebutton', TRUE );
 					$text = $gBitSmarty->fetch('bitpackage:kernel/popup_box.tpl');
 					$text = preg_replace( '/"/',"'",$text );
 
-					$popup = array(
+					$popup = [
 						'trigger' => 'onclick',
 						'text' => $text,
 						'fullhtml' => '1',
 						'sticky' => '1',
 						'timeout' => '8000',
-					);
+					];
 
-					$biticon = array(
+					$biticon = [
 						'ipackage' => 'icons',
 						'iname' => 'dialog-information',
 						'iforce' => 'icon',
 						'iexplain' => 'Extended Help',
-					);
+					];
 
-					$html .= ' <span class="formhelppopup '.$class.'" '.$atts.'>&nbsp;';
-					$html .= '<a '.smarty_function_popup( $popup ).'>';
+					$html .= ' <span class="formhelppopup" '.$atts.'>&nbsp;';
+					$html .= '<a '.smarty_function_popup( $popup, $pSmarty ).'>';
 					$html .= smarty_function_biticon( $biticon );
 					$html .= '</a>';
 					$html .= '</span>';
 				} else {
-					$html .= '<span class="help-block '.$class.'" '.$atts.'>'.$content.'</span>';
+					$html .= '<span class="help-block" '.$atts.'>'.$content.'</span>';
 				}
 			}
 
@@ -167,4 +168,3 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 		}
 	}
 }
-?>

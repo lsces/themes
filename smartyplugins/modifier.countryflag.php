@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -19,5 +21,3 @@ function smarty_modifier_countryflag($user)
   $flag = $gBitSystem->getConfig('users_country','Other',$user);
   return "<img alt='flag' src='".IMG_PKG_URL."flags/".$flag.".gif' />";
 }
-
-?>

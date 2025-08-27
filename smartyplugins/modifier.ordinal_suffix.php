@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -69,4 +71,3 @@ function smarty_modifier_ordinal_suffix( $pNum ) {
 	return $pNum.tra( $suffix );
 
 }
-?>

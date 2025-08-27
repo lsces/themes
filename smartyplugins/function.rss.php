@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -14,4 +16,3 @@ function smarty_function_rss($params, &$gBitSmarty) {
   $feed = rss_parse_data("", $params);
   print $feed;
 }
-?>

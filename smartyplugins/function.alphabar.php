@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -24,21 +26,13 @@ function smarty_function_alphabar( $params, &$gBitSmarty ) {
 	extract( $params );
 
 	// work out what the url is
-	if( isset( $ifile ) ) {
-		if( isset( $ipackage ) ) {
-			if( $ipackage == 'root' ) {
-				$url = BIT_ROOT_URL.$ifile;
-			} else {
-				$url = constant( strtoupper( $ipackage ).'_PKG_URL' ).$ifile;
-			}
-		} else {
-			$url = constant( strtoupper( $gBitSystem->getActivePackage() ).'_PKG_URL' ).$ifile;
-		}
-	} else {
-		$url = $_SERVER['SCRIPT_NAME'];
-	}
+	$url = isset( $ifile )
+		? ( isset( $ipackage )
+			? ( $ipackage == 'root' ? BIT_ROOT_URL.$ifile : constant( strtoupper( $ipackage ).'_PKG_URL' ).$ifile )
+			: constant( strtoupper( $gBitSystem->getActivePackage() ).'_PKG_URL' ).$ifile )
+		: $_SERVER['SCRIPT_NAME'];
 
-	$alphabar_params = array( 'ifile', 'ipackage', 'iall' );
+	$alphabar_params = [ 'ifile', 'ipackage', 'iall' ];
 	// append any other paramters that were passed in
 	$url_params = '';
 	foreach( $params as $key => $val ) {
@@ -48,7 +42,7 @@ function smarty_function_alphabar( $params, &$gBitSmarty ) {
 	}
 
 	$ret = '<div class="pagination alphabar">';
-	$alpha = array( 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0-9','+' );
+	$alpha = [ 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0-9','+' ];
 	foreach( $alpha as $char ) {
 		if( empty( $iskip ) || !in_array( $char, $iskip )) {
 			$wrap = array( 'open' => '', 'close' => '' );
@@ -66,4 +60,3 @@ function smarty_function_alphabar( $params, &$gBitSmarty ) {
 
 	return $ret;
 }
-?>

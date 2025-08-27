@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -34,5 +36,3 @@ function smarty_function_var_dump($params, &$gBitSmarty)
     $debugger->msg("Smarty var_dump: Parameter 'var' not specified");
   return '<!-- var_dump('.$v.') -->';
 }
-
-?>

@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -58,5 +60,3 @@ function smarty_function_sameurl($params, &$gBitSmarty)
 }
 
 /* vim: set expandtab: */
-
-?>

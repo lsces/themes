@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\KernelTools;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -49,11 +52,10 @@ function smarty_function_formlabel( $params,&$gBitSmarty ) {
 	}
 	$html .= '>';
 	if( empty( $params['no_translate'] ) ) {
-		$html .= tra( $name );
+		$html .= KernelTools::tra( $name );
 	} else {
 		$html .= $name;
 	}
 	$html .= '</label>';
 	return $html;
 }
-?>

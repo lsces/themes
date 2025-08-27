@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -18,5 +20,3 @@ function smarty_modifier_nlbr($string)
   return nl2br($string);
 	
 }
-
-?>

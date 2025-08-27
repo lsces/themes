@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\KernelTools;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -10,20 +13,15 @@
  * biticon_first_match
  *
  * @param string $pDir Directory in which we want to search for the icon
- * @param array $pFilename Icon name without the extension
+ * @param string $pFilename Icon name without the extension
  * @access public
- * @return Icon name with extension on success, FALSE on failure
+ * @return string|bool Icon name with extension on success, false on failure
  */
 function biticon_first_match( $pDir, $pFilename ) {
 	if( is_dir( $pDir )) {
 		global $gSniffer;
 
-		// if this is MSIE < 7, we try png last.
-		if( $gSniffer->_browser_info['browser'] == 'ie' && $gSniffer->_browser_info['maj_ver'] < 7 ) {
-			$extensions = array( 'gif', 'jpg', 'png' );
-		} else {
-			$extensions = array( 'png', 'gif', 'jpg' );
-		}
+		$extensions = [ 'png', 'gif', 'jpg' ];
 
 		foreach( $extensions as $ext ) {
 			if( is_file( $pDir.$pFilename.'.'.$ext ) ) {
@@ -31,26 +29,26 @@ function biticon_first_match( $pDir, $pFilename ) {
 			}
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 /**
  * Turn collected information into an html image
  *
- * @param boolean $pParams['url'] set to TRUE if you only want the url and nothing else
- * @param string $pParams['iexplain'] Explanation of what the icon represents
- * @param string $pParams['iforce'] takes following optins: icon, icon_text, text - will override system settings
- * @param string $pFile Path to icon file
- * @param string iforce  override site-wide setting how to display icons (can be set to 'icon', 'text' or 'icon_text')
- * @access public
- * @return Full <img> on success
+ * @param array $pParams
+ * @var boolean ['url']		set to true if you only want the url and nothing else
+ * @var string ['iexplain'] Explanation of what the icon represents
+ * @var string ['iclass']
+ * @var string ['iforce']	override site-wide setting how to display icons (can be set to 'icon', 'text' or 'icon_text')
+ * @var string $pFile Path to icon file
+ * @return string Full <img> on success
  */
 function biticon_output( $pParams, $pFile ) {
 	global $gBitSystem;
-	$iexplain = isset( $pParams["iexplain"] ) ? tra( $pParams["iexplain"] ) : 'please set iexplain';
+	$iexplain = isset( $pParams["iexplain"] ) ? KernelTools::tra( $pParams["iexplain"] ) : 'please set iexplain';
 
 	if( empty( $pParams['iforce'] )) {
-		$pParams['iforce'] = NULL;
+		$pParams['iforce'] = 'none';
 	}
 
 	if( isset( $pParams["url"] )) {
@@ -61,12 +59,12 @@ function biticon_output( $pParams, $pFile ) {
 		} else {
 			$outstr='<img src="'.$pFile.'"';
 			if( isset( $pParams["iexplain"] ) ) {
-				$outstr .= ' alt="'.tra( $pParams["iexplain"] ).'" title="'.tra( $pParams["iexplain"] ).'"';
+				$outstr .= ' alt="'.KernelTools::tra( $pParams["iexplain"] ).'" title="'.KernelTools::tra( $pParams["iexplain"] ).'"';
 			} else {
 				$outstr .= ' alt=""';
 			}
 
-			$ommit = array( 'ilocation', 'ipackage', 'ipath', 'iname', 'iexplain', 'iforce', 'istyle', 'iclass' );
+			$ommit = [ 'ilocation', 'ipackage', 'ipath', 'iname', 'iexplain', 'iforce', 'istyle', 'iclass' ];
 			foreach( $pParams as $name => $val ) {
 				if( !in_array( $name, $ommit ) ) {
 					$outstr .= ' '.$name.'="'.$val.'"';
@@ -93,7 +91,7 @@ function biticon_output( $pParams, $pFile ) {
 
 	if( !preg_match( "#^broken\.#", $pFile )) {
 		if( !biticon_write_cache( $pParams, $outstr )) {
-			echo tra( 'There was a problem writing the icon cache file' );
+			echo KernelTools::tra( 'There was a problem writing the icon cache file' );
 		}
 	}
 
@@ -103,25 +101,23 @@ function biticon_output( $pParams, $pFile ) {
 /**
  * smarty_function_biticon
  *
- * @param array $pParams['ipath'] subdirectory within icon directory
- * @param array $pParams['iname'] name of the icon without extension
- * @param array $pParams['ipackage'] package the icon should be searched for - if it's part of an icon theme, this should be set to 'icons'
- * @param array $pCheckSmall look for a small render of the image
+ * @param array $pParams
+ * @var boolean ['url']			set to true if you only want the url and nothing else
+ * @var string  ['iexplain']	Explanation of what the icon represents
+ * @var string  ['iclass']
+ * @var string  ['iforce']		override site-wide setting how to display icons (can be set to 'icon', 'text' or 'icon_text')
+ * @param bool $pCheckSmall look for a small render of the image
  * @access public
- * @return final <img>
+ * @return string final <img>
  */
-function smarty_function_biticon( $pParams, $pSmall=NULL ) {
+function smarty_function_biticon( $pParams, $pSmall = false ) {
 	global $gBitSystem, $gBitThemes, $gSniffer;
 
 	// this is needed in case everything goes horribly wrong
 	$copyParams = $pParams;
 
 	// ensure that ipath has a leading and trailing slash
-	if( !empty( $pParams['ipath'] )) {
-		$pParams['ipath'] = str_replace( "//", "/", "/".$pParams['ipath']."/" );
-	} else {
-		$pParams['ipath'] = '/';
-	}
+	$pParams['ipath'] = !empty( $pParams['ipath'] ) ? str_replace( "//", "/", "/".$pParams['ipath']."/" ) : '/';
 
 	// try to separate iname from ipath if we've been given some sloppy naming
 	if( strstr( $pParams['iname'], '/' )) {
@@ -158,11 +154,7 @@ function smarty_function_biticon( $pParams, $pSmall=NULL ) {
 	}
 
 	// make sure ipackage is set correctly
-	if( !empty( $pParams['ipackage'] )) {
-		$pParams['ipackage'] = strtolower( $pParams['ipackage'] );
-	} else {
-		$pParams['ipackage'] = 'icons';
-	}
+	$pParams['ipackage'] = !empty( $pParams['ipackage'] ) ? strtolower( $pParams['ipackage'] ?? '' ) :'icons';
 
 	// if the user is using a text-browser we force text instead of icons
 	if( $gSniffer->_browser_info['browser'] == 'lx' || $gSniffer->_browser_info['browser'] == 'li' ) {
@@ -170,7 +162,7 @@ function smarty_function_biticon( $pParams, $pSmall=NULL ) {
 	}
 
 	// get out of here as quickly as possible if we've already cached the icon information before
-	if(( $ret = biticon_read_cache( $pParams )) && !( defined( 'TEMPLATE_DEBUG' ) && TEMPLATE_DEBUG == TRUE )) {
+	if(( $ret = biticon_read_cache( $pParams )) && !( defined( 'TEMPLATE_DEBUG' ) && TEMPLATE_DEBUG == true )) {
 		return $ret;
 	}
 
@@ -181,11 +173,11 @@ function smarty_function_biticon( $pParams, $pSmall=NULL ) {
 		// violators will be poked with soft cushions by the Cardinal himself!!!
 		$icon_style = !empty( $pParams['istyle'] ) ? $pParams['istyle'] : $gBitSystem->getConfig( 'site_icon_style', DEFAULT_ICON_STYLE );
 
-		if( FALSE !== ( $matchFile = biticon_first_match( CONFIG_PKG_PATH."iconsets/$icon_style".$pParams['ipath'], $pParams['iname'] ))) {
+		if( false !== ( $matchFile = biticon_first_match( CONFIG_PKG_PATH."iconsets/$icon_style".$pParams['ipath'], $pParams['iname'] ))) {
 			return biticon_output( $pParams, CONFIG_PKG_URL."iconsets/$icon_style".$pParams['ipath'].$matchFile );
 		}
 
-		if( $icon_style != DEFAULT_ICON_STYLE && FALSE !== ( $matchFile = biticon_first_match( CONFIG_PKG_PATH."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'], $pParams['iname'] ))) {
+		if( $icon_style != DEFAULT_ICON_STYLE && false !== ( $matchFile = biticon_first_match( CONFIG_PKG_PATH."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'], $pParams['iname'] ))) {
 			return biticon_output( $pParams, CONFIG_PKG_URL."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'].$matchFile );
 		}
 
@@ -197,34 +189,34 @@ function smarty_function_biticon( $pParams, $pSmall=NULL ) {
 	// since package icons reside in <pkg>/icons/ we don't need the small/ subdir
 	if( strstr( "/small/", $pParams['ipath'] )) {
 		$pParams['ipath'] = str_replace( "small/", "", $pParams['ipath'] );
-		$small = TRUE;
+		$small = true;
 	}
 
 	// first check themes/force
-	if( FALSE !== ( $matchFile = biticon_first_match( THEMES_PKG_PATH."force/icons/".$pParams['ipackage'].$pParams['ipath'], $pParams['iname'] ))) {
+	if( false !== ( $matchFile = biticon_first_match( THEMES_PKG_PATH."force/icons/".$pParams['ipackage'].$pParams['ipath'], $pParams['iname'] ))) {
 		return biticon_output( $pParams, BIT_ROOT_URL."themes/force/icons/".$pParams['ipackage'].$pParams['ipath'].$matchFile );
 	}
 
 	//if we have site styles, look there
-	if( FALSE !== ( $matchFile = biticon_first_match( $gBitThemes->getStylePath().'/icons/'.$pParams['ipackage'].$pParams['ipath'], $pParams['iname'] ))) {
-		return biticon_output( $pParams, $gBitThemes->getStyleUrl().'/icons/'.$pParams['ipackage'].$pParams['ipath'].$matchFile );
+	if( false !== ( $matchFile = biticon_first_match( $gBitThemes->getStylePath().'icons/'.$pParams['ipackage'].$pParams['ipath'], $pParams['iname'] ))) {
+		return biticon_output( $pParams, $gBitThemes->getStyleUrl().'icons/'.$pParams['ipackage'].$pParams['ipath'].$matchFile );
 	}
 
 	//Well, then lets look in the package location
-	if( FALSE !== ( $matchFile = biticon_first_match( constant( strtoupper( $pParams['ipackage'] ).'_PKG_PATH' )."icons".$pParams['ipath'], $pParams['iname'] ))) {
+	if( false !== ( $matchFile = biticon_first_match( constant( strtoupper( $pParams['ipackage'] ).'_PKG_PATH' )."icons".$pParams['ipath'], $pParams['iname'] ))) {
 		return biticon_output( $pParams, constant( strtoupper( $pParams['ipackage'] ).'_PKG_URL' )."icons".$pParams['ipath'].$matchFile );
 	}
 
-	// Still didn't find it! Well lets output something (return FALSE if only the url is requested)
+	// Still didn't find it! Well lets output something (return empty string if only the url is requested)
 	if( isset( $pParams['url'] )) {
-		return FALSE;
+		return '';
 	} else {
 		if( empty( $pSmall ) ) {
 			// if we were looking for the large icon, we'll try the whole kaboodle again, looking for the small icon
-			$copyParams['ipath'] = preg_replace( "!/.*?/$!", "/small/", $copyParams['ipath'] );
-			return smarty_function_biticon( $copyParams, TRUE );
+			$copyParams['ipath'] = preg_replace( "!/.*?/$!", "/small/", $pParams['ipath'] );
+			return smarty_function_biticon( $copyParams, true );
 		} else {
-			return biticon_output( $pParams, NULL );
+			return biticon_output( $pParams, '' );
 		}
 	}
 }
@@ -234,10 +226,10 @@ function smarty_function_biticon( $pParams, $pSmall=NULL ) {
  *
  * @param array $pParams
  * @access public
- * @return cached icon string on sucess, FALSE on failure
+ * @return string cached icon string on sucess, false on failure
  */
 function biticon_read_cache( $pParams ) {
-	$ret = FALSE;
+	$ret = false;
 	$cacheFile = biticon_get_cache_file( $pParams );
 	if( is_readable( $cacheFile )) {
 		if( $h = fopen( $cacheFile, 'r' )) {
@@ -254,10 +246,10 @@ function biticon_read_cache( $pParams ) {
  *
  * @param array $pParams
  * @access public
- * @return TRUE on success, FALSE on failure
+ * @return bool true on success, false on failure
  */
 function biticon_write_cache( $pParams, $pCacheString ) {
-	$ret = FALSE;
+	$ret = false;
 	if( $cacheFile = biticon_get_cache_file( $pParams )) {
 		if( $h = fopen( $cacheFile, 'w' )) {
 			$ret = fwrite( $h, $pCacheString );
@@ -265,7 +257,7 @@ function biticon_write_cache( $pParams, $pCacheString ) {
 		}
 	}
 
-	return( $ret != 0 );
+	return $ret;
 }
 
 /**
@@ -273,17 +265,17 @@ function biticon_write_cache( $pParams, $pCacheString ) {
  *
  * @param array $pParams
  * @access public
- * @return full path to cachefile
+ * @return string full path to cachefile
  */
 function biticon_get_cache_file( $pParams ) {
 	global $gBitThemes, $gBitSystem;
 
 	// create a hash filename based on the parameters given
 	$hashstring = '';
-	$ihash = array( 'iforce', 'ipath', 'iname', 'iexplain', 'ipackage', 'url', 'istyle', 'id', 'style', 'onclick' );
+	$ihash = [ 'iforce', 'ipath', 'iname', 'iexplain', 'ipackage', 'url', 'istyle', 'id', 'style', 'onclick' ];
 	foreach( $pParams as $param => $value ) {
-		if( in_array( $param, $ihash ) && is_string( $value ) ) {
-			$hashstring .= strtolower( $value );
+		if( in_array( $param, $ihash )) {
+			$hashstring .= strtolower( $value ?? '' );
 		}
 	}
 

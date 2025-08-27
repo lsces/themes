@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use \Bitweaver\Wiki\BitPage;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -50,7 +53,7 @@
 #
 # Step 3: Include the following line in the wiki/edit_page.tpl file at the point where you want the notice displayed:
 #
-#{include_wiki_page_content page="`$pageInfo.original_title` - edit notice" page_default="default edit notice"}
+#{include_wiki_page_content page="`$gContent->mInfo.original_title` - edit notice" page_default="default edit notice"}
 #
 # Now whenever "ABC" is edited the custom notice will be displayed on the edit page.
 # Editing any other page will display the default edit notice.
@@ -62,7 +65,7 @@ function smarty_function_include_wiki_page_content($params, &$gBitSmarty)
 	$parsed = '';
 	//
 	if( ($pageName = !empty( $params['page'] ) ? $params['page'] : (!empty( $params['page_default'] ) ? $params['page_default'] : NULL )) ) {
-		include_once( WIKI_PKG_CLASS_PATH.'BitPage.php' );
+		include_once WIKI_PKG_CLASS_PATH.'BitPage.php';
 		if( $includePage = BitPage::lookupObject( array( 'page' => $pageName ) ) ) {
 			$parsed = $includePage->getParsedData();
 		}
@@ -70,5 +73,3 @@ function smarty_function_include_wiki_page_content($params, &$gBitSmarty)
 
 	return $parsed;
 }
-
-?>

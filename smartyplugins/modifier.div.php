@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -21,5 +23,3 @@ function smarty_modifier_div($string,$num,$max=10)
 }
 
 /* vim: set expandtab: */
-
-?>

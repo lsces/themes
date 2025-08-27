@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin modifier duration
  *
@@ -18,21 +20,21 @@
  */
 function smarty_modifier_duration($string)
 {
-  $result=Array();
+  $result=[];
   if($string > 60*60*24) {
     $days = floor($string/(60*60*24));
     $result[]="$days days";
-    $string = $string % (60*60*24);
+    $string %= 60*60*24;
   }
   if($string > 60*60) {
     $hours = floor($string/(60*60));
     $result[]="$hours hours";
-    $string = $string % (60*60);
+    $string %= 60*60;
   }
   if($string > 60) {
-    $mins = floor($string/(60));
+    $mins = floor($string/60);
     $result[]="$mins minutes";
-    $string = $string % (60);
+    $string %= 60;
   }
   if($string > 0) {
     $result[]="$string seconds";
@@ -40,5 +42,3 @@ function smarty_modifier_duration($string)
   
   return implode(' ',$result);
 }
-
-?>

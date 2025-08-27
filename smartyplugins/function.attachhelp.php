@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -8,8 +10,8 @@
 /**
 * smarty_function_attachmenthelp
 */
-function smarty_function_attachhelp( $pParams, &$gBitSmarty ) {
-	global $gBitSystem;
+function smarty_function_attachhelp( $pParams, &$gSmartyTemplate ) {
+	global $gBitSystem, $gBitSmarty;
 
 	// print legend if desired
 	if( !empty( $pParams['legend'] )) {
@@ -40,4 +42,3 @@ function smarty_function_attachhelp( $pParams, &$gBitSmarty ) {
 	$gBitSmarty->assign( 'attachhelp', $attachhelp );
 	return $gBitSmarty->fetch( 'bitpackage:liberty/attachhelp.tpl' );
 }
-?>

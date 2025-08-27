@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\BitDate;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -16,8 +19,8 @@
  *           - 1.0 initial release
  * @version 1.0
  * @author   Stephan Borg
- * @param array
- * @param Smarty
+ * @param array 
+ * @param array Smarty
  * @return string
 */
 function smarty_function_jscalendar($params, &$gBitSmarty) {
@@ -37,13 +40,10 @@ function smarty_function_jscalendar($params, &$gBitSmarty) {
 		extract( $params );
 
 		$time = $gBitSystem->mServerTimestamp->getDisplayDateFromUTC( $time );
-		$time = strftime( "%m/%d/%Y %H:%M", $time );
+		$time = BitDate::strftime( "%m/%d/%Y %H:%M", $time );
 
-		if( $readonly ) {
-			$html_result = $time;
-		} else {
-			$html_result =
-				"<script type=\"text/javascript\">//<![CDATA[
+		$html_result = $readonly ? $time
+			:	"<script type=\"text/javascript\">//<![CDATA[
 					Calendar.setup({
 						date        : \"$time\",
 						inputField  : \"$inputField\",
@@ -53,13 +53,10 @@ function smarty_function_jscalendar($params, &$gBitSmarty) {
 						electric    : $electric,
 						onUpdate    : $onUpdate
 					});
-				//]]></script>"
-			;
-		}
+				//]]></script>";
 
 		return $html_result;
 	} else {
 		return '';
 	}
 }
-?>

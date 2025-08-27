@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -18,4 +20,3 @@ function smarty_function_inlinemodule($params, &$gBitSmarty) {
 	$module_params = ( !empty( $params ) ? $params : NULL );
 	print $gBitSmarty->fetch( $params['file'] );
 }
-?>

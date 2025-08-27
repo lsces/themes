@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -11,9 +13,9 @@
 function smarty_function_banner($params, &$gBitSmarty)
 {
     global $gBitSystem;
-    include_once( BANNERS_PKG_PATH.'banner_lib.php' );
+    include_once BANNERS_PKG_PATH.'banner_lib.php';
     if(!isset($bannerlib)) {
-      $bannerlib = new BannerLib();
+      $bannerlib = new \Bitweaver\BannerLib();
     }
 
     extract($params);
@@ -24,9 +26,6 @@ function smarty_function_banner($params, &$gBitSmarty)
         return;
     }
     $banner = $bannerlib->select_banner($zone);
-    print($banner);
+    print $banner;
 }
 
-/* vim: set expandtab: */
-
-?>

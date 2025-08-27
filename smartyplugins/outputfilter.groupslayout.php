@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -56,7 +58,7 @@ function smarty_outputfilter_groupslayout( $source, &$gBitSmarty ) {
 	preg_match_all( $extractor, $source, $match );
 	$contents = $match[0];
 
-	$ret = array();
+	$ret = [];
 	foreach( $contents as $key => $content ) {
 		// if we picked something up, we rip it out and modify
 		if( !empty( $content ) ) {
@@ -99,4 +101,3 @@ function smarty_outputfilter_groupslayout( $source, &$gBitSmarty ) {
 
 	return $source;
 }
-?>

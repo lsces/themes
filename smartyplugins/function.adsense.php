@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -16,4 +18,3 @@ function smarty_function_adsense( $params, &$gBitSmarty ) {
 		echo "You need to activate the adsense liberty plugin to use this.";
 	}
 }
-?>

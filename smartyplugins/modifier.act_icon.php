@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -37,5 +39,3 @@ function smarty_modifier_act_icon($type,$isInter='n')
   $img="<img src='".GALAXIA_PKG_URL."icons/$ic' alt='$type' title='$type' />";
   return $img;	
 }
-
-?>

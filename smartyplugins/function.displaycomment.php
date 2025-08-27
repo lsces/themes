@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -9,18 +11,15 @@
  * smarty_function_displaycomment
  */
 function smarty_function_displaycomment( $pParams, &$pSmarty ) {
+	global $gBitSmarty;
 
 	if (!empty($pParams['comment'])) {
 		$comment = $pParams['comment'];
-		$pSmarty->assign('comment', $comment);
-		if (empty($pParams['template'])) {
-			$ret = $pSmarty->fetch('bitpackage:liberty/display_comment.tpl');
-		} else {
-			$ret = $pSmarty->fetch($pParams['template']);
-		}
+		$gBitSmarty->assign('comment', $comment);
+		$ret = ( empty( $pParams['template'] ) ) 
+			? $gBitSmarty->fetch( 'bitpackage:liberty/display_comment.tpl' )
+			: $gBitSmarty->fetch( $pParams['template'] );
 	}
 
 	return $ret;
 }
-
-?>

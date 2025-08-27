@@ -1,8 +1,11 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty {set} compiler function plugin
  *
- * File:     compiler.set.php
+ * File:     compiler.set.<?php
+
  * Type:     compiler function
  * Name:     set
  * Purpose:  Set a value to a variable (also arrays).
@@ -13,7 +16,7 @@
  * @link http://www.dav-muz.net/
  * @version 1.0
  * @copyright Copyright 2006 by Muzzarelli Davide
- * @author Davide Muzzarelli <info@dav-muz.net>
+ * @author Davide Muzzarelli <info@dav-muz.ne
  *
  * @package kernel
  * @subpackage plugins
@@ -67,5 +70,3 @@ function smarty_compiler_set($params, &$smarty) {
 		return "{$params['var']} = {$params['value']};";
 	}
 }
-?>
-

@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -23,5 +25,3 @@ function smarty_function_content($params, &$gBitSmarty)
     $data = $dcslib->get_actual_content($id);
     print($data);
 }
-
-?>

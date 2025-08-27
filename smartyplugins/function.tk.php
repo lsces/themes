@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -12,4 +14,3 @@ function smarty_function_tk($params, &$gBitSmarty) {
     global $gBitUser;
 	print 'tk='.$gBitUser->mTicket;
 }
-?>

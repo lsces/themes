@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
 /**
  * Smarty {pagination} function plugin
@@ -16,7 +18,9 @@
  *           - <attribute>=<value>  (optional) - pass in any attributes and they will be added to the pagination string<br>
  * Output:   url of the form: $_SERVER[SCRIPT_NAME]?attribute1=value1&attribute2=value2
  */
-function smarty_function_pagination( $params, &$gBitSmarty ) {
+function smarty_function_pagination( $params, &$gSmartyTemplate ) {
+	global $gBitSmarty;
+
 	$pgnUrl = $gBitSmarty->getTemplateVars('returnURL');
     if ( isset( $params['url'] ) ) {
      	  $pgnUrl = $params['url'];
@@ -29,13 +33,15 @@ function smarty_function_pagination( $params, &$gBitSmarty ) {
     $gBitSmarty->assign( 'pgnUrl', $pgnUrl );
 
 	$pgnVars = '';
-	$pgnHidden = array();
+	$pgnHidden = [];
 	foreach( $params as $form_param => $form_val ) {
-		$pgnVars .= "&amp;".$form_param."=".$form_val;
-		$pgnHidden[$form_param] = $form_val;
+		if ( !is_array($form_val)) {
+			$pgnVars .= "&amp;$form_param=$form_val";
+			$pgnHidden[$form_param] = $form_val;
+		}
 	}
+	
     $gBitSmarty->assign( 'pgnVars', $pgnVars );
 	$gBitSmarty->assign( 'pgnHidden', $pgnHidden );
-    $gBitSmarty->display('bitpackage:kernel/pagination.tpl');
+    return $gBitSmarty->fetch('bitpackage:kernel/pagination.tpl');
 }
-?>

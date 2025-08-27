@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * 
@@ -58,22 +60,22 @@ function smarty_function_bit_select_datetime( $pParams, &$gBitSmarty ) {
 		//It is the readonly input field that will be evaluated back on the server
 
 		//unsupported $format = preg_replace( "/%Z/", "", $format );  // JSCalendar does not know about time zones
-		$html_result = "<input type=\"text\" name=\"$name\" id=\"${nname}_id\" value=\"$time\" readonly />\n";
-		$html_result = $html_result . "<button type=\"reset\" id=\"${nname}_button\">...</button>\n";
-		$html_result = $html_result . "<script type=\"text/javascript\">\n";
-		$html_result = $html_result . "    Calendar.setup({\n";
-		$html_result = $html_result . "        date        : \"$time\",\n";
-		$html_result = $html_result . "        inputField  :    \"${nname}_id\",      // id of the input field\n";
-		$html_result = $html_result . "        ifFormat    :    \"%Y-%m-%d %H:%M\",       // format of the input field\n";
-		$html_result = $html_result . "        showsTime   :    $showtime,            // will display a time selector\n";
-		$html_result = $html_result . "        button      :    \"${nname}_button\",   // trigger for the calendar (button ID)\n";
-		$html_result = $html_result . "        singleClick :    true,           // double-click mode\n";
-		$html_result = $html_result . "        step        :    1                // show all years in drop-down boxes (instead of every other year as default)\n";
-		$html_result = $html_result . "    });\n";
-		$html_result = $html_result . "</script>\n";
+		$html_result = "<input type=\"text\" name=\"$name\" id=\"{$nname}_id\" value=\"$time\" readonly />\n";
+		$html_result .= "<button type=\"reset\" id=\"{$nname}_button\">...</button>\n";
+		$html_result .= "<script type=\"text/javascript\">\n";
+		$html_result .= "    Calendar.setup({\n";
+		$html_result .= "        date        : \"$time\",\n";
+		$html_result .= "        inputField  :    \"{$nname}_id\",      // id of the input field\n";
+		$html_result .= "        ifFormat    :    \"%Y-%m-%d %H:%M\",       // format of the input field\n";
+		$html_result .= "        showsTime   :    $showtime,            // will display a time selector\n";
+		$html_result .= "        button      :    \"{$nname}_button\",   // trigger for the calendar (button ID)\n";
+		$html_result .= "        singleClick :    true,           // double-click mode\n";
+		$html_result .= "        step        :    1                // show all years in drop-down boxes (instead of every other year as default)\n";
+		$html_result .= "    });\n";
+		$html_result .= "</script>\n";
 	} else {
-		$gBitSmarty->loadPlugin( 'smarty_modifier_html_select_date' );
-		$gBitSmarty->loadPlugin( 'smarty_modifier_html_select_time' );
+	//	$gBitSmarty->loadPlugin( 'smarty_modifier_html_select_date' );
+	//	$gBitSmarty->loadPlugin( 'smarty_modifier_html_select_time' );
 
 		// we use html_select_date and html_select_time to pick a date, which generate a number of select fields.
 		//On every change a hidden field will be updated via javascript.
@@ -81,32 +83,32 @@ function smarty_function_bit_select_datetime( $pParams, &$gBitSmarty ) {
 
 		$pDate = array (
 			'prefix' => $nname,
-			'all_extra' => "onchange=\"bit_select_datetime_${nname}()\"",
+			'all_extra' => "onchange=\"bit_select_datetime_{$nname}()\"",
 			'time' => $time
 		);
 
 		$pTime = array (
 			'prefix' => $nname,
-			'all_extra' => "onchange=\"bit_select_datetime_${nname}()\"",
+			'all_extra' => "onchange=\"bit_select_datetime_{$nname}()\"",
 			'display_seconds' => false,
 			'time' => $time
 		);
 
-		$html_result  = "<input type=\"hidden\" name=\"$name\" value=\"${time}\">";
+		$html_result  = "<input type=\"hidden\" name=\"$name\" value=\"{$time}\">";
 		$html_result .= smarty_function_html_select_date( $pDate, $gBitSmarty );
 		if( $showtime == 'true' ) {
 			$html_result .= smarty_function_html_select_time( $pTime, $gBitSmarty );
 			$html_result .= "<script type=\"text/javascript\"> \n";
-			$html_result .= "    function bit_select_datetime_${nname} () {\n";
-			$html_result .= "    	var date = new Date(); \n date.setHours ( document.getElementsByName(\"${nname}Hour\")[0].value);\ndate.setMinutes( document.getElementsByName(\"${nname}Minute\")[0].value); \n date.setFullYear(document.getElementsByName(\"${nname}Year\")[0].value,document.getElementsByName(\"${nname}Month\")[0].value-1,document.getElementsByName(\"${nname}Day\")[0].value); \n ";
-			$html_result .= "document.getElementsByName(\"${name}\")[0].value = Math.floor(date.getTime() / 1000);";
+			$html_result .= "    function bit_select_datetime_{$nname} () {\n";
+			$html_result .= "    	var date = new Date(); \n date.setHours ( document.getElementsByName(\"{$nname}Hour\")[0].value);\ndate.setMinutes( document.getElementsByName(\"{$nname}Minute\")[0].value); \n date.setFullYear(document.getElementsByName(\"{$nname}Year\")[0].value,document.getElementsByName(\"{$nname}Month\")[0].value-1,document.getElementsByName(\"{$nname}Day\")[0].value); \n ";
+			$html_result .= "document.getElementsByName(\"{$name}\")[0].value = Math.floor(date.getTime() / 1000);";
 			$html_result .= "}\n";
 			$html_result .= "</script>\n";
 		} else {
 			$html_result .= "<script type=\"text/javascript\">\n";
-			$html_result .= "    function bit_select_datetime_${name} () {\n";
-			$html_result .= "    	var date = new Date(); \n date.setDate( document.getElementsByName(\"${nname}Day\")[0].value ); \n date.setMonth(document.getElementsByName(\"${nname}Month\")[0].value-1); \n date.setFullYear(document.getElementsByName(\"${nname}Year\")[0].value); \n ";
-			$html_result .= "        document.getElementsByName(\"${name}\")[0].value = Math.floor(date.getTime() / 1000);";
+			$html_result .= "    function bit_select_datetime_{$name} () {\n";
+			$html_result .= "    	var date = new Date(); \n date.setDate( document.getElementsByName(\"{$nname}Day\")[0].value ); \n date.setMonth(document.getElementsByName(\"{$nname}Month\")[0].value-1); \n date.setFullYear(document.getElementsByName(\"{$nname}Year\")[0].value); \n ";
+			$html_result .= "        document.getElementsByName(\"{$name}\")[0].value = Math.floor(date.getTime() / 1000);";
 			$html_result .= "}\n";
 			$html_result .= "</script>\n";
 		}
@@ -114,4 +116,3 @@ function smarty_function_bit_select_datetime( $pParams, &$gBitSmarty ) {
 
 	return $html_result."(".$gBitUser->getPreference('site_display_utc').")\n";
 }
-?>

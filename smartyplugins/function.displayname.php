@@ -1,4 +1,8 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\BitBase;
+use Bitweaver\Users\RoleUser;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -19,13 +23,13 @@ function smarty_function_displayname( $pParams, &$gBitSmarty ) {
 			$hash = array_merge( $pParams, $pParams['hash'] );
 			unset( $hash['hash'] );
 			// if the hash only has a user_id, we need to look up the user
-			if( @BitBase::verifyId( $hash['user_id'] ) && empty( $hash['user'] ) && empty( $hash['email'] ) && empty( $hash['login'] )) {
+			if( BitBase::verifyId( $hash['user_id'] ) && empty( $hash['user'] ) && empty( $hash['email'] ) && empty( $hash['login'] )) {
 				$lookupHash['user_id'] = $hash['user_id'];
 			}
 		} else {
 			// We were probably just passed the 'login' due to legacy code which has yet to be converted
 			if( strpos( '@', $pParams['hash'] ) ) {
-				$lookupHash['email'] = $hash;
+				$lookupHash['email'] = $pParams['hash'];
 			} elseif( is_numeric( $pParams['hash'] ) ) {
 				$lookupHash['user_id'] = $pParams['hash'];
 			} else {
@@ -49,13 +53,10 @@ function smarty_function_displayname( $pParams, &$gBitSmarty ) {
 		$hash = $gBitUser->getUserInfo( $lookupHash );
 	}
 
-	if( !empty( $hash ) ) {
-		$displayName = BitUser::getDisplayNameFromHash( $hash, empty( $pParams['nolink'] ) );
-	} else {
+	$displayName = !empty( $hash )
+		? RoleUser::getDisplayNameFromHash( $hash, empty( $pParams['nolink'] ) )
 		// Now we're really in trouble. We don't even have a user_id to work with
-		$displayName = "Unknown";
-	}
+		: "Unknown";
 
-	return( $displayName );
+	return $displayName;
 }
-?>

@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\BitDate;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -9,7 +12,7 @@
  * required setup
  */
 global $gBitSmarty;
-$gBitSmarty->loadPlugin('smarty_shared_make_timestamp');
+// $gBitSmarty->loadPlugin('smarty_shared_make_timestamp');
 
 /**
  * Smarty plugin
@@ -24,23 +27,18 @@ $gBitSmarty->loadPlugin('smarty_shared_make_timestamp');
  */
 function smarty_modifier_cal_date_format($string, $format = "%b %e, %Y", $default_date=null, $tra_format=null)
 {
-	$mDate = new BitDate();
-	if ( $mDate->get_display_offset()) {
-        $format = preg_replace("/ ?%Z/","",$format);
-   	} else {
-        $format = preg_replace("/%Z/","UTC",$format);
-    }
+	$mDate = new BitDate(0);
+	$format =  $mDate->get_display_offset()
+		? preg_replace("/ ?%Z/","",$format)
+   		: preg_replace("/%Z/","UTC",$format);
 
-	$disptime = strtotime( $string ); // Let PHP handle all conversion, TZ or not...
+	$disptime = $mDate->getTimestampFromISO($string);
 
 	global $gBitSystem, $gBitLanguage; //$gBitLanguage->mLanguage= $gBitSystem->getConfig("language", "en");
 	if ($gBitSystem->getConfig("language", "en") != $gBitLanguage->mLanguage && $tra_format) {
 		$format = $tra_format;
 	}
-
 	return $mDate->strftime($format, $disptime, true);
 }
 
 /* vim: set expandtab: */
-
-?>

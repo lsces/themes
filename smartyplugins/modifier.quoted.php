@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -20,5 +22,3 @@ function smarty_modifier_quoted($string)
 }
 
 /* vim: set expandtab: */
-
-?>

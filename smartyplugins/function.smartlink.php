@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Bitweaver\KernelTools;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -64,18 +67,11 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 	if( !empty( $hash['iurl'] ) ) {
 		$url = $hash['iurl'];
 	} elseif( !empty( $hash['ifile'] ) ) {
-		if( !empty( $hash['ipackage'] ) ) {
-			if( $hash['ipackage'] == 'root' ) {
-				$url = BIT_ROOT_URL.$hash['ifile'];
-			} else {
-				$pkgConst = strtoupper( $hash['ipackage'] ).'_PKG_URL';
-				if( defined( $pkgConst ) ) {
-					$url = constant( strtoupper( $hash['ipackage'] ).'_PKG_URL' ).$hash['ifile'];
-				}
-			}
-		} else {
-			$url = constant( strtoupper( $gBitSystem->getActivePackage() ).'_PKG_URL' ).$hash['ifile'];
-		}
+		$url = !empty( $hash['ipackage'] )
+			? ( $hash['ipackage'] == 'root'
+				? $url = BIT_ROOT_URL.$hash['ifile']
+				: constant( strtoupper( $hash['ipackage'] ).'_PKG_URL' ).$hash['ifile'] ) 
+			: constant( strtoupper( $gBitSystem->getActivePackage() ).'_PKG_URL' ).$hash['ifile'];
 	} else {
 		$url = $_SERVER['SCRIPT_NAME'];
 	}
@@ -86,8 +82,8 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 		$ititle = $hash['ititle'];
 		$iatitle =  empty( $hash['iatitle'] ) ? $ititle : $hash['iatitle'];
 	} else {
-		$ititle = tra( $hash['ititle'] );
-		$iatitle =  empty( $hash['iatitle'] ) ? $ititle : tra ( $hash['iatitle'] );
+		$ititle = KernelTools::tra( $hash['ititle'] );
+		$iatitle =  empty( $hash['iatitle'] ) ? $ititle : KernelTools::tra( $hash['iatitle'] );
 	}
 
 	$atitle = 'title="'.$iatitle.'"';
@@ -98,7 +94,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 		$sort_asc = $hash['isort'].'_asc';
 		$sort_desc = $hash['isort'].'_desc';
 
-		$atitle = 'title="'.tra( 'Sort by' ).": ".$iatitle.'"';
+		$atitle = 'title="'.KernelTools::tra( 'Sort by' ).": ".$iatitle.'"';
 		$url .= '?';
 		$url_params .= 'sort_mode=';
 
@@ -109,27 +105,27 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 
 		// check if sort_mode has anything to do with our link
 		if( $sort_asc == $isort_mode ) {
-			$sorticon = array(
+			$sorticon = [
 				'ipackage' => 'icons',
-				'iname' => 'fa-sort-up',
+				'iname' => 'icon-sort-up',
 				'iexplain' => 'ascending',
 				'iforce' => 'icon',
-			);
+			];
 			$url_params .= $sort_desc;
 		} elseif( $sort_desc == $isort_mode ) {
-			$sorticon = array(
+			$sorticon = [
 				'ipackage' => 'icons',
-				'iname' => 'fa-sort-down',
+				'iname' => 'icon-sort-down',
 				'iexplain' => 'descending',
 				'iforce' => 'icon',
-			);
+			];
 			$url_params .= $sort_asc;
 		} else {
 			$url_params .= $hash['isort'].'_'.( isset( $hash['iorder'] ) ? $hash['iorder'] : 'asc' );
 		}
 	}
 
-	$ignore = array( 'iatitle', 'icontrol', 'isort', 'ianchor', 'isort_mode', 'iorder', 'ititle', 'idefault', 'ifile', 'ipackage', 'itype', 'iurl', 'ionclick', 'ibiticon', 'iforce', 'itra', 'booticon' );
+	$ignore = [ 'iatitle', 'icontrol', 'isort', 'ianchor', 'isort_mode', 'iorder', 'ititle', 'idefault', 'ifile', 'ipackage', 'itype', 'iurl', 'ionclick', 'ibiticon', 'booticon', 'iforce', 'itra' ];
 	// append any other paramters that were passed in
 	foreach( $hash as $key => $val ) {
 		if( !empty( $val ) && !in_array( $key, $ignore ) ) {
@@ -163,7 +159,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 	}
 
 	// encode quote marks so we not break href="" construction
-	$url_params = preg_replace('/"/', '%22', $url_params);
+	$url_params = preg_replace('/"/', '%22', $url_params ?? '');
 
 	if( isset( $hash['itype'] ) && $hash['itype'] == 'url' ) {
 		$ret = $url.$url_params;
@@ -172,13 +168,13 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 
 		// if we want to display an icon instead of text, do that
 		if( isset( $hash['booticon'] ) ) {
-			if( !empty( $tmp[2] )) {
-				$tmp[1] .= "/".$tmp[2];
-			}
-			$booticon = array(
+	//		if( !empty( $tmp[2] )) {
+	//			$tmp[1] .= "/".$tmp[2];
+	//		}
+			$booticon = [
 				'iname' => $hash['booticon'],
 				'iexplain' => $hash['ititle'], // use untranslated ititle - booticon has a tra()
-			);
+			];
 			if( !empty( $hash['iforce'] ) ) {
 				$booticon['iforce'] = $hash['iforce'];
 			}
@@ -188,11 +184,11 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 			if( !empty( $tmp[2] )) {
 				$tmp[1] .= "/".$tmp[2];
 			}
-			$ibiticon = array(
+			$ibiticon = [
 				'ipackage' => $tmp[0],
 				'iname' => $tmp[1],
 				'iexplain' => $hash['ititle'], // use untranslated ititle - biticon has a tra()
-			);
+			];
 			if( !empty( $hash['iforce'] ) ) {
 				$ibiticon['iforce'] = $hash['iforce'];
 			}
@@ -211,4 +207,3 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 	}
 	return $ret;
 }
-?>

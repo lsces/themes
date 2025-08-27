@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -83,4 +85,3 @@ function _translate_lang( $pKey ) {
 		return $pKey[1].$pKey[2]."{/tr}";
 	}
 }
-?>

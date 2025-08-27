@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -18,4 +20,3 @@ function smarty_function_form_id(){
 	}
 	return $ret;
 }
-?>

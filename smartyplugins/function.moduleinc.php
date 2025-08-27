@@ -1,4 +1,6 @@
 <?php
+namespace Bitweaver\Plugins;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -19,7 +21,7 @@
  * @param integer $pParams['cache_time'] seconds the template will be cached
  */
 function smarty_function_moduleinc($pParams, &$gBitSmarty) {
-	global $gBitSystem, $gBitThemes;
+	global $gBitSystem, $gBitThemes, $gBitSmarty;
 
 	// go through some hassle here in consideration of a future day when this handles any module
 	list( $package, $template ) = split(  '/', $pParams['module_rsrc'] );
@@ -40,11 +42,11 @@ function smarty_function_moduleinc($pParams, &$gBitSmarty) {
 			$fp = fopen( $cachefile, "r" );
 			$data = fread( $fp, filesize( $cachefile ));
 			fclose( $fp );
-			print( $data );
+			print $data;
 		} else {
 			if( $moduleParams = $gBitThemes->getCustomModule( $template )) {
 				$moduleParams = array_merge( $pParams, $moduleParams );
-				$gBitSmarty->assignByRef( 'moduleParams', $moduleParams );
+				$gBitSmarty->assign( 'moduleParams', $moduleParams );
 				$data = $gBitSmarty->fetch( 'bitpackage:themes/custom_module.tpl' );
 
 				if( !empty( $pParams["cache_time"] ) ) {
@@ -53,7 +55,7 @@ function smarty_function_moduleinc($pParams, &$gBitSmarty) {
 					fwrite( $fp, $data, strlen( $data ));
 					fclose( $fp );
 				}
-				print( $data );
+				print $data;
 			}
 		}
 		unset( $data );
