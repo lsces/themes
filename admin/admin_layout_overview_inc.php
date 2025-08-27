@@ -45,25 +45,25 @@ $layoutAreas['right']  = 'r';
 if( $gBitSystem->isFeatureActive( 'site_bottom_column' )) {
 	$layoutAreas['bottom'] = 'b';
 }
-$gBitSmarty->assignByRef( 'layoutAreas', $layoutAreas );
+$gBitSmarty->assign( 'layoutAreas', $layoutAreas );
 
 $layouts = $gBitThemes->getAllLayouts();
 foreach( $layouts as $package => $layout ) {
 	$gBitThemes->generateModuleNames( $layout );
 	$layouts[$package] = $layout;
 }
-$gBitSmarty->assignByRef( 'layouts', $layouts );
+$gBitSmarty->assign( 'layouts', $layouts );
 
 $allModulesHelp = $gBitThemes->getAllModules( 'modules', 'help_mod_' );
 ksort( $allModulesHelp );
-$gBitSmarty->assignByRef( 'allModulesHelp', $allModulesHelp );
+$gBitSmarty->assign( 'allModulesHelp', $allModulesHelp );
 
 $gBitSmarty->assign( 'pageName', 'Layout Options' );
 if( defined( 'ROLE_MODEL' )) {
 	$roles = $gBitUser->getAllUserRoles( ROOT_USER_ID );
-	$gBitSmarty->assignByRef( "roles", $roles );
+	$gBitSmarty->assign( "roles", $roles );
 } else {
 	$groups = $gBitUser->getAllUserGroups( ROOT_USER_ID );
-	$gBitSmarty->assignByRef( "groups", $groups );
+	$gBitSmarty->assign( "groups", $groups );
 }
 ?>

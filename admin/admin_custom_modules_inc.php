@@ -2,7 +2,7 @@
 // $Header$
 
 require_once( '../../kernel/includes/setup_inc.php' );
-$feedback = array();
+$feedback = [];
 
 if( !empty( $_REQUEST['name'] )) {
 	if( !empty( $_REQUEST['action'] )) {

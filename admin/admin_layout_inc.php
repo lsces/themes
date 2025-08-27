@@ -2,15 +2,15 @@
 // $Header$
 
 // Initialization
-require_once( '../../kernel/includes/setup_inc.php' );
+require_once '../../kernel/includes/setup_inc.php';
 
 if( defined( 'ROLE_MODEL' )) {
 	if( !isset($_REQUEST["roles"] ) ) {
-		$_REQUEST["roles"] = array();
+		$_REQUEST["roles"] = [];
 	}
 } else {
 	if( !isset($_REQUEST["groups"] ) ) {
-		$_REQUEST["groups"] = array();
+		$_REQUEST["groups"] = [];
 	}
 }
 
@@ -18,12 +18,12 @@ if( empty( $_REQUEST['module_package'] ) ) {
 	$_REQUEST['module_package'] = DEFAULT_PACKAGE;
 }
 
-$feedback = array();
-$gBitSmarty->assignByRef( 'feedback', $feedback );
-$layoutHash = array(
-	'layout' => $_REQUEST['module_package'],
-	'fallback' => FALSE,
-);
+$feedback = [];
+$gBitSmarty->assign( 'feedback', $feedback );
+$layoutHash = [
+	'layout'   => $_REQUEST['module_package'],
+	'fallback' => false,
+];
 $layout = $gBitThemes->getLayout( $layoutHash );
 
 if( !empty( $_REQUEST['fixpos'] )) {
@@ -97,19 +97,19 @@ if( isset( $_REQUEST['module_id'] ) && !empty( $_REQUEST['move_module'] )) {
 // this will sort the layout selection dropdown
 $allLayouts = $gBitThemes->getAllLayouts();
 ksort( $allLayouts );
-$gBitSmarty->assignByRef( 'allLayouts', $allLayouts );
+$gBitSmarty->assign( 'allLayouts', $allLayouts );
 $gBitSmarty->assign( 'module_package', $_REQUEST['module_package'] );
 
 $layoutHash = array(
 	'layout' => $_REQUEST['module_package'],
-	'fallback' => FALSE,
+	'fallback' => false,
 );
 $editLayout = $gBitThemes->getLayout( $layoutHash );
 $gBitThemes->generateModuleNames( $editLayout );
 $gBitSmarty->assign( 'editLayout', $editLayout );
 
 $combinedList = array_merge( array_keys( $gBitSystem->mPackages ), array_keys( $allLayouts ) );
-$layoutList = array();
+$layoutList = [];
 foreach( $combinedList as $l ) {
 	$layoutList[$l] = $l;
 	if( isset( $allLayouts[$l] ) ) {
@@ -128,37 +128,36 @@ $layoutAreas['right']  = 'r';
 if( $gBitSystem->isFeatureActive( 'site_bottom_column' )) {
 	$layoutAreas['bottom'] = 'b';
 }
-$gBitSmarty->assignByRef( 'layoutAreas', $layoutAreas );
+$gBitSmarty->assign( 'layoutAreas', $layoutAreas );
 
 $allModules = $gBitThemes->getAllModules();
 ksort( $allModules );
-$gBitSmarty->assignByRef( 'allModules', $allModules );
+$gBitSmarty->assign( 'allModules', $allModules );
 
 $allModulesHelp = $gBitThemes->getAllModules( 'modules', 'help_mod_' );
 ksort( $allModulesHelp );
-$gBitSmarty->assignByRef( 'allModulesHelp', $allModulesHelp );
+$gBitSmarty->assign( 'allModulesHelp', $allModulesHelp );
 
 $allCenters = $gBitThemes->getAllModules( 'templates', 'center_' );
 ksort( $allCenters );
-$gBitSmarty->assignByRef( 'allCenters', $allCenters );
+$gBitSmarty->assign( 'allCenters', $allCenters );
 
-$orders = array();
+$orders = [];
 
 for( $i = 1; $i < 50; $i++ ) {
 	$orders[] = $i;
 }
 
-$gBitSmarty->assignByRef( 'orders', $orders );
+$gBitSmarty->assign( 'orders', $orders );
 
 if( defined( 'ROLE_MODEL' )) {
 	$roles = $gBitUser->getAllUserRoles( ROOT_USER_ID );
-	$gBitSmarty->assignByRef( "roles", $roles );
+	$gBitSmarty->assign( "roles", $roles );
 } else {
 	$groups = $gBitUser->getAllUserGroups( ROOT_USER_ID );
-	$gBitSmarty->assignByRef( "groups", $groups );
+	$gBitSmarty->assign( "groups", $groups );
 }
 // we need gBitThemes as well
-$gBitSmarty->assignByRef( "gBitThemes", $gBitThemes );
+$gBitSmarty->assign( "gBitThemes", $gBitThemes );
 
-$gBitThemes->loadJavascript( THEMES_PKG_PATH.'scripts/BitThemes.js', TRUE );
-?>
+$gBitThemes->loadJavascript( THEMES_PKG_PATH.'scripts/BitThemes.js', true );

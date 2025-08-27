@@ -5,7 +5,7 @@
 require_once( '../../kernel/includes/setup_inc.php' );
 require_once( KERNEL_PKG_INCLUDE_PATH."simple_form_functions_lib.php" );
 
-//$gBitSmarty->assign( 'loadDragDrop', TRUE );
+//$gBitSmarty->assign( 'loadDragDrop', true );
 //$gBitSystem->setOnloadScript('initDragDrop();');
 $gBitSystem->verifyPermission( 'p_admin' );
 
@@ -65,7 +65,7 @@ if( !empty( $_REQUEST['update_menus'] ) ) {
 			$gBitSystem->storeConfig( "menu_$menuPackage", 'n', THEMES_PKG_NAME );
 		} elseif( $gBitSystem->getConfig( "menu_$menuPackage" ) == 'n' ) {
 			// the package menu was off and now is on. Just delete the pref since on is the assumed state
-			$gBitSystem->storeConfig( "menu_$menuPackage", NULL, THEMES_PKG_NAME );
+			$gBitSystem->storeConfig( "menu_$menuPackage", null, THEMES_PKG_NAME );
 		}
 
 		if( !empty( $_REQUEST["{$menuPackage}_menu_text"] ) ) {
@@ -77,7 +77,7 @@ if( !empty( $_REQUEST['update_menus'] ) ) {
 			// someone thinks that our default package names aren't good enough! HA!
 			$gBitSystem->storeConfig( "{$menuPackage}_menu_position", $_REQUEST["{$menuPackage}_menu_position"], constant( strtoupper( $menuPackage ).'_PKG_NAME' ));
 		} else {
-			$gBitSystem->storeConfig( "{$menuPackage}_menu_position", NULL, constant( strtoupper( $menuPackage ).'_PKG_NAME' ));
+			$gBitSystem->storeConfig( "{$menuPackage}_menu_position", null, constant( strtoupper( $menuPackage ).'_PKG_NAME' ));
 		}
 	}
 

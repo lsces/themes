@@ -1,21 +1,22 @@
 <?php 
-require_once( '../../kernel/includes/setup_inc.php' );
-require_once( KERNEL_PKG_INCLUDE_PATH.'simple_form_functions_lib.php' );
+require_once '../../kernel/includes/setup_inc.php';
+require_once KERNEL_PKG_INCLUDE_PATH . 'simple_form_functions_lib.php';
 
 $gBitSystem->verifyPermission( 'p_admin' );
 
 // apply the icon theme
-if( !empty( $_REQUEST["site_icon_style"] ) ) {
+if (!empty( $_REQUEST["site_icon_style"] )) {
 	$gBitSystem->storeConfig( 'site_icon_style', $_REQUEST["site_icon_style"], THEMES_PKG_NAME );
 }
 
 // apply the style layout
-if( !empty( $_REQUEST["site_style_layout"] ) ) {
-	if( !empty( $_REQUEST['approved'] ) ) {
-		$gBitSystem->storeConfig( 'site_style_layout', ( ( $_REQUEST["site_style_layout"] != 'remove' ) ? $_REQUEST["site_style_layout"] : NULL ), THEMES_PKG_NAME );
-	} else {
-		$gBitSystem->setConfig( 'site_style_layout', ( ( $_REQUEST["site_style_layout"] != 'remove' ) ? $_REQUEST["site_style_layout"] : NULL ), THEMES_PKG_NAME );
-		$gBitSmarty->assign( 'approve', TRUE );
+if (!empty( $_REQUEST["site_style_layout"] )) {
+	if (!empty( $_REQUEST['approved'] )) {
+		$gBitSystem->storeConfig( 'site_style_layout', ( $_REQUEST["site_style_layout"] != 'remove' ) ? $_REQUEST["site_style_layout"] : null, THEMES_PKG_NAME );
+	}
+	else {
+		$gBitSystem->setConfig( 'site_style_layout', ( $_REQUEST["site_style_layout"] != 'remove' ) ? $_REQUEST["site_style_layout"] : null, THEMES_PKG_NAME );
+		$gBitSmarty->assign( 'approve', true );
 	}
 }
 
@@ -27,28 +28,28 @@ if( !empty( $_REQUEST["site_style"] ) ) {
 		$gBitThemes->setStyle( $_REQUEST["site_style"] );
 	} else {
 		$gBitSystem->setConfig( 'style_variation', !empty( $_REQUEST["style_variation"] ) ? $_REQUEST["style_variation"] : '', THEMES_PKG_NAME );
-		$gBitSmarty->assign( 'approve', TRUE );
+		$gBitSmarty->assign( 'approve', true );
 		$gBitThemes->setStyle( $_REQUEST["site_style"] );
 	}
 }
 
 // Get list of available styles
-$styles = $gBitThemes->getStyles( NULL, TRUE );
-$gBitSmarty->assignByRef( "styles", $styles );
+$styles = $gBitThemes->getStyles();
+$gBitSmarty->assign( "styles", $styles );
 
-$subDirs = array( 'style_info', 'alternate' );
-$stylesList = $gBitThemes->getStylesList( NULL, NULL, $subDirs );
-$gBitSmarty->assignByRef( "stylesList", $stylesList );
+$subDirs = [ 'style_info', 'alternate' ];
+$stylesList = $gBitThemes->getStylesList( '', false, $subDirs );
+$gBitSmarty->assign( "stylesList", $stylesList );
 
-$subDirs = array( 'style_info' );
-$iconStyles = $gBitThemes->getStylesList( CONFIG_PKG_PATH."iconsets/", NULL, $subDirs );
-$gBitSmarty->assignByRef( "iconStyles", $iconStyles );
+$subDirs = [ 'style_info' ];
+$iconStyles = $gBitThemes->getStylesList( CONFIG_PKG_PATH."iconsets/", false, $subDirs );
+$gBitSmarty->assign( "iconStyles", $iconStyles );
 
 $styleLayouts = $gBitThemes->getStyleLayouts();
-$gBitSmarty->assignByRef( "styleLayouts", $styleLayouts );
+$gBitSmarty->assign( "styleLayouts", $styleLayouts );
 
 // pick some icons for the preview.
-$sampleIcons = array(
+$sampleIcons = [
 	'applications-internet',
 	'dialog-cancel',
 	'dialog-error',
@@ -64,11 +65,10 @@ $sampleIcons = array(
 	'go-up',
 	'help-browser',
 	'folder',
-);
+];
 $gBitSmarty->assign( "sampleIcons", $sampleIcons );
 
 // load css file
 $gBitThemes->loadCss( THEMES_PKG_PATH.'css/admin_themes.css' );
 
 $gBitSystem->display( 'bitpackage:themes/admin_themes_manager.tpl', 'Themes Manager' , array( 'display_mode' => 'admin' ));
-?>
