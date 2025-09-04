@@ -1,4 +1,7 @@
 <?php
+namespace Bitweaver\Plugins;
+use Smarty\Resource\Smarty_Resource_Custom;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -14,7 +17,7 @@
 class Smarty_Resource__Custom extends Smarty_Resource_Custom {
 
 	protected function fetch ( $pTplName, &$pTplSource, &$pTplTime ) {
-		global $gBitLanguage, $gBitThemes, $gBitSmarty;
+		global $gBitLanguage, $gBitThemes, $gBitSystem, $gBitSmarty;
 		$ret = '';
 
 		// We're gonna run our own cache mechanism for user_modules
@@ -32,7 +35,7 @@ class Smarty_Resource__Custom extends Smarty_Resource_Custom {
 		} else {
 			global $moduleParams;
 			if( $moduleParams = $gBitThemes->getCustomModule( $template )) {
-				$gBitSmarty->assignByRef( 'moduleParams', $moduleParams );
+				$gBitSmarty->assign( 'moduleParams', $moduleParams );
 				$pTplSource = $gBitSmarty->fetch( 'bitpackage:themes/custom_module.tpl' );
 				// write to chache file
 				$fp = fopen( $cacheFile, "w+" );
