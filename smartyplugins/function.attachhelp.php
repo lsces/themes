@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+use Bitweaver\KernelTools;
 
 /**
  * Smarty plugin
@@ -26,7 +27,7 @@ function smarty_function_attachhelp( $pParams, &$gSmartyTemplate ) {
 
 	// prepare the output
 	if( empty( $pParams['attachment_id'] )) {
-		$gBitSmarty->trigger_error( tra( 'You need to provide an attachment_id' ));
+		trigger_error( KernelTools::tra( 'You need to provide an attachment_id' ));
 		return;
 	} elseif( !empty( $pParams['wiki_plugin_link'] )) {
 		$attachhelp = trim( $pParams['wiki_plugin_link'] );
