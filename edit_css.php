@@ -12,6 +12,7 @@
 /**
  * Setup
  */
+use Bitweaver\Kerneltools;
 include_once( '../kernel/includes/setup_inc.php' );
 include_once( THEMES_PKG_PATH.'css_lib.php' );
 
@@ -96,7 +97,7 @@ $gBitSmarty->assign('customCSSImageURL',$customCSSImageURL);
 // Create a custom.css for this user if they do not already have one
 if (!file_exists($customCSSFile)) {
 	if (!copy(THEMES_PKG_PATH.'/styles/basic/basic.css', $customCSSFile)) {
-		$gBitSmarty->assign('msg', tra("Unable to create a custom CSS file for you!"));
+		$gBitSmarty->assign('msg', KernelTools::tra"Unable to create a custom CSS file for you!"));
 		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}
@@ -108,7 +109,7 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 	$fp = fopen($customCSSFile, "w");
 
 	if (!$fp) {
-		$gBitSmarty->assign('msg', tra("You dont have permission to write the style sheet"));
+		$gBitSmarty->assign('msg', KernelTools::tra"You dont have permission to write the style sheet"));
 		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}
@@ -133,7 +134,7 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 	$fp = fopen($customCSSFile, "w");
 
 	if (!$fp) {
-		$gBitSmarty->assign('msg', tra("You dont have permission to write the style sheet"));
+		$gBitSmarty->assign('msg', KernelTools::tra"You dont have permission to write the style sheet"));
 		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}

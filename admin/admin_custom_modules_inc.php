@@ -2,13 +2,15 @@
 // $Header$
 
 require_once( '../../kernel/includes/setup_inc.php' );
+use Bitweaver\KernalTools;
+
 $feedback = [];
 
 if( !empty( $_REQUEST['name'] )) {
 	if( !empty( $_REQUEST['action'] )) {
 		if( $_REQUEST['action'] == 'remove' ) {
 			if( $gBitThemes->expungeCustomModule( $_REQUEST['name'] )) {
-				$feedback['success'] = tra( 'The module was successsfully removed.' );
+				$feedback['success'] = KernelTools::tra( 'The module was successsfully removed.' );
 			} else {
 				$feedback['error'] = $gBitThemes->mErrors;
 			}
@@ -17,7 +19,7 @@ if( !empty( $_REQUEST['name'] )) {
 		}
 	} elseif( !empty( $_REQUEST['save'] )) {
 		if( $gBitThemes->storeCustomModule( $_REQUEST )) {
-			$feedback['success'] = tra( 'The module was successsfully stored.' );
+			$feedback['success'] = KernelTools::tra( 'The module was successsfully stored.' );
 		} else {
 			$feedback['error'] = $gBitThemes->mErrors;
 			$gBitSmarty->assign( 'module', $_REQUEST );
