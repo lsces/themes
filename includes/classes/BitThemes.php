@@ -1465,9 +1465,9 @@ class BitThemes extends BitSingleton {
 						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-3.7.1.js', false, $pos++, $joined );
 //						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-ui-14.1.js', false, $pos++, $joined );
 //						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-migrate-3.5.2.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/bootstrap'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/bootstrap-cookie-consent'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap-3.2/colourstrap/colourstrap-full'.$jqueryMin.'.css', false, $pos++, $joined );
+						$this->loadJavascript( THEMES_PKG_PATH.'js/bootstrap.js', false, $pos++, $joined );
+						$this->loadJavascript( THEMES_PKG_PATH.'js/bootstrap-cookie-consent.js', false, $pos++, $joined );
+						$this->loadCss( THEMES_PKG_PATH.'css/colourstrap-full.css', false, $pos++, $joined );
 //						$this->loadCss( THEMES_PKG_PATH.'js/jquery-ui'.$jqueryMin.'.css', false, $pos++, $joined );
 						break;
 					case 'jqueryold':
