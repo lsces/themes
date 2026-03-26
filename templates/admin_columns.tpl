@@ -146,7 +146,7 @@
 								<td>{$name}</td>
 								{foreach from=$hideableAreas item=areaname key=area name=areas}
 									{foreach from=$displayModes item=modename key=mode name=modes}
-										<td class="{if $smarty.foreach.modes.last && !$smarty.foreach.areas.last}splitstyle{/if}">
+										<td class="{if $smarty.foreach.modes.last and !$smarty.foreach.areas.last}splitstyle{/if}">
 											<input type="checkbox" name="hide[{$package}_{$mode}_hide_{$area}_col]" value="y" {if $gBitSystem->isFeatureActive("`$package`_`$mode`_hide_`$area`_col")}checked="checked"{/if} />
 										</td>
 									{/foreach}

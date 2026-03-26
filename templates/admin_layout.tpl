@@ -50,7 +50,7 @@
 <div class="form-group">
 	<div class="col-md-7">
 		<table class="width100p">
-			<caption>{tr}Current Layout of '{if !$module_package || $module_package=='kernel'}Site Default{else}{$module_package|capitalize}{/if}'{/tr}</caption>
+			<caption>{tr}Current Layout of '{if !$module_package or $module_package=='kernel'}Site Default{else}{$module_package|capitalize}{/if}'{/tr}</caption>
 			<tr>
 				{foreach from=$layoutAreas item=area key=colkey}
 					{if $colkey =='top'}
@@ -100,12 +100,12 @@
 			<div class="form-group">
 				{formlabel label="Package"}
 				{forminput}
-					<span class="highlight">{tr}{if !$module_package || $module_package eq 'kernel'}Site Default{else}{$module_package|capitalize}{/if}{/tr}</span>
+					<span class="highlight">{tr}{if !$module_package or $module_package eq 'kernel'}Site Default{else}{$module_package|capitalize}{/if}{/tr}</span>
 					{formhelp note="This is the package you are currently editing."}
 				{/forminput}
 			</div>
 
-			{if $fEdit && $fAssign.name}
+			{if $fEdit and $fAssign.name}
 				<input type="hidden" name="assign_name" value="{$fAssign.name}" />
 			{else}
 				<div class="form-group">
@@ -252,7 +252,7 @@
 			<div class="form-group">
 				{formlabel label="Package"}
 				{forminput}
-					<span class="highlight">{tr}{if !$module_package || $module_package eq 'kernel'}Site Default{else}{$module_package|capitalize}{/if}{/tr}</span>
+					<span class="highlight">{tr}{if !$module_package or $module_package eq 'kernel'}Site Default{else}{$module_package|capitalize}{/if}{/tr}</span>
 					{formhelp note="This is the package you are currently editing."}
 				{/forminput}
 			</div>
@@ -260,7 +260,7 @@
 			<div class="form-group">
 				{formlabel label="Center Piece" for="module"}
 				{forminput}
-					{if $fEdit && $fAssign.name}
+					{if $fEdit and $fAssign.name}
 						<input type="hidden" name="fAssign[module]" value="{$fAssign.module}" id="module" />{$fAssign.module}
 					{else}
 						{* html_options name="fAssign[module_rsrc]" id="module" values=$allCenters options=$allCenters selected=$mod *}
