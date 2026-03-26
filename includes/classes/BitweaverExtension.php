@@ -85,7 +85,7 @@ class BitweaverExtension extends Base {
 		}
 
         switch ($modifier) {
-			case 'add_link_ticket':		$this->modifiers[$modifier] = new \Bitweaver\Plugins\AddLinkTicket(); break;
+//			case 'add_link_ticket':		$this->modifiers[$modifier] = new \Bitweaver\Plugins\AddLinkTicket(); break;
 			case 'tr': 					$this->modifiers[$modifier] = new \Bitweaver\Plugins\PreTr();
 //			case 'bit_short_datetime':	$this->modifiers[$modifier] = new \Bitweaver\Plugins\BitShortDatetime();
         }
