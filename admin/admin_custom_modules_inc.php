@@ -2,7 +2,7 @@
 // $Header$
 
 require_once( '../../kernel/includes/setup_inc.php' );
-use Bitweaver\KernalTools;
+use Bitweaver\KernelTools;
 
 $feedback = [];
 

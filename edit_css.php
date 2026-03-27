@@ -29,7 +29,7 @@ function delete($dir, $pattern = "*.*")
     if (is_dir($dir)) {
     	$d = opendir($dir);
         while ($file = readdir($d)) {
-            if (is_file($dir.$file) && ereg("^".$pattern."$", $file)){
+            if (is_file($dir.$file) && preg_match("^".$pattern."$", $file)){
                 if (unlink($dir.$file))    
                 	$deleted[] = $file;
             }
@@ -92,12 +92,12 @@ $gBitSystem->verifyPermission( 'bit_p_create_css' );
 
 $customCSSPath = $gBitUser->getStoragePath( null,$gBitUser->mUserId );	// Path to this user's storage directory
 $customCSSFile = $customCSSPath.'custom.css';	// Path to this user's custom stylesheet
-$customCSSImageURL = $gBitUser->getStorageURL( null,$gBitUser->mUserId ).'/images/';
+$customCSSImageURL = $gBitUser->getStorageURL( $gBitUser->mUserId ).'/images/';
 $gBitSmarty->assign('customCSSImageURL',$customCSSImageURL);			
 // Create a custom.css for this user if they do not already have one
 if (!file_exists($customCSSFile)) {
 	if (!copy(THEMES_PKG_PATH.'/styles/basic/basic.css', $customCSSFile)) {
-		$gBitSmarty->assign('msg', KernelTools::tra"Unable to create a custom CSS file for you!"));
+		$gBitSmarty->assign('msg', KernelTools::tra("Unable to create a custom CSS file for you!"));
 		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}
@@ -109,7 +109,7 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 	$fp = fopen($customCSSFile, "w");
 
 	if (!$fp) {
-		$gBitSmarty->assign('msg', KernelTools::tra"You dont have permission to write the style sheet"));
+		$gBitSmarty->assign('msg', KernelTools::tra ("You dont have permission to write the style sheet"));
 		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
 		die;
 	}
@@ -134,8 +134,8 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 	$fp = fopen($customCSSFile, "w");
 
 	if (!$fp) {
-		$gBitSmarty->assign('msg', KernelTools::tra"You dont have permission to write the style sheet"));
-		$gBitSystem->display( 'error.tpl' , null, array( 'display_mode' => 'edit' ));
+		$gBitSmarty->assign('msg', KernelTools::tra("You dont have permission to write the style sheet"));
+		$gBitSystem->display( 'error.tpl' , null, [ 'display_mode' => 'edit' ]);
 		die;
 	}
 	
@@ -146,7 +146,7 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 	// User has uploaded an image to use in their custom theme
 	//print('You uploaded: '.$_FILES['fImgUpload']['name']);
 	print(strtoupper($_FILES['fImgUpload']['name']));
-	if (!ereg(".JPG$|.PNG$|.GIF$|.BMP$",strtoupper($_FILES['fImgUpload']['name']))) {
+	if (!preg_match("/.JPG$|.PNG$|.GIF$|.BMP$/",strtoupper($_FILES['fImgUpload']['name']))) {
 		$errorMsg = "Your image must be one of the following types: .jpg, .png, .gif, .bmp";
 	} else {
 		if ($_FILES['fImgUpload']['error'] == UPLOAD_ERR_OK && copy($_FILES['fImgUpload']['tmp_name'], $customCSSPath.'/images/'.$_FILES['fImgUpload']['name'])) {
@@ -158,7 +158,7 @@ if (isset($_REQUEST["fSaveCSS"])and $_REQUEST["fSaveCSS"]) {
 	}
 } elseif (isset($_REQUEST['fDeleteImg'])) {
 	// Delete one of the images in this user's storage directory
-	$imgName = $customCSSPath.'/images/'.$_REQUEST['fDeleteImg'];
+	$imgName = "$customCSSPath/images/".$_REQUEST['fDeleteImg'];
 	//print("imgname: $imgName");
 	if (file_exists($imgName)) {
 		unlink($imgName);
@@ -195,13 +195,11 @@ if (isset($errorMsg))
 $imageList = ls_a($customCSSPath.'images/');
 $themeImages = [];
 foreach ($imageList as $image) {
-	if (ereg(".JPG$|.PNG$|.GIF$|.BMP$",strtoupper($image))) {
+	if (preg_match("/.JPG$|.PNG$|.GIF$|.BMP$/",strtoupper($image))) {
 		$themeImages[] = $image;
 	}
 }
 
 $gBitSmarty->assign('themeImages',$themeImages);	
 
-$gBitSystem->display( 'bitpackage:themes/edit_css.tpl', null, array( 'display_mode' => 'edit' ));
-
-?>
+$gBitSystem->display( 'bitpackage:themes/edit_css.tpl', null, [ 'display_mode' => 'edit' ]);
