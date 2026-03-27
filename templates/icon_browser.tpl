@@ -39,7 +39,7 @@
 					</td>
 					<td>
 						{* only show huge size if looking at a particular set *}
-						{if $smarty.request.icon_style and $iconList.$iconStyle.$name}
+						{if $smarty.request.icon_style && $iconList.$iconStyle.$name}
 							{* avoid translation here by not using iexplain *}
 							{biticon istyle=$iconStyle ipackage=icons iname="huge/`$iconList.$iconStyle.$name`"}
 						{/if}
