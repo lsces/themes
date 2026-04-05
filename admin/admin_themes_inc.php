@@ -2,60 +2,60 @@
 use \Bitweaver\KernelTools;
 
 $themeSettings = [
-	'site_use_jscalendar' => array(
+	'site_use_jscalendar' => [
 		'label' => 'Enable JSCalendar',
-		'note' => 'If checked, a calendar popup allows for easily selecting a date using an appealing interface.',
-	),
-	'themes_collapsible_modules' => array(
+		'note'  => 'If checked, a calendar popup allows for easily selecting a date using an appealing interface.',
+	],
+	'themes_collapsible_modules' => [
 		'label' => 'Collapsible modules',
-		'note' => 'This allows users to collapse modules by clicking on their titles. Can be useful if you use many modules.',
-	),
-	'themes_output_highlighting' => array(
+		'note'  => 'This allows users to collapse modules by clicking on their titles. Can be useful if you use many modules.',
+	],
+	'themes_output_highlighting' => [
 		'label' => 'Search term highlighting',
-		'note' => 'This enables the use of "highlight=x" in the URL to highlight words used in a search result.',
-	),
-//	'themes_edit_css' => array(
+		'note'  => 'This enables the use of "highlight=x" in the URL to highlight words used in a search result.',
+	],
+//	'themes_edit_css' => [
 //		'label' => 'Edit Css',
 //		'note' => 'Enables you to edit CSS files from within your browser to customise your site style according to your desires.',
-//	),
-	'site_disable_fat' => array(
+//	],
+	'site_disable_fat' => [
 		'label' => "Disable fading",
-		'note' => "If checked, success, warning or error messages display no fading effect anymore.",
-	),
-	'site_disable_jstabs' => array(
+		'note'  => "If checked, success, warning or error messages display no fading effect anymore.",
+	],
+	'site_disable_jstabs' => [
 		'label' => "Disable Javascript tabs",
-		'note' => "If checked, admin pages flow vertically, instead of displaying in a 'tabbed pages' interface.",
-	),
-	'site_fancy_zoom' => array(
+		'note'  => "If checked, admin pages flow vertically, instead of displaying in a 'tabbed pages' interface.",
+	],
+	'site_fancy_zoom' => [
 		'label' => "Enable Fancy Zoom for images",
-		'note' => "If checked, a Javascript zooms images when clicking on them. This will modify the behaviour when viewing most images. If you are running a commercial site, please read the license notice in /util/javascript/fancyzoom/js-global/FancyZoom.js.",
-	),
-	'site_mods_req_admn_grp' => array(
+		'note'  => "If checked, a Javascript zooms images when clicking on them. This will modify the behaviour when viewing most images. If you are running a commercial site, please read the license notice in /util/javascript/fancyzoom/js-global/FancyZoom.js.",
+	],
+	'site_mods_req_admn_grp' => [
 		'label' => 'Modules require membership',
-		'note' => 'If enabled, modules with group/role restrictions require the administrator to be member of the group/role. If disabled, all modules are always visible to administrators.',
-	),
-	'themes_joined_js_css' => array(
+		'note'  => 'If enabled, modules with group/role restrictions require the administrator to be member of the group/role. If disabled, all modules are always visible to administrators.',
+	],
+	'themes_joined_js_css' => [
 		'label' => 'Joined CSS and JS',
-		'note' => 'If enabled, javascript and CSS files will be concatenated into single files to reduce server requests. This is useful for webdesigners and developers. Please enable this feature on live sites.',
-	),
-	'themes_packed_js_css' => array(
+		'note'  => 'If enabled, javascript and CSS files will be concatenated into single files to reduce server requests. This is useful for webdesigners and developers. Please enable this feature on live sites.',
+	],
+	'themes_packed_js_css' => [
 		'label' => 'Packed CSS and JS',
-		'note' => 'If enabled, javascript and CSS files will be reduced to their smallest possible size. This is useful for webdesigners and developers. Please enable this feature on live sites.',
-	),
-	'themes_disable_pkg_css' => array( 
+		'note'  => 'If enabled, javascript and CSS files will be reduced to their smallest possible size. This is useful for webdesigners and developers. Please enable this feature on live sites.',
+	],
+	'themes_disable_pkg_css' => [
 		'label' => 'Disable All Package CSS',
-		'note' => 'If checked, all css that is automatically included by packages will be disabled. If you want to include some of the package css it is recommended you copy that css to your theme css file.',
-	),
+		'note'  => 'If checked, all css that is automatically included by packages will be disabled. If you want to include some of the package css it is recommended you copy that css to your theme css file.',
+	],
 ];
 $gBitSmarty->assign( 'themeSettings', $themeSettings );
 
 if( !empty( $_REQUEST['change_prefs'] )) {
-	$pref_simple_values = array(
+	$pref_simple_values = [
 		"site_biticon_display_style",
 		"site_icon_size",
 		"themes_jquery_hosting",
 		"default_icon_style",
-	);
+	];
 
 	foreach( $pref_simple_values as $svitem ) {
 		simple_set_value( $svitem, THEMES_PKG_NAME );
@@ -67,36 +67,34 @@ if( !empty( $_REQUEST['change_prefs'] )) {
 
 	// due to the packing / joining options, we will remove the cache and reload the page
 	$gBitThemes->mThemeCache->expungeCache();
-	bit_redirect( KERNEL_PKG_URL."admin/index.php?page=themes" );
+	KernelTools::bit_redirect( KERNEL_PKG_URL."admin/index.php?page=themes" );
 }
 
 // set the options biticon takes
-$biticon_display_options = array(
-	'icon' => KernelTools::tra( 'Icon' ),
-	'text' => KernelTools::tra( 'Text' ),
-	'icon_text' => KernelTools::tra( 'Icon and Text' )
-);
+$biticon_display_options = [
+	'icon'      => KernelTools::tra( 'Icon' ),
+	'text'      => KernelTools::tra( 'Text' ),
+	'icon_text' => KernelTools::tra( 'Icon and Text' ),
+];
 $gBitSmarty->assign( "biticon_display_options", $biticon_display_options );
 
 // get the icon styles
-$subDirs = array( 'style_info' );
+$subDirs = [ 'style_info' ];
 $iconStyles = $gBitThemes->getStylesList( CONFIG_PKG_PATH."styles/icons/", false, $subDirs );
 foreach( $iconStyles as $key=>$style ){
 	$iconStyles[$key] = str_replace( "_", " ", $style['style'] );
 }
 $gBitSmarty->assign( "iconStyles", $iconStyles );
 
-$biticon_sizes = array(
+$biticon_sizes = [
 	'small' => KernelTools::tra( 'Small' ),
 	'large' => KernelTools::tra( 'Large' ),
-);
+];
 $gBitSmarty->assign( "biticon_sizes", $biticon_sizes );
 
 // These numbers are intentionally off by 1 due to the way IE fixes name their js
-$jqueryOptions = array(
-	'jquery' => KernelTools::tra( 'Google Hosted' ),
+$jqueryOptions = [
+	'jquery'      => KernelTools::tra( 'Google Hosted' ),
 	'jquerylocal' => KernelTools::tra( 'Local' ),
-);
+];
 $gBitSmarty->assign( 'jqueryOptions', $jqueryOptions );
-
-?>
