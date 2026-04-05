@@ -890,18 +890,18 @@ class BitThemes extends BitSingleton {
 		}
 
 		// if we don't have a valid area, we'll just shove it in the left column
-		$pHash['store']['layout_area'] = $this->verifyArea( $pHash['layout_area'] ) ? $pHash['layout_area'] : 'l';
+		$pHash['store']['layout_area'] = !empty($pHash['layout_area']) ? $this->verifyArea( $pHash['layout_area'] ) : 'l';
 
 		$pHash['store']['title']         = !empty( $pHash['title'] )             ? $pHash['title']         : null;
 		$pHash['store']['params']        = !empty( $pHash['params'] )            ? $pHash['params']        : null;
 		$pHash['store']['layout']        = !empty( $pHash['layout'] )            ? $pHash['layout']        : DEFAULT_PACKAGE;
-		$pHash['store']['module_rows']   = @is_numeric( $pHash['module_rows'] )  ? $pHash['module_rows']   : null;
-		$pHash['store']['cache_time']    = @is_numeric( $pHash['cache_time'] )   ? $pHash['cache_time']    : null;
-		$pHash['store']['pos']           = @is_numeric( $pHash['pos'] )          ? $pHash['pos']           : 1;
+		$pHash['store']['module_rows']   = !empty($pHash['module_rows']) && is_numeric( $pHash['module_rows'] )  ? $pHash['module_rows']   : null;
+		$pHash['store']['cache_time']    = !empty($pHash['cache_time']) && is_numeric( $pHash['cache_time'] )   ? $pHash['cache_time']    : null;
+		$pHash['store']['pos']           = !empty($pHash['pos']) && is_numeric( $pHash['pos'] )          ? $pHash['pos']           : 1;
 
-		if( !empty( $pHash['roles'] ) && is_array( $pHash['roles'] )) {
+		if( !empty( $pHash['roles'] ) && \is_array( $pHash['roles'] )) {
 			$pHash['store']['roles'] = implode( ' ', $pHash['roles'] );
-		} elseif( !empty( $pHash['groups'] ) && is_array( $pHash['groups'] )) {
+		} elseif( !empty( $pHash['groups'] ) && \is_array( $pHash['groups'] )) {
 			$pHash['store']['groups'] = implode( ' ', $pHash['groups'] );
 		} elseif (defined('ROLE_MODEL') ) {
 			$pHash['store']['roles'] = null;
@@ -912,7 +912,7 @@ class BitThemes extends BitSingleton {
 		if( !empty( $pHash['config'] ) ) {
 			$pHash['store']['params'] = '';
 			foreach( $pHash['config'] as $paramName=>$paramValue ) {
-				$pHash['store']['params'] .= $paramName.'='.urlencode( $paramValue ).'&';
+				$pHash['store']['params'] .= "$paramName=".urlencode( $paramValue ).'&';
 			}
 		} else {
 			$pHash['store']['params']        = !empty( $pHash['params'] )            ? $pHash['params']        : null;
