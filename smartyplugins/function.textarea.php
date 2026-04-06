@@ -5,7 +5,7 @@ namespace Bitweaver\Plugins;
  * Smarty plugin
  * @package Smarty
  * @subpackage plugins
- * @link http://www.bitweaver.org/wiki/function_textarea function_textarea
+ * @link https://www.bitweaver.org/wiki/function_textarea function_textarea
  */
 
 /** 

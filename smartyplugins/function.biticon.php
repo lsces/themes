@@ -6,7 +6,7 @@ use Bitweaver\KernelTools;
  * Smarty plugin
  * @package Smarty
  * @subpackage plugins
- * @link http://www.bitweaver.org/wiki/function_biticon function_biticon
+ * @link https://www.bitweaver.org/wiki/function_biticon function_biticon
  */
 
 /**

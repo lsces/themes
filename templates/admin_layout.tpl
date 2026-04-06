@@ -186,13 +186,13 @@
 					{formhelp note="Here you can enter any additional parameters the module might need. Use the http query string form, e.g. foo=123&amp;bar=ABC (optional)"}
 					{foreach key=pkg item=modules from=$allModules}
 						{foreach key=value item=module from=$modules}
-						{if $module.params}
+						{if !empty($module.params)}
 							<table id="themes_params_help_{$value}" class="themes_params_help" style="display:none">
 								<tr>
 									<th colspan=2 style="text-align:left">Options for {$module.title|default:''}</th>
 								</tr>
 								{foreach key=param item=data from=$module.params|default:[]}
-								{if $data.help}
+								{if !empty($data.help)}
 									<tr>
 										<td style="font-weight:bold; padding-right:4px">{$param}</td>
 										<td>{$data.help}</td>
@@ -212,7 +212,7 @@
 					{forminput}
 						<select multiple="multiple" size="5" name="roles[]" id="roles">
 							{foreach from=$roles key=roleId item=role}
-								<option value="{$roleId}" {if $role.selected eq 'y'}selected="selected"{/if}>{$role.role_name}</option>
+								<option value="{$roleId}" {if $role.selected ?? 'n' eq 'y'}selected="selected"{/if}>{$role.role_name}</option>
 							{/foreach}
 						</select>
 						{formhelp note="Select the roles of users who can see this module. If you select no role, the module will be visible to all users."}

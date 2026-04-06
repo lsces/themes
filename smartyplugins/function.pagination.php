@@ -6,7 +6,7 @@ namespace Bitweaver\Plugins;
  * Smarty {pagination} function plugin
  * @package Smarty
  * @subpackage plugins
- * @link http://www.bitweaver.org/wiki/function_pagination function_pagination
+ * @link https://www.bitweaver.org/wiki/function_pagination function_pagination
  */
 
 /**

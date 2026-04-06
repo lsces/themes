@@ -20,7 +20,7 @@ namespace Bitweaver\Plugins;
  * 
  * @package Smarty
  * @subpackage plugins
- * @link http://www.bitweaver.org/wiki/function_libertypagination function.libertypagination
+ * @link https://www.bitweaver.org/wiki/function_libertypagination function.libertypagination
  */
 
 /**

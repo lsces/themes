@@ -88,7 +88,7 @@ function smarty_function_formhelp( $pParams, &$pSmarty=NULL ) {
 	if( $gBitSystem->isFeatureActive( 'site_online_help' ) || $gBitSystem->isFeatureActive( 'site_form_help' ) || $force == 'y' ) {
 		if( !empty( $rawHash ) ) {
 			if( !empty( $rawHash['page'] ) && ( $gBitSystem->isFeatureActive('site_online_help') || $force == 'y' ) ) {
-				$ret_page = '<strong>'.KernelTools::tra( 'Online help' ).'</strong>: <a class=\'external\' href=\'http://doc.bitweaver.org/wiki/index.php?page='.$rawHash['page'].'\'>'.$rawHash['page'].'</a><br />';
+				$ret_page = '<strong>'.KernelTools::tra( 'Online help' ).'</strong>: <a class=\'external\' href=\'https://bitweaver.org/wiki/index.php?page='.$rawHash['page'].'\'>'.$rawHash['page'].'</a><br />';
 			}
 
 			if( !empty( $rawHash['link'] ) && ( $gBitSystem->isFeatureActive('site_online_help') || $force == 'y' ) ) {

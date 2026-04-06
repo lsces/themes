@@ -5,7 +5,7 @@ namespace Bitweaver\Plugins;
  * Smarty plugin
  * @package Smarty
  * @subpackage plugins
- * @link http://www.bitweaver.org/wiki/function_booticon function_booticon
+ * @link https://www.bitweaver.org/wiki/function_booticon function_booticon
  */
 
 /**

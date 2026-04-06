@@ -5,7 +5,7 @@ namespace Bitweaver\Plugins;
  * Smarty {pageurl} function plugin
  * @package Smarty
  * @subpackage plugins
- * @link http://www.bitweaver.org/wiki/function_pageurl function_pageurl
+ * @link https://www.bitweaver.org/wiki/function_pageurl function_pageurl
  */
 
 /**
