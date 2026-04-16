@@ -1,6 +1,8 @@
 <?php
 namespace Bitweaver\Plugins;
 
+use Bitweaver\Liberty\LibertyContent;
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -17,7 +19,7 @@ namespace Bitweaver\Plugins;
  * @link http://smarty.php.net/manual/en/language.function.popup.php {popup}
  *		  (Smarty online manual)
  * @param array
- * @param Smarty
+ * @param object Smarty
  * @return string
  */
 

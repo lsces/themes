@@ -76,7 +76,7 @@ class BitThemes extends BitSingleton {
 	}
 
 	public function __sleep() {
-		return array_merge( parent::__sleep(), [ 'mStyles', 'mThemeCache', 'mAjaxLibs', 'mAuxFiles', 'mRawFiles', 'mModules' ] );
+		return [ ...parent::__sleep(), 'mStyles', 'mThemeCache', 'mAjaxLibs', 'mAuxFiles', 'mRawFiles', 'mModules' ];
 	}
 
 	// {{{ =================== Styles ====================
@@ -224,7 +224,7 @@ class BitThemes extends BitSingleton {
 	/**
 	 * figure out the current style URL
 	 *
-	 * @param string $pScanFile file to be looked for
+	 * @param string $pStyle file to be looked for
 	 * @return string 
 	 */
 	public function getStyleUrl( string $pStyle = '' ) {
@@ -237,7 +237,7 @@ class BitThemes extends BitSingleton {
 	/**
 	 * figure out the current style URL
 	 *
-	 * @param string $pScanFile file to be looked for
+	 * @param string $pStyle file to be looked for
 	 * @return string
 	 */
 	public function getStylePath( string $pStyle = '' ) {
@@ -329,7 +329,7 @@ class BitThemes extends BitSingleton {
 
 		if( empty( $pSubDirs )) {
 			$subDirs[] = [ '' ];
-		} elseif( !is_array( $pSubDirs )) {
+		} elseif( !\is_array( $pSubDirs )) {
 			$subDirs[] = $pSubDirs;
 		} else {
 			$subDirs = $pSubDirs;
@@ -476,7 +476,7 @@ class BitThemes extends BitSingleton {
 								$r["data"] = $data;
 							} else {
 								if( $moduleParams = $this->getCustomModule( $template )) {
-									$moduleParams = array_merge( $r, $moduleParams );
+									$moduleParams = [ ...$r, ...$moduleParams ];
 									$gBitSmarty->assign( 'moduleParams', $moduleParams );
 									$ret .= $gBitSmarty->fetch( 'bitpackage:themes/custom_module.tpl' );
 
@@ -492,7 +492,7 @@ class BitThemes extends BitSingleton {
 							unset( $data );
 						} else {
 							$explosion = explode( '/', $r['module_rsrc'] );
-							$template = array_pop( $explosion );
+							$template = \array_pop( $explosion );
 							
 							// using $module_rows, $module_params and $module_title is deprecated. please use $moduleParams hash instead
 							global $module_rows, $module_params, $module_title, $gBitLanguage;
@@ -581,7 +581,7 @@ class BitThemes extends BitSingleton {
 						FROM `".BIT_DB_PREFIX."themes_layouts` tl
 						WHERE  tl.`layout`=? ORDER BY ".$this->mDb->convertSortmode( "pos_asc" );
 
-			$result = $this->mDb->query( $query, array( $l ) );
+			$result = $this->mDb->query( $query, [ $l ] );
 			if( $result && $result->RecordCount() ) {
 				break;
 			}
@@ -592,7 +592,7 @@ class BitThemes extends BitSingleton {
 			$skipDefaults = isset( $row['layout'] ) && ( $row['layout'] != DEFAULT_PACKAGE ) && ( $gBitSystem->getActivePackage() != DEFAULT_PACKAGE )
 				? true : false;
 
-			if ( !is_array( $gCenterPieces ) ){
+			if ( !\is_array( $gCenterPieces ) ){
 				$gCenterPieces = [];
 			}
 			while( $row ) {
@@ -612,7 +612,7 @@ class BitThemes extends BitSingleton {
 
 						if( $gBitUser->isAdmin() ) {
 							if ( $gBitSystem->isFeatureActive('site_mods_req_admn_grp') ) {
-								if( in_array(1, $row['module_roles']) ) {
+								if( \in_array(1, $row['module_roles']) ) {
 									$row['visible'] = true;
 								}
 							}
@@ -639,7 +639,7 @@ class BitThemes extends BitSingleton {
 						$row['module_groups'] = !empty($row['groups']) ? $this->parseGroups( $row['groups'] ) : null;
 						if( $gBitUser->isAdmin() ) {
 							if ( $gBitSystem->isFeatureActive('site_mods_req_admn_grp') ) {
-								if( in_array(1, $row['module_groups']) ) {
+								if( \in_array(1, $row['module_groups']) ) {
 									$row['visible'] = true;
 								}
 							}
@@ -703,7 +703,7 @@ class BitThemes extends BitSingleton {
 				}
 			}
 		} else {
-			foreach( array_keys( $this->mLayout ) as $area ) {
+			foreach( \array_keys( $this->mLayout ) as $area ) {
 				if( !empty( $this->mLayout[$area] )) {
 					foreach( $this->mLayout[$area] as $module ) {
 						if( $pModuleResource == $module['module_rsrc'] ) {
@@ -734,7 +734,7 @@ class BitThemes extends BitSingleton {
 			foreach( $layout as $column ) {
 				$i = 5;
 				foreach( $column as $module ) {
-					$this->mDb->query( "UPDATE `".BIT_DB_PREFIX."themes_layouts` SET pos=? WHERE `module_id`=?", array( $i, $module['module_id'] ));
+					$this->mDb->query( "UPDATE `".BIT_DB_PREFIX."themes_layouts` SET pos=? WHERE `module_id`=?", [ $i, $module['module_id'] ]);
 					$i += 5;
 				}
 			}
@@ -762,7 +762,7 @@ class BitThemes extends BitSingleton {
 		if( ( count( $layouts ) > 1 ) && isset( $layouts['kernel'] ) ) {
 			$kernel_layout = $layouts['kernel'];
 			unset( $layouts['kernel'] );
-			$layouts = array('kernel' => $kernel_layout) + $layouts;
+			$layouts = [ 'kernel' => $kernel_layout ] + $layouts;
 		}
 		return $layouts;
 	}
@@ -820,7 +820,7 @@ class BitThemes extends BitSingleton {
 			if( $grps = @unserialize( $pParseString )) {
 				foreach( $grps as $grp ) {
 					global $gBitUser;
-					if( !( $groupId = array_search( $grp, $gBitUser->mGroups ))) {
+					if( !( $groupId = \array_search( $grp, $gBitUser->mGroups ))) {
 						if( $gBitUser->isAdmin() ) {
 							$ret[] = $gBitUser->groupExists( $grp );
 						}
@@ -852,7 +852,7 @@ class BitThemes extends BitSingleton {
 			if( $grps = @unserialize( $pParseString )) {
 				foreach( $grps as $grp ) {
 					global $gBitUser;
-					if( !( $roleId = array_search( $grp, $gBitUser->mRoles ))) {
+					if( !( $roleId = \array_search( $grp, $gBitUser->mRoles ))) {
 						if( $gBitUser->isAdmin() ) {
 							$ret[] = $gBitUser->roleExists( $grp, 0 );
 						}
@@ -934,7 +934,7 @@ class BitThemes extends BitSingleton {
 
 			if( \Bitweaver\BitBase::verifyId( $pHash['store']['module_id'] ?? 0 )) {
 				// if we've been passed a module_id, we are updating an entry in the DB
-				$result = $this->mDb->associateUpdate( $table, $pHash['store'], array( 'module_id' => $pHash['store']['module_id'] ));
+				$result = $this->mDb->associateUpdate( $table, $pHash['store'], [ 'module_id' => $pHash['store']['module_id'] ]);
 			} else {
 				// no module_id yet - let's get one
 				$pHash['store']['module_id'] = $this->mDb->GenID( 'themes_layouts_module_id_seq' );
@@ -953,7 +953,7 @@ class BitThemes extends BitSingleton {
 	public function getModuleData( mixed $pModuleId ): array {
 		$ret = [];
 		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
-			$ret = $this->mDb->getRow( "SELECT tl.* FROM `".BIT_DB_PREFIX."themes_layouts` tl WHERE `module_id`=? ", array( $pModuleId ));
+			$ret = $this->mDb->getRow( "SELECT tl.* FROM `".BIT_DB_PREFIX."themes_layouts` tl WHERE `module_id`=? ", [ $pModuleId ]);
 			$ret['module_params'] = !empty($ret['params']) ? $this->parseString( $ret['params']) : null;
 		}
 		return $ret;
@@ -989,7 +989,7 @@ class BitThemes extends BitSingleton {
 	 * generic function to move module up or down
 	 *
 	 * @param mixed $pModuleId
-	 * @param string $pOrientation
+	 * @param string $pDirection
 	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
 	public function moveModule( mixed $pModuleId, string $pDirection = 'down' ): bool {
@@ -1006,15 +1006,15 @@ class BitThemes extends BitSingleton {
 				$order     = 'ORDER BY pos ASC';
 			}
 			$query  = "SELECT `module_id` FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `layout`=? AND `layout_area`=? $pos_check AND `module_id` <> ? $order";
-			$swapModuleId = $this->mDb->getOne( $query, array( $moduleData['layout'], $moduleData['layout_area'], $moduleData['pos'], $moduleData['module_id'] ));
+			$swapModuleId = $this->mDb->getOne( $query, [ $moduleData['layout'], $moduleData['layout_area'], $moduleData['pos'], $moduleData['module_id'] ]);
 			if( $moduleSwap = $this->getModuleData( $swapModuleId )) {
 				if( $moduleData['pos'] == $moduleSwap['pos'] ) {
 					$query = "UPDATE `".BIT_DB_PREFIX."themes_layouts` $pos_set WHERE `module_id`=?";
-					$result = $this->mDb->query( $query, array( $moduleData['module_id'] ));
+					$result = $this->mDb->query( $query, [ $moduleData['module_id'] ]);
 				} else {
 					$query = "UPDATE `".BIT_DB_PREFIX."themes_layouts` SET `pos`=? WHERE `module_id`=?";
-					$result = $this->mDb->query( $query, array( $moduleSwap['pos'], $moduleData['module_id'] ));
-					$result = $this->mDb->query( $query, array( $moduleData['pos'], $moduleSwap['module_id'] ));
+					$result = $this->mDb->query( $query, [ $moduleSwap['pos'], $moduleData['module_id'] ]);
+					$result = $this->mDb->query( $query, [ $moduleData['pos'], $moduleSwap['module_id'] ]);
 				}
 			}
 		}
@@ -1060,7 +1060,7 @@ class BitThemes extends BitSingleton {
 
 		if( \Bitweaver\BitBase::verifyId( $pModuleId )) {
 			$query = "UPDATE `".BIT_DB_PREFIX."themes_layouts` SET `layout_area`=? WHERE `module_id`=?";
-			$result = $this->mDb->query( $query, array( $pArea, $pModuleId ));
+			$result = $this->mDb->query( $query, [ $pArea, $pModuleId ]);
 		}
 		return true;
 	}
@@ -1068,18 +1068,18 @@ class BitThemes extends BitSingleton {
 	/**
 	 * unassignModule
 	 *
-	 * @param array $pModuleId can be a module id or a resource path. if it is a resource path, all modules with that resource will be removed
+	 * @param string $pModuleMixed can be a module id or a resource path. if it is a resource path, all modules with that resource will be removed
 	 * @access public
 	 * @return bool true on success, false on failure - mErrors will contain reason for failure
 	 */
 	public function unassignModule( $pModuleMixed ) {
 		$ret = false;
 		if( \Bitweaver\BitBase::verifyId( $pModuleMixed )) {
-			if( $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `module_id`=?", array( $pModuleMixed ))) {
+			if( $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `module_id`=?", [ $pModuleMixed ])) {
 				$ret = true;
 			}
 		} elseif( !empty( $pModuleMixed )) {
-			if( $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `module_rsrc`=?", array( $pModuleMixed ))) {
+			if( $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `module_rsrc`=?", [ $pModuleMixed ])) {
 				$ret = true;
 			}
 		}
@@ -1103,13 +1103,13 @@ class BitThemes extends BitSingleton {
 	 * @return void
 	 */
 	public function generateModuleNames( array &$p2DHash ): void {
-		if( is_array( $p2DHash )) {
+		if( \is_array( $p2DHash )) {
 			// Generate human friendly names
-			foreach( array_keys( $p2DHash ) as $col ) {
-				if( is_array( $p2DHash[$col] ) && count( $p2DHash[$col] )) {
-					foreach( array_keys( $p2DHash["$col"] ) as $mod ) {
-						list( $rsrc, $specifier ) = explode( ':', $p2DHash[$col][$mod]['module_rsrc'], 2 );
-						$specelems = explode( '/', $specifier );
+			foreach( \array_keys( $p2DHash ) as $col ) {
+				if( \is_array( $p2DHash[$col] ) && count( $p2DHash[$col] )) {
+					foreach( \array_keys( $p2DHash["$col"] ) as $mod ) {
+						[ $rsrc, $specifier ] = \explode( ':', $p2DHash[$col][$mod]['module_rsrc'], 2 );
+						$specelems = \explode( '/', $specifier );
 						$package = current( $specelems );
 						if( $package == 'temp' ) $package = next( $specelems );
 						// handle special case for custom modules
@@ -1143,13 +1143,13 @@ class BitThemes extends BitSingleton {
 
 		if(( $modules = $this->getCustomModuleList() ) && $pPrefix == 'mod_' ) {
 			foreach( $modules as $m ) {
-				$this->mModules[$pDir][$pPrefix][KernelTools::tra( 'Custom Modules' )]['_custom:custom/'.$m["name"]] = array( 'title' => $m["name"] );
+				$this->mModules[$pDir][$pPrefix][KernelTools::tra( 'Custom Modules' )]['_custom:custom/'.$m["name"]] = [ 'title' => $m["name"] ];
 			}
 			asort( $this->mModules[$pDir][$pPrefix][KernelTools::tra( 'Custom Modules' )] );
 		}
 
 		// iterate through all packages and look for all possible modules
-		foreach( array_keys( $gBitSystem->mPackages ) as $key ) {
+		foreach( \array_keys( $gBitSystem->mPackages ) as $key ) {
 			if( $gBitSystem->isPackageActive( $key )) {
 				$loc = BIT_ROOT_PATH.$gBitSystem->mPackages[$key]['dir'].'/'.$pDir;
 				if( @is_dir( $loc )) {
@@ -1158,13 +1158,14 @@ class BitThemes extends BitSingleton {
 						while (($file = readdir($h)) !== false) {
 							// match on legacy module files which require a prefix
 						    if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
-								$this->mModules[$pDir][$pPrefix][ucfirst( $key )]['bitpackage:'.$key.'/'.$file] = array( 'title' => str_replace( '_', ' ', $match[1] ),
-																														 'template' => $file,
-																														);
+								$this->mModules[$pDir][$pPrefix][ucfirst( $key )]["bitpackage:$key/$file"] = [
+									'title'    => str_replace( '_', ' ', $match[1] ),
+									'template' => $file,
+								];
 							}
 							// loop over nested directories which contain modern modules
 							// these modules are only accessible from gBitThemes
-							elseif ( !in_array( $file, ['.','..','CVS'] ) && @is_dir( $loc.'/'.$file ) ){
+							elseif ( !\in_array( $file, ['.','..','CVS'] ) && @is_dir( $loc.'/'.$file ) ){
 								$conf_file = $loc.'/'.$file.'/config_inc.php';
 								// we expect a configuration file
 								if( @is_file( $conf_file ) ){
@@ -1186,9 +1187,10 @@ class BitThemes extends BitSingleton {
 						if( $h ) {
 							while (($file = readdir($h)) !== false) {
 							    if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
-									$this->mModules[$pDir][$pPrefix][ucfirst( $key )]['bitpackage:temp/'.$key.'/'.$file] = array( 'title' => str_replace( '_', ' ', $match[1] ),
-																																  'template' => $file,
-																																);
+									$this->mModules[$pDir][$pPrefix][ucfirst( $key )]["bitpackage:temp/$key/$file"] = [
+										'title'    => str_replace( '_', ' ', $match[1] ),
+										'template' => $file,
+									];
 								}
 							}
 							closedir ($h);
@@ -1236,10 +1238,10 @@ class BitThemes extends BitSingleton {
 		$this->StartTrans();
 
 		foreach( $legacy_mods as $old ){
-			$key =  array_pop( explode( "/", $old['module_rsrc'] ) );
-			if( in_array( $key, array_keys($upgrade_mods) ) && $old['module_rsrc'] != $upgrade_mods[$key]){
-				$storeHash = array( 'module_rsrc' => $upgrade_mods[$key] );
-				$this->mDb->associateUpdate( BIT_DB_PREFIX."themes_layouts", $storeHash, array( 'module_rsrc' => $old['module_rsrc'] ));
+			$key =  \array_pop( explode( "/", $old['module_rsrc'] ) );
+			if( \in_array( $key, \array_keys($upgrade_mods) ) && $old['module_rsrc'] != $upgrade_mods[$key]){
+				$storeHash = [ 'module_rsrc' => $upgrade_mods[$key] ];
+				$this->mDb->associateUpdate( BIT_DB_PREFIX."themes_layouts", $storeHash, [ 'module_rsrc' => $old['module_rsrc'] ]);
 			}
 		}
 
@@ -1324,7 +1326,7 @@ class BitThemes extends BitSingleton {
 	public function storeCustomModule( $pParamHash ) {
 		if( $this->verifyCustomModule( $pParamHash )) {
 			$table = "`".BIT_DB_PREFIX."themes_custom_modules`";
-			$result = $this->mDb->query( "DELETE FROM $table WHERE `name`=?", array( $pParamHash['store']['name'] ));
+			$result = $this->mDb->query( "DELETE FROM $table WHERE `name`=?", [ $pParamHash['store']['name'] ]);
 			$result = $this->mDb->associateInsert( $table, $pParamHash['store'] );
 		}
 		return count( $this->mErrors ) == 0;
@@ -1362,7 +1364,7 @@ class BitThemes extends BitSingleton {
 	public function expungeCustomModule( $pName ): bool {
 		if( !empty( $pName )) {
 			$this->unassignModule( '_custom:custom/'.$pName );
-			$result = $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", array( $pName ));
+			$result = $this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", [ $pName ]);
 		}
 		return true;
 	}
@@ -1379,7 +1381,7 @@ class BitThemes extends BitSingleton {
 		} elseif( strpos( $pMixed, "bitpackage:" ) !== false ) {
 			return false;
 		} else {
-			$result = $this->mDb->getOne( "SELECT `name` FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", array( $pMixed ));
+			$result = $this->mDb->getOne( "SELECT `name` FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", [ $pMixed ]);
 			return !empty( $result );
 		}
 	}
@@ -1488,6 +1490,11 @@ class BitThemes extends BitSingleton {
 						$this->loadCSs( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/assets/jquery.signaturepad.css', false, $pos++, $joined );
 						$this->loadCss( EXTERNAL_LIBS_PATH.'formvalidation/dist/css/formValidation'.$jqueryMin.'.css', false, $pos++, $joined );
 						break;
+					case 'mochikit':
+						$this->loadJavascript( $pLibPath.'Base.js', false, $pos++ );
+						$this->loadJavascript( $pLibPath.'Async.js', false, $pos++ );
+						$this->loadJavascript( UTIL_PKG_PATH.'javascript//MochiKitBitAjax.js', false, $pos++, $joined );
+						break;
 					case 'yui':
 						$this->loadJavascript( $pLibPath.'yuiloader-dom-event/yuiloader-dom-event.js', false, $pos++ );
 						break;
@@ -1495,7 +1502,7 @@ class BitThemes extends BitSingleton {
 				$this->mAjaxLibs[$ajaxLib] = true;
 			}
 
-			if( is_array( $pLibHash )) {
+			if( \is_array( $pLibHash )) {
 				foreach( $pLibHash as $lib ) {
 					$fullLib = ($lib[0] == '/' ? '' : $pLibPath).$lib;
 					$this->loadJavascript( $fullLib, $pPack, $pos++, $joined );
@@ -1515,7 +1522,7 @@ class BitThemes extends BitSingleton {
 	 */
 	public function isAjaxLoaded( string $pAjaxLib ): bool {
 		if( !empty( $this->mAjaxLibs ) && !empty( $pAjaxLib )) {
-			return in_array( strtolower( $pAjaxLib ), array_keys( $this->mAjaxLibs ));
+			return \in_array( strtolower( $pAjaxLib ), \array_keys( $this->mAjaxLibs ));
 		} else { return false; }
 	}
 
@@ -1537,9 +1544,9 @@ class BitThemes extends BitSingleton {
 				$file = "{$info['path']}templates/{$pFilename}.tpl";
 				$out = "bitpackage:{$package}/{$pFilename}.tpl";
 				if( is_readable( $file )) {
-                    if( in_array( $package, $prepend )) {
+                    if( \in_array( $package, $prepend )) {
 						$anti[] = $out;
-					} elseif( in_array( $package, $append )) {
+					} elseif( \in_array( $package, $append )) {
 						$post[] = $out;
 					} else {
 						$mid[] = $out;
@@ -1547,7 +1554,7 @@ class BitThemes extends BitSingleton {
 				}
 			}
 		}
-		$this->mAuxFiles['templates'][$pFilename] = array_merge( $anti, $mid, $post );
+		$this->mAuxFiles['templates'][$pFilename] = [ ...$anti, ...$mid, ...$post ];
 //debug vd($this->mAuxFiles['templates']);
 	}
 
@@ -1691,8 +1698,8 @@ class BitThemes extends BitSingleton {
 
 				// now pack the css file if wanted
 				if( $pPack ) {
-					$packer = array(
-//						"#/\*.*\*/#"           => "",       // one line comments -- disabled for now since it causes problems when someone has a multiline comment and closes it with /* */
+					$packer = [
+						//						"#/\*.*\*/#"           => "",       // one line comments -- disabled for now since it causes problems when someone has a multiline comment and closes it with /* */
 						"#\n\s*#s"             => "\n",     // leading whitespace
 						"#[\t ]+#"             => " ",      // reduce whitespace
 						"#,\s*#s"              => ",",      // whitespace after ,
@@ -1703,8 +1710,8 @@ class BitThemes extends BitSingleton {
 						"#{([^\}]*){#"         => "{\n$1{", // insert newlines after { when there's a second { on that line ( e.g.: @media{body{...} )
 						"#.*{\s*\}#"           => '',       // remove empty definitions ( thanks to the ',' regex above, things like h1,h2,h3 {} should all be on one line )
 						"#\n+#"                => "\n",     // excess newlines
-					);
-					$content = preg_replace( array_keys( $packer ), array_values( $packer ), $content );
+					];
+					$content = preg_replace( \array_keys( $packer ), \array_values( $packer ), $content );
 				}
 
 				// css files have been compressed and url()s have been fixed
@@ -1781,7 +1788,7 @@ class BitThemes extends BitSingleton {
 			return $ret;
 		}
 
-		if( !empty( $pType ) && !empty( $this->mAuxFiles[$pType] ) && is_array( $this->mAuxFiles[$pType] )) {
+		if( !empty( $pType ) && !empty( $this->mAuxFiles[$pType] ) && \is_array( $this->mAuxFiles[$pType] )) {
 			$cachestring = '';
 			$lastmodified = 0;
 			// get a unique cachefile name for this set of javascript files
@@ -1825,13 +1832,13 @@ class BitThemes extends BitSingleton {
 		if( !empty( $this->mUnloadFiles[$pType] )) {
 			foreach( $this->mUnloadFiles[$pType] as $file ) {
 				if( !empty( $this->mAuxFiles[$pType] )) {
-					if( $key = array_search( $file, $this->mAuxFiles[$pType] )) {
+					if( $key = \array_search( $file, $this->mAuxFiles[$pType] )) {
 						unset( $this->mAuxFiles[$pType][$key] );
 					}
 				}
 
 				if( !empty( $this->mRawFiles[$pType] )) {
-					if( $key = array_search( $file, $this->mRawFiles[$pType] )) {
+					if( $key = \array_search( $file, $this->mRawFiles[$pType] )) {
 						unset( $this->mRawFiles[$pType][$key] );
 					}
 				}
@@ -1924,12 +1931,12 @@ class BitThemes extends BitSingleton {
 	public function overrideAuxFile( string $pType, string $pOriginalFile, string $pNewFile ): bool {
 		$ret = false;
 		if( is_file( $pNewFile )) {
-			if( $key = array_search( $pOriginalFile, $this->mAuxFiles[$pType] )) {
+			if( $key = \array_search( $pOriginalFile, $this->mAuxFiles[$pType] )) {
 				$this->mAuxFiles[$pType][$key] = $pNewFile;
 				$ret = true;
 			}
 
-			if( $key = array_search( $pOriginalFile, $this->mRawFiles[$pType] )) {
+			if( $key = \array_search( $pOriginalFile, $this->mRawFiles[$pType] )) {
 				$this->mRawFiles[$pType][$key] = $pNewFile;
 				$ret = true;
 			}
@@ -1979,7 +1986,7 @@ class BitThemes extends BitSingleton {
 		}
 
 		if( !empty( $pFile ) && !empty( $pType ) && !empty( $fileHash[$pType] )) {
-			return in_array( $pFile, $fileHash[$pType] );
+			return \in_array( $pFile, $fileHash[$pType] );
 		} else { return false; }
 	}
 
@@ -2051,7 +2058,7 @@ class BitThemes extends BitSingleton {
 	 */
 	public function getGraphvizGraphAttributes( $pParams = [] ) {
 		global $gBitSystem;
-		$ret = array(
+		$ret = [
 			'bgcolor'  => $gBitSystem->getConfig( 'graphviz_graph_bgcolor', 'transparent' ),
 			'color'    => $gBitSystem->getConfig( 'graphviz_graph_color', '#000000' ),
 			'fontname' => $gBitSystem->getConfig( 'graphviz_graph_fontname', 'Helvetica' ),
@@ -2060,7 +2067,7 @@ class BitThemes extends BitSingleton {
 			'overlap'  => $gBitSystem->getConfig( 'graphviz_graph_overlap', 'scale' ),
 			'rankdir'  => $gBitSystem->getConfig( 'graphviz_graph_rankdir', 'LR' ),
 			'size'     => '',
-		);
+		];
 
 		foreach( $pParams as $key => $value ) {
 			// any parameter can be prefixed that they can be passed in all at once
@@ -2082,7 +2089,7 @@ class BitThemes extends BitSingleton {
 	 */
 	public function getGraphvizNodeAttributes( $pParams = [] ) {
 		global $gBitSystem;
-		$ret = array(
+		$ret = [
 			'color'     => $gBitSystem->getConfig( 'graphviz_node_color', '#aaaaaa' ),
 			'fillcolor' => $gBitSystem->getConfig( 'graphviz_node_fillcolor', 'white' ),
 			'fontname'  => $gBitSystem->getConfig( 'graphviz_node_fontname', 'Helvetica' ),
@@ -2094,7 +2101,7 @@ class BitThemes extends BitSingleton {
 			'shape'     => $gBitSystem->getConfig( 'graphviz_node_shape', 'box' ),
 			'style'     => $gBitSystem->getConfig( 'graphviz_node_style', 'rounded,filled' ),
 			'width'     => $gBitSystem->getConfig( 'graphviz_node_width', '.1' ),
-		);
+		];
 
 		foreach( $pParams as $key => $value ) {
 			// any parameter can be prefixed that they can be passed in all at once
@@ -2116,7 +2123,7 @@ class BitThemes extends BitSingleton {
 	 */
 	public function getGraphvizEdgeAttributes( $pParams = [] ) {
 		global $gBitSystem;
-		$ret = array(
+		$ret = [
 			'color'     => $gBitSystem->getConfig( 'graphviz_edge_color', '#888888' ),
 			'fontcolor' => $gBitSystem->getConfig( 'graphviz_edge_fontcolor', 'black' ),
 			'fontname'  => $gBitSystem->getConfig( 'graphviz_edge_fontname', 'Helvetica' ),
@@ -2124,7 +2131,7 @@ class BitThemes extends BitSingleton {
 			'style'     => $gBitSystem->getConfig( 'graphviz_edge_style', 'solid' ),
 			'dir'       => '',
 			'label'     => '',
-		);
+		];
 
 		foreach( $pParams as $key => $value ) {
 			// any parameter can be prefixed that they can be passed in all at once
@@ -2185,7 +2192,7 @@ function themes_feedback_to_html( $params ) {
 	foreach( $hash as $key => $val ) {
 		if( $val ) {
 			$keys = [ 'warning', 'success', 'error', 'important', 'note' ];
-			if( in_array( $key, $keys )) {
+			if( \in_array( $key, $keys )) {
 				switch( $key ) {
 					case 'success':
 						$alertClass = 'alert alert-success';
@@ -2203,12 +2210,12 @@ function themes_feedback_to_html( $params ) {
 						break;
 				}
 
-				if( !is_array( $val ) ) {
+				if( !\is_array( $val ) ) {
 					$val = [ $val ];
 				}
 
 				foreach( $val as $valText ) {
-					if( is_array( $valText ) ) {
+					if( \is_array( $valText ) ) {
 						foreach( $valText as $text ) {
 							$feedback .= '<span class="inline-block '.$alertClass.'">'.$text.'</span>';
 						}
@@ -2223,7 +2230,7 @@ function themes_feedback_to_html( $params ) {
 				 * otherwise we'll render the color as text. -wjames5
 				 */ 
 				if ( $key != 'color' ) {
-					if( is_array( $val ) ) {
+					if( \is_array( $val ) ) {
 						foreach( $val as $text ) {
 							$feedback .= '<span class="'.$key.'">'.$text.'</span>';
 						}
