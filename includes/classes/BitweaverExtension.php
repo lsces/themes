@@ -111,6 +111,7 @@ class BitweaverExtension extends Base {
 					case 'is_file':				return [$this, 'smarty_modifier_is_file'];
 					case 'is_readable':			return [$this, 'smarty_modifier_is_readable'];
 					case 'ucfirst':				return [$this, 'smarty_modifier_ucfirst'];
+					case 'html_entity_decode':	return [$this, 'smarty_modifier_html_entity_decode'];
                 }
 			} else {
 				if ( !$this->callbacks[$modifierName]['loaded'] ) {
@@ -311,5 +312,9 @@ class BitweaverExtension extends Base {
 
 	public function smarty_modifier_ucfirst ( string $file ) {
 		return ucfirst( $file );
+	}
+
+	public function smarty_modifier_html_entity_decode ( string $file ) {
+		return html_entity_decode( $file );
 	}
 }
