@@ -52,7 +52,7 @@ class BitSmarty extends \Smarty\Smarty {
 		$this->force_compile = isset($smarty_force_compile) && $smarty_force_compile;
 		$this->debugging = isset($smarty_debugging) ? $smarty_debugging : false;
 		$this->assign( 'app_name', 'bitweaver' );
-		$this->error_reporting = E_ALL; //  & ~E_DEPRECATED & ~E_NOTICE;
+		$this->error_reporting = BIT_PHP_ERROR_REPORTING;
 		
 		global $permCheck;
 		$permCheck = new PermissionCheck();
