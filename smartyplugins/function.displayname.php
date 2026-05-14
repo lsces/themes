@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\BitBase;
 use Bitweaver\Users\RoleUser;
 

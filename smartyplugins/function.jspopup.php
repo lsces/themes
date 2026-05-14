@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
 
 /**
@@ -44,8 +45,7 @@ function smarty_function_jspopup( $pParams, &$pSmarty=NULL ) {
 		unset( $pParams['text'] );
 	}
 
-
-	$optionHash = array( 'type', 'width', 'height', 'gutsonly', 'img' );
+	$optionHash = [ 'type', 'width', 'height', 'gutsonly', 'img' ];
 	$guts = '';
 	foreach( $pParams as $param => $val ) {
 		if( !in_array( $param, $optionHash ) ) {
@@ -98,7 +98,7 @@ function smarty_function_jspopup( $pParams, &$pSmarty=NULL ) {
 
 	if( !empty( $pParams['gutsonly'] ) ) {
 		return $guts;
-	} else {
-		return '<a '.$guts.'>'.( !empty( $img ) ? $img : $text ).'</a>';
 	}
+		return '<a '.$guts.'>'.( !empty( $img ) ? $img : $text ).'</a>';
+
 }

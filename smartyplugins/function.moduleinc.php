@@ -59,5 +59,5 @@ function smarty_function_moduleinc($pParams, &$gBitSmarty) {
 			}
 		}
 		unset( $data );
-	} 
+	}
 }

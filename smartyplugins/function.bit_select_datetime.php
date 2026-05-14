@@ -81,18 +81,18 @@ function smarty_function_bit_select_datetime( $pParams, &$gBitSmarty ) {
 		//On every change a hidden field will be updated via javascript.
 		//it's the hidden field that is evaluated back on the server.
 
-		$pDate = array (
+		$pDate =  [
 			'prefix' => $nname,
 			'all_extra' => "onchange=\"bit_select_datetime_{$nname}()\"",
-			'time' => $time
-		);
+			'time' => $time,
+		];
 
-		$pTime = array (
+		$pTime =  [
 			'prefix' => $nname,
 			'all_extra' => "onchange=\"bit_select_datetime_{$nname}()\"",
 			'display_seconds' => false,
-			'time' => $time
-		);
+			'time' => $time,
+		];
 
 		$html_result  = "<input type=\"hidden\" name=\"$name\" value=\"{$time}\">";
 		$html_result .= smarty_function_html_select_date( $pDate, $gBitSmarty );

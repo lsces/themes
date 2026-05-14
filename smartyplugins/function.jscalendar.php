@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\BitDate;
 
 /**
@@ -56,7 +57,7 @@ function smarty_function_jscalendar($params, &$gBitSmarty) {
 				//]]></script>";
 
 		return $html_result;
-	} else {
-		return '';
 	}
+		return '';
+
 }

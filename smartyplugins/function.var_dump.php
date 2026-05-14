@@ -13,7 +13,6 @@ namespace Bitweaver\Plugins;
  * \author zaufi <zaufi@sendmail.ru>
  */
 
-
 /**
  * \brief Smarty plugin to add variable dump to debug console log
  * Usage format {var_dump var=var_name_2_dump}
@@ -26,13 +25,13 @@ function smarty_function_var_dump($params, &$gBitSmarty)
   $v = $params['var'];
   if (strlen($v) != 0)
   {
-    $tmp = $gBitSmarty->getTemplateVars();
-    if (is_array($tmp) && isset($tmp[$v]))
-      $debugger->msg("Smarty var_dump(".$v.') = '.print_r($tmp[$v], true));
-    else
-      $debugger->msg("Smarty var_dump(".$v."): Variable not found");
+	$tmp = $gBitSmarty->getTemplateVars();
+	if (is_array($tmp) && isset($tmp[$v]))
+	  $debugger->msg("Smarty var_dump(".$v.') = '.print_r($tmp[$v], true));
+	else
+	  $debugger->msg("Smarty var_dump(".$v."): Variable not found");
   }
   else
-    $debugger->msg("Smarty var_dump: Parameter 'var' not specified");
+	$debugger->msg("Smarty var_dump: Parameter 'var' not specified");
   return '<!-- var_dump('.$v.') -->';
 }

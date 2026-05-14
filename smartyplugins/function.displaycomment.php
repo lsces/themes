@@ -16,7 +16,7 @@ function smarty_function_displaycomment( $pParams, &$pSmarty ) {
 	if (!empty($pParams['comment'])) {
 		$comment = $pParams['comment'];
 		$gBitSmarty->assign('comment', $comment);
-		$ret = ( empty( $pParams['template'] ) ) 
+		$ret = ( empty( $pParams['template'] ) )
 			? $gBitSmarty->fetch( 'bitpackage:liberty/display_comment.tpl' )
 			: $gBitSmarty->fetch( $pParams['template'] );
 	}

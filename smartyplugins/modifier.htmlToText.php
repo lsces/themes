@@ -7,7 +7,6 @@ namespace Bitweaver\Plugins;
  * @subpackage plugins
  */
 
-
 /**
  * Smarty htmlToText modifier plugin
  *

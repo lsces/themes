@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
 
 /**
@@ -210,15 +211,14 @@ function smarty_function_biticon( $pParams, $pSmall = false ) {
 	// Still didn't find it! Well lets output something (return empty string if only the url is requested)
 	if( isset( $pParams['url'] )) {
 		return '';
-	} else {
+	}
 		if( empty( $pSmall ) ) {
 			// if we were looking for the large icon, we'll try the whole kaboodle again, looking for the small icon
 			$copyParams['ipath'] = preg_replace( "!/.*?/$!", "/small/", $pParams['ipath'] );
 			return smarty_function_biticon( $copyParams, true );
-		} else {
-			return biticon_output( $pParams, '' );
 		}
-	}
+			return biticon_output( $pParams, '' );
+
 }
 
 /**

@@ -11,8 +11,8 @@
  * @subpackage plugins
  */
 
-
 namespace Bitweaver\Plugins;
+
 use Smarty\Resource\CustomPlugin;
 use Smarty\Template\Source;
 use Smarty\Template;
@@ -37,7 +37,7 @@ class ResourceBitpackage extends CustomPlugin {
 	 * @param string $pFile file to be included, should be of the form "bitpackage:<packagename>/<templatename>"
 	 * @return void
 	 */
-    public function populate(Source $source, ?Template $_template = null) {
+	public function populate(Source $source, ?Template $_template = null) {
 		global $gBitThemes;
 		$ret = FALSE;
 
@@ -81,8 +81,7 @@ class ResourceBitpackage extends CustomPlugin {
 		return $ret;
 	}
 
-
-    protected function fetchTimestamp( $pTplName ) {
+	protected function fetchTimestamp( $pTplName ) {
 		$ret = FALSE;
 		$locations = $this->getTplLocations( $pTplName );
 		foreach( $locations as $resource ) {

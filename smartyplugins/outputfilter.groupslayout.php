@@ -65,9 +65,9 @@ function smarty_outputfilter_groupslayout( $source, &$gBitSmarty ) {
 			$source = preg_replace( $extractor, "@@@SMARTY:TRIM:CONTENT@@@", $source );
 
 			// Protect some parts
-			$patterns = array(
-				"!<script[^>]+>.*?</script>!is"           => "@@@SMARTY:TRIM:SCRIPT@@@"
-			);
+			$patterns = [
+				"!<script[^>]+>.*?</script>!is"           => "@@@SMARTY:TRIM:SCRIPT@@@",
+			];
 
 			//			ksort( $patterns );
 
@@ -94,8 +94,8 @@ function smarty_outputfilter_groupslayout( $source, &$gBitSmarty ) {
 
 	// insert the code back into the source
 	foreach( $ret as $content ) {
-	    // Escape dollars in content so they don't back reference
-	    $content = preg_replace('!\$!','\\\$', $content);
+		// Escape dollars in content so they don't back reference
+		$content = preg_replace('!\$!','\\\$', $content);
 		$source = preg_replace( "!@@@SMARTY:TRIM:CONTENT@@@!", $content, $source, 1 );
 	}
 

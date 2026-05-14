@@ -32,19 +32,18 @@ namespace Bitweaver\Plugins;
  * }
  */
 
-
 //SECURITY HERE!
 
 function smarty_function_querytable($params, &$gBitSmarty) {
 	global $gBitSystem;
 	extract($params);
 	//Security here
-	$arguments = Array('table','template','tableclass','where',
+	$arguments = ['table','template','tableclass','where',
 					   'columns','height',
 					   'sort_column','sort_order','colalign','columnheadingclass',
 					   'max_rows','offset','total','directpagination',
-					   'combopagination');
-	
+					   'combopagination', ];
+
 	if(!isset($table)) {return "Table is a mandatory argument to querytable plugin!";}
 	if(!isset($template)) {return "Template is a mandatory argument to querytable plugin!";}
 	if(!isset($tableclass)) $tableclass='normal';
@@ -69,7 +68,7 @@ function smarty_function_querytable($params, &$gBitSmarty) {
 		$output.="&amp;$arg=$val";
 	}
 	$output.="'></iframe>";
-	
+
 	return $output;
 
 }

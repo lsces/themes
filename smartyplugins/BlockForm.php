@@ -1,9 +1,10 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
- 
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -25,10 +26,8 @@ use Smarty\Template;
  * @todo somehow make the variable that is contained within $iselect global --> this will allow importing of outside variables not set in $_REQUEST
  */
 
-
 class BlockForm implements BlockHandlerInterface {
- 
- 
+
 	public function handle( $pParams, $pContent, Template $template, &$repeat): string {
 		global $gBitSystem, $gSniffer;
 
@@ -106,12 +105,12 @@ class BlockForm implements BlockHandlerInterface {
 				$ret .= isset( $legend ) ? '</fieldset>' : '';			// close the open tags
 				$ret .= '</form>';
 				return $ret;
-			} else {
+			}
 				global $gSmartyFormHorizontal;
 				// global var other plugin functions will pick up to add proper col-XX-YY styling for horizontal forms
 				$gSmartyFormHorizontal = !empty( $pParams['class'] ) && strpos( $pParams['class'], 'form-horizontal' ) !== false;
 				return '';
-			}
+
 		}
 		return '';
 	}

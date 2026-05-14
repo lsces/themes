@@ -59,7 +59,7 @@ class BitFeedback {
 
 		if (isset($_SESSION['bit_feedback'][$pagekey])) {
 			$messages = $_SESSION['bit_feedback'][$pagekey];
-			$_SESSION['bit_feedback'][$pagekey] = array();
+			$_SESSION['bit_feedback'][$pagekey] = [];
 			unset($_SESSION['bit_feedback'][$pagekey]);
 		}
 

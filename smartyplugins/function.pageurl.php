@@ -61,7 +61,7 @@ function smarty_function_pageurl( $params, &$gBitSmarty ) {
 	$pageUrlVar = preg_replace( '/^\&amp;/', '', $str );
 
 	$pageUrl = $pgnUrl . "?" . $pageUrlVar;
-	
+
 	return $pageUrl;
 }
 

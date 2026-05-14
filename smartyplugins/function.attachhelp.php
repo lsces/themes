@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
 
 /**
@@ -7,7 +8,7 @@ use Bitweaver\KernelTools;
  * @package Smarty
  * @subpackage plugins
  */
- 
+
 /**
 * smarty_function_attachmenthelp
 */

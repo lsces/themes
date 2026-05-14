@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
 
 /**
@@ -70,7 +71,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 		$url = !empty( $hash['ipackage'] )
 			? ( $hash['ipackage'] == 'root'
 				? $url = BIT_ROOT_URL.$hash['ifile']
-				: constant( strtoupper( $hash['ipackage'] ).'_PKG_URL' ).$hash['ifile'] ) 
+				: constant( strtoupper( $hash['ipackage'] ).'_PKG_URL' ).$hash['ifile'] )
 			: constant( strtoupper( $gBitSystem->getActivePackage() ).'_PKG_URL' ).$hash['ifile'];
 	} else {
 		$url = $_SERVER['SCRIPT_NAME'];
@@ -90,7 +91,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 
 	// if isort is set, we need to deal with all the sorting stuff
 	if( !empty( $hash['isort'] ) ) {
-		$isort_mode = isset( $hash['isort_mode'] ) ? $hash['isort_mode'] : (isset( $_REQUEST['sort_mode'] ) ? $_REQUEST['sort_mode'] : NULL);
+		$isort_mode = $hash['isort_mode'] ?? ($_REQUEST['sort_mode'] ?? NULL);
 		$sort_asc = $hash['isort'].'_asc';
 		$sort_desc = $hash['isort'].'_desc';
 
@@ -100,7 +101,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 
 		// check if we have to highlight this link, when $isort_mode isn't set
 		if( isset( $hash['idefault'] ) && empty( $isort_mode ) ) {
-			$isort_mode .= $hash['isort'].'_'.( isset( $hash['iorder'] ) ? $hash['iorder'] : 'asc' );
+			$isort_mode .= $hash['isort'].'_'.( $hash['iorder'] ?? 'asc' );
 		}
 
 		// check if sort_mode has anything to do with our link
@@ -121,7 +122,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 			];
 			$url_params .= $sort_asc;
 		} else {
-			$url_params .= $hash['isort'].'_'.( isset( $hash['iorder'] ) ? $hash['iorder'] : 'asc' );
+			$url_params .= $hash['isort'].'_'.( $hash['iorder'] ?? 'asc' );
 		}
 	}
 

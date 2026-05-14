@@ -25,14 +25,14 @@ namespace Bitweaver\Plugins;
  * @param Smarty_Compiler object
  * @return void|string
  */
- 
+
 /**
  * Set Compiler Function
  * 
  * @param array parameters "var": variable. "value": value to assign. "if": assign the value only if this test is true (tests avaiables: 'empty', '!empty', 'is_null', '!is_null', 'isset', '!isset', 'is_void').
  * @param Smarty_Compiler object
  * @return void|string
- */ 
+ */
 function smarty_compiler_set($params, &$smarty) {
 	// Extract if "value" parameter contain an array
 	$regularExpression = '/ value=array\([\'"]?.*[\'"]?\)/';
@@ -42,7 +42,7 @@ function smarty_compiler_set($params, &$smarty) {
 	}
 
 	$params = $smarty->_parse_attrs($params);
-	$functionsPermitted = array('empty', '!empty', 'is_null', '!is_null', 'isset', '!isset', 'is_void'); // Functions permitted in "if" parameter.
+	$functionsPermitted = ['empty', '!empty', 'is_null', '!is_null', 'isset', '!isset', 'is_void']; // Functions permitted in "if" parameter.
 
 	if (!isset($params['var'])) {
 		$smarty->_syntax_error("set: missing 'var' parameter", E_USER_WARNING);
@@ -59,14 +59,14 @@ function smarty_compiler_set($params, &$smarty) {
 		if (in_array($params['if'], $functionsPermitted)) {
 			if ($params['if'] == 'is_void') { // "is_void" command
 				return "if (empty({$params['var']}) and ({$params['var']} !== 0) and ({$params['var']} !== '0')) {$params['var']} = {$params['value']};";
-			} else { // others commands
+			}   // others commands
 				return "if ({$params['if']}({$params['var']})) {$params['var']} = {$params['value']};";
-			}
-		} else { // "if" parameter not correct
+
+		}   // "if" parameter not correct
 			$smarty->_syntax_error("set: 'if' parameter not valid", E_USER_WARNING);
 			return;
-		}
-	} else { // normal setting
+
+	}   // normal setting
 		return "{$params['var']} = {$params['value']};";
-	}
+
 }

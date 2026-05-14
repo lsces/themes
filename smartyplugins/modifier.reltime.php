@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
 
 /**
@@ -49,9 +50,9 @@ function smarty_modifier_reltime( $pTimeStamp, $pMode = 'long', $pFallback = 'bi
 		// hours
 		if( $delta < $min * 2 ) {
 			return KernelTools::tra( "one minute ago" );
-		} else {
-			return round( $delta / $min )." ".KernelTools::tra( "minutes ago" );
 		}
+			return round( $delta / $min )." ".KernelTools::tra( "minutes ago" );
+
 	} elseif( $delta < $day ) {
 		// up to a day
 		if( $delta < $hour * 1.1 ) {
@@ -64,35 +65,33 @@ function smarty_modifier_reltime( $pTimeStamp, $pMode = 'long', $pFallback = 'bi
 			if( floor( $delta / $hour ) > 1 ){
 				if( $delta_hours > 1 ){
 					return floor( $delta / $hour )." hours {$delta_hours} minutes ago";
-				} else {
-					return floor( $delta / $hour )." hours {$delta_hours} minute ago";
 				}
-			} else {
+					return floor( $delta / $hour )." hours {$delta_hours} minute ago";
+
+			}
 				if( $delta_hours > 1 ){
 					return floor( $delta / $hour )." hour {$delta_hours} minutes ago";
-				} else {
-					return floor( $delta / $hour )." hour {$delta_hours} minute ago";
 				}
-			}
+					return floor( $delta / $hour )." hour {$delta_hours} minute ago";
 
-		} else {
+		}
 
 			return round( $delta / $hour )." ".KernelTools::tra( "hour(s) ago" );
-		}
+
 	} elseif( $delta < $week ) {
 		// up to a week
 		if( $delta < $day * 2 ) {
 			return KernelTools::tra( "Yesterday" )." ".date( $strf, $pTimeStamp );
-		} else {
+		}
 			if( $pMode == 'short' ) {
 				return date( 'D '.$strf, $pTimeStamp );
 			}
 			return KernelTools::tra( date( 'l', $pTimeStamp ) )." ".date( $strf, $pTimeStamp );
-		}
-	} else {
+
+	}
 		// anything longer than a week
 //		$gBitSmarty->loadPlugin( "smarty_modifier_$pFallback" );
 		$pFallback = "Bitweaver\\Plugins\\smarty_modifier_$pFallback";
 		return $pFallback( $pTimeStamp );
-	}
+
 }

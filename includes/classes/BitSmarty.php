@@ -14,6 +14,7 @@
  * required setup
  */
 namespace Bitweaver\Themes;
+
 use Bitweaver\KernelTools;
 require_once EXTERNAL_LIBS_PATH.'smarty/libs/Smarty.class.php';
 
@@ -50,10 +51,10 @@ class BitSmarty extends \Smarty\Smarty {
 		$this->config_dir = "configs/";
 		// $this->caching = true;
 		$this->force_compile = isset($smarty_force_compile) && $smarty_force_compile;
-		$this->debugging = isset($smarty_debugging) ? $smarty_debugging : false;
+		$this->debugging = $smarty_debugging ?? false;
 		$this->assign( 'app_name', 'bitweaver' );
 		$this->error_reporting = BIT_PHP_ERROR_REPORTING;
-		
+
 		global $permCheck;
 		$permCheck = new PermissionCheck();
 		$this->assign( 'perm', $permCheck );
@@ -68,15 +69,15 @@ class BitSmarty extends \Smarty\Smarty {
 		}
 	}
 
-    /**
-     * Override the fetch method to add custom behavior.
-     *
-     * @param string $resource_name The template resource name.
-     * @param string|null $cache_id The cache ID.
-     * @param string|null $compile_id The compile ID.
-     * @return string The output of the template.
-     */
-    public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false) {
+	/**
+	 * Override the fetch method to add custom behavior.
+	 *
+	 * @param string $resource_name The template resource name.
+	 * @param string|null $cache_id The cache ID.
+	 * @param string|null $compile_id The compile ID.
+	 * @return string The output of the template.
+	 */
+	public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false) {
 		global $gBitSystem;
 		if( strpos( $template, ':' )) {
 			list( $resource, $location ) = explode( ':', $template);
@@ -84,7 +85,7 @@ class BitSmarty extends \Smarty\Smarty {
 				list( $package, $tpl ) = explode( '/', $location );
 				// exclude temp, as it contains nexus menus
 				if( !$gBitSystem->isPackageActive( $package ) && $package != 'temp' ) {
-				    return '';
+					return '';
 				}
 			}
 		}

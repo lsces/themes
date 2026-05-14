@@ -11,7 +11,7 @@ namespace Bitweaver\Plugins;
  * @package Smarty
  * @subpackage plugins
  */
- 
+
 /**
  * Function body.
  *
@@ -22,23 +22,23 @@ function smarty_modifier_duration($string)
 {
   $result=[];
   if($string > 60*60*24) {
-    $days = floor($string/(60*60*24));
-    $result[]="$days days";
-    $string %= 60*60*24;
+	$days = floor($string/(60*60*24));
+	$result[]="$days days";
+	$string %= 60*60*24;
   }
   if($string > 60*60) {
-    $hours = floor($string/(60*60));
-    $result[]="$hours hours";
-    $string %= 60*60;
+	$hours = floor($string/(60*60));
+	$result[]="$hours hours";
+	$string %= 60*60;
   }
   if($string > 60) {
-    $mins = floor($string/60);
-    $result[]="$mins minutes";
-    $string %= 60;
+	$mins = floor($string/60);
+	$result[]="$mins minutes";
+	$string %= 60;
   }
   if($string > 0) {
-    $result[]="$string seconds";
+	$result[]="$string seconds";
   }
-  
+
   return implode(' ',$result);
 }

@@ -13,11 +13,11 @@ namespace Bitweaver\Plugins;
 function smarty_function_required( $pParams, &$pSmarty=NULL ) {
 	global $gBitSmarty;
 //	$gBitSmarty->loadPlugin( 'smarty_function_biticon' );
-	$biticon = array(
+	$biticon = [
 		'ipackage' => 'icons',
 		'iname'    => 'emblem-important',
 		'iexplain' => 'Required',
-	);
+	];
 	$ret = \Bitweaver\Plugins\smarty_function_biticon( $biticon );
 
 	if( !empty( $pParams['legend'] )) {

@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
 
@@ -56,9 +57,9 @@ class BlockFormInput implements BlockHandlerInterface {
 
 		if( $content ) {
 			return '<div class="'.$class.'" '.$attr.' >'.$labelStart.$content.$labelEnd.'</div>';
-		} else {
-			return '';
 		}
+			return '';
+
 	}
 
 	public function isCacheable(): bool {

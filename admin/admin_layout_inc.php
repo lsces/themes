@@ -91,7 +91,7 @@ if( isset( $_REQUEST['module_id'] ) && !empty( $_REQUEST['move_module'] )) {
 				unset( $fAssign['store'] );
 			}
 		}
-	} 
+	}
 }
 
 // this will sort the layout selection dropdown
@@ -100,10 +100,10 @@ ksort( $allLayouts );
 $gBitSmarty->assign( 'allLayouts', $allLayouts );
 $gBitSmarty->assign( 'module_package', $_REQUEST['module_package'] );
 
-$layoutHash = array(
+$layoutHash = [
 	'layout' => $_REQUEST['module_package'],
 	'fallback' => false,
-);
+];
 $editLayout = $gBitThemes->getLayout( $layoutHash );
 $gBitThemes->generateModuleNames( $editLayout );
 $gBitSmarty->assign( 'editLayout', $editLayout );

@@ -12,16 +12,16 @@ namespace Bitweaver\Plugins;
  */
 function smarty_function_ed($params, &$gBitSmarty)
 {
-    global $gBitSystem;
-    extract($params);
-    // Param = zone
+	global $gBitSystem;
+	extract($params);
+	// Param = zone
 
-    if (empty($id)) {
-        $gBitSmarty->trigger_error("ed: missing 'id' parameter");
-        return;
-    }
-    
-    print($banner);
+	if (empty($id)) {
+		$gBitSmarty->trigger_error("ed: missing 'id' parameter");
+		return;
+	}
+
+	print($banner);
 }
 
 /* vim: set expandtab: */

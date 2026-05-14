@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use \Bitweaver\Wiki\BitPage;
 
 /**
@@ -13,7 +14,6 @@ use \Bitweaver\Wiki\BitPage;
  *
  * \author jht <jht@lj.net>
  */
-
 
 /**
  * \brief Smarty plugin to include specified wiki page content (transclusion)
@@ -45,11 +45,11 @@ use \Bitweaver\Wiki\BitPage;
 #
 # Step 1: Create a new page named: "ABC - edit notice" containing the notice
 # The content of this page is the notice that you want shown whenever the page "ABC" is edited.
-# The notice can be any length and include wiki markup. 
+# The notice can be any length and include wiki markup.
 #
 # Step 2: Create a new page named something like: "default edit notice"
 # The content of this page is the notice that you want shown whenever a page without a custom edit notices is edited.
-# The notice can be any length and include wiki markup. 
+# The notice can be any length and include wiki markup.
 #
 # Step 3: Include the following line in the wiki/edit_page.tpl file at the point where you want the notice displayed:
 #
@@ -59,14 +59,13 @@ use \Bitweaver\Wiki\BitPage;
 # Editing any other page will display the default edit notice.
 #
 
-
 function smarty_function_include_wiki_page_content($params, &$gBitSmarty)
 {
 	$parsed = '';
 	//
 	if( ($pageName = !empty( $params['page'] ) ? $params['page'] : (!empty( $params['page_default'] ) ? $params['page_default'] : NULL )) ) {
 		include_once WIKI_PKG_CLASS_PATH.'BitPage.php';
-		if( $includePage = BitPage::lookupObject( array( 'page' => $pageName ) ) ) {
+		if( $includePage = BitPage::lookupObject( [ 'page' => $pageName ] ) ) {
 			$parsed = $includePage->getParsedData();
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
-use Bitweaver\BitDate;
 
 /**
  * Smarty plugin
@@ -44,11 +44,11 @@ function smarty_modifier_bit_date_format( $pString, $format = "%b %e, %Y", $pTra
 			: new \DateTime( $pString );
 		$disptime = strtotime($dateTimeUser->format(DATE_W3C));
 		return $gBitSystem->mServerTimestamp->strftime( $format, $disptime );
-	} else {
+	}
 		$format = $gBitSystem->get_display_offset()
 			? preg_replace( "/ ?%Z/",'', $format )
 			: $format = preg_replace( "/%Z/", "UTC", $format );
 		$disptime = $gBitSystem->mServerTimestamp->getDisplayDateFromUTC( $pString );
-	}
+
 	return $gBitSystem->mServerTimestamp->strftime( $format, $disptime, TRUE );
 }

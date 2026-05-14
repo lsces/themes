@@ -1,0 +1,60 @@
+<!--Make sure your page contains a valid doctype at the very top-->
+
+<link rel="stylesheet" type="text/css" href="haccordion.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="haccordion.js">
+
+/***********************************************
+* Horizontal Accordion script- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
+***********************************************/
+
+</script>
+
+<style type="text/css">
+
+/*CSS for example Accordion #hc1*/
+
+#hc1 li{
+margin:0 3px 0 0; /*Spacing between each LI container*/
+}
+
+#hc1 li .hpanel{
+padding: 5px; /*Padding inside each content*/
+background: lightblue;
+}
+
+/*CSS for example Accordion #hc2*/
+
+#hc2 li{
+margin:0 0 0 0; /*Spacing between each LI container*/
+border: 12px solid black;
+}
+
+#hc2 li .hpanel{
+padding: 5px; /*Padding inside each content*/
+background: #E2E9FF;
+cursor: hand;
+cursor: pointer;
+}
+
+</style>
+
+<script>
+
+haccordion.setup({
+	accordionid: 'hc1', //main accordion div id
+	paneldimensions: {peekw:'50px', fullw:'400px', h:'158px'},
+	selectedli: [0, true], //[selectedli_index, persiststate_bool]
+	collapsecurrent: false //<- No comma following very last setting!
+})
+
+haccordion.setup({
+	accordionid: 'hc2', //main accordion div id
+	paneldimensions: {peekw:'30px', fullw:'450px', h:'150px'},
+	selectedli: [-1, true], //[selectedli_index, persiststate_bool]
+	collapsecurrent: true //<- No comma following very last setting!
+})
+
+</script>

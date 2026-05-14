@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Themes;
+
 $pRegisterHash = [
 	'package_name' => 'themes',
 	'package_path' => dirname( dirname( __FILE__ ) ).'/',
@@ -22,7 +23,7 @@ $gLibertySystem->registerService(
 		'content_display_function' => 'themes_content_display',
 		'content_list_function' => 'themes_content_list',
 	],
-	[ 'description' => 'Applied when user themes are enabled; See theme pkg administration to enable.' ]
+	[ 'description' => 'Applied when user themes are enabled; See theme pkg administration to enable.' ],
 );
 
 BitThemes::loadSingleton();

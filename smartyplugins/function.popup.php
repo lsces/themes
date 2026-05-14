@@ -9,7 +9,6 @@ use Bitweaver\Liberty\LibertyContent;
  * @subpackage plugins
  */
 
-
 /**
  * Smarty {popup} function plugin
  *
@@ -117,15 +116,15 @@ function smarty_function_popup($params, &$gBitSmarty) {
 
 	if (!empty($target) && !empty($target_append)) {
 	  if (strstr($target, "?")) {
-	    $target .= "&".$target_append;
+		$target .= "&".$target_append;
 	  }
 	  else {
-	    $target .= "?".$target_append;
+		$target .= "?".$target_append;
 	  }
 	}
 
 	if (!empty($text)) {
-		$retval = $trigger . '="return overlib(\''.preg_replace(array("!'!","![\r\n]!"),array("\'",'\r'),$text).'\'';
+		$retval = $trigger . '="return overlib(\''.preg_replace(["!'!","![\r\n]!"],["\'",'\r'],$text).'\'';
 		$retval .= $append . ');" onmouseout="nd();"';
 	}
 	else {

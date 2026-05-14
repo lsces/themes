@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\BitDate;
 
 /**
@@ -30,7 +31,7 @@ function smarty_modifier_cal_date_format($string, $format = "%b %e, %Y", $defaul
 	$mDate = new BitDate(0);
 	$format =  $mDate->get_display_offset()
 		? preg_replace("/ ?%Z/","",$format)
-   		: preg_replace("/%Z/","UTC",$format);
+		: preg_replace("/%Z/","UTC",$format);
 
 	$disptime = $mDate->getTimestampFromISO($string);
 

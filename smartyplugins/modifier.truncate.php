@@ -7,7 +7,6 @@ namespace Bitweaver\Plugins;
  * @subpackage plugins
  */
 
-
 /**
  * Smarty truncate modifier plugin
  *
@@ -42,7 +41,7 @@ function smarty_modifier_truncate($string, $length = 80, $etc = '...', $break_wo
 			$etc .= "<span style='display:none;' id='dyn_".$divId."_edit'>".substr($string, strlen($fragment))."</span>";
 		}
 		return $fragment.$etc;
-	} else
+	}
 		return $string;
 }
 

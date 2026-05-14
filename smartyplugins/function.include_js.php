@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use \Bitweaver\BitCache;
 
 /**
@@ -29,7 +30,7 @@ function smarty_function_include_js( $params,&$gBitSmarty ) {
 				$pack = FALSE;
 			default:
 				break;
-		}			
+		}
 	}
 	if( is_file( $file )) {
 		// pack it

@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once '../../kernel/includes/setup_inc.php';
 require_once KERNEL_PKG_INCLUDE_PATH . 'simple_form_functions_lib.php';
 
@@ -71,4 +71,4 @@ $gBitSmarty->assign( "sampleIcons", $sampleIcons );
 // load css file
 $gBitThemes->loadCss( THEMES_PKG_PATH.'css/admin_themes.css' );
 
-$gBitSystem->display( 'bitpackage:themes/admin_themes_manager.tpl', 'Themes Manager' , array( 'display_mode' => 'admin' ));
+$gBitSystem->display( 'bitpackage:themes/admin_themes_manager.tpl', 'Themes Manager' , [ 'display_mode' => 'admin' ]);

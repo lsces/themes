@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\KernelTools;
 
 /**
@@ -18,7 +19,7 @@ use Bitweaver\KernelTools;
  */
 function smarty_function_minifind($params, &$gSmartyTemplate) {
 	global $gBitSmarty;
-	
+
 	if(isset($params['legend'])) {
 		$legend = $params['legend'];
 		unset($params['legend']);
@@ -29,11 +30,11 @@ function smarty_function_minifind($params, &$gSmartyTemplate) {
 	if( !empty( $params['find_name'] ) ) {
 		$gBitSmarty->assign( 'find_name', KernelTools::tra( $params['name'] ) );
 	}
-	
+
 	if( !empty( $params['prompt'] ) ) {
 		$gBitSmarty->assign( 'prompt', KernelTools::tra( $params['prompt'] ).'...' );
 	}
-	
+
 	$gBitSmarty->assign( 'legend',$legend );
 	$gBitSmarty->assign( 'hidden',$params );
 	return $gBitSmarty->fetch( 'bitpackage:kernel/minifind.tpl' );

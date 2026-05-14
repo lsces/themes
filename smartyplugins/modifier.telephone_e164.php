@@ -14,10 +14,10 @@ function smarty_modifier_telephone_e164( $pTelephoneNumber, $pCountryCodeIso2='U
 		global $gPhoneNumberUtil;
 		if( empty( $gPhoneNumberUtil ) ) {
 			spl_autoload_register(function ($class) {
-				// replace namespace separators with directory separators in the relative 
+				// replace namespace separators with directory separators in the relative
 				// class name, append with .php
 				$class_path = str_replace('\\', '/', $class);
-				
+
 				$file =  EXTERNAL_LIBS_PATH . $class_path . '.php';
 
 				// if the file exists, require it
@@ -40,8 +40,7 @@ function smarty_modifier_telephone_e164( $pTelephoneNumber, $pCountryCodeIso2='U
 	return $ret;
 }
 
-
-//$phonenumber = preg_replace(['/\D/', '/^0(?!0)/', '/^\+?0*((3[578]?|42?)\d)0*/'], 
+//$phonenumber = preg_replace(['/\D/', '/^0(?!0)/', '/^\+?0*((3[578]?|42?)\d)0*/'],
 //                            ['',     '+49',       '+$1'], $pTelephoneNumber );
 
 /*

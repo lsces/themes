@@ -53,7 +53,7 @@ function smarty_modifier_displayUrl($pMixed, $lib='') {
 	if (is_string($pMixed)) {
 		if (empty($lib)) $lib ='BitPage';
 		if (smarty_modifier_displayUrl_findLib($lib)) {
-			$call =array($lib, 'getDisplayUrl');
+			$call =[$lib, 'getDisplayUrl'];
 			if (is_callable($call)) {
 				return call_user_func($call,$pMixed);
 			}

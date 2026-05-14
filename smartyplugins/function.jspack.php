@@ -60,7 +60,7 @@ function smarty_function_jspack( $pParams, &$gBitSmarty ) {
 
 		$defer = !empty( $pParams['defer'] ) ? " defer='".$pParams['defer']."'" : "";
 		return '<script'.$defer.' src="'.$bitCache->getCacheUrl( $cachefile ).'"></script>';
-	} else {
-		return "<!-- ".tra( 'not a valid file: ' ).$pParams['ifile']." -->";
 	}
+		return "<!-- ".tra( 'not a valid file: ' ).$pParams['ifile']." -->";
+
 }

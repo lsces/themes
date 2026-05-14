@@ -76,7 +76,7 @@ function smarty_output_highlight( $source, $gBitSmarty ) {
 				}
 
 				// Wrap all the highlight words with a colourful span
-				$wordArr = array();
+				$wordArr = [];
 				$pattern = '#"([^"]*)"#';
 				if( preg_match_all( $pattern, $words, $ms ) ) {
 					$wordArr = $ms[1];

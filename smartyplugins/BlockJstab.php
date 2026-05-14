@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Bitweaver\BitBase;
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
@@ -25,13 +26,13 @@ use Bitweaver\KernelTools;
 	public function handle( $params, $content, Template $template, &$repeat): string {
 		if( empty( $repeat ) ){
 			global $jsTabLinks;
-			
+
 			$tClass = isset( $params['class'] ) ? ' class="'.$params['class'].'"' : '';
 			$tStyle	= isset( $params['style'] ) ? ' style="'.$params['style'].'"' : '';
 			$tClick	= isset( $params['onclick'] ) ? ' onclick="'.$params['onclick'].'"' : '';
-			$tTitle	= KernelTools::tra( isset( $params['title'] ) ? $params['title'] : 'No Title' );
+			$tTitle	= KernelTools::tra( $params['title'] ?? 'No Title' );
 
-			$tabId = strtolower( isset( $params['id'] ) ? $params['id'] : 'tab'.preg_replace("/[^A-Za-z0-9]/", '', $tTitle) ); 
+			$tabId = strtolower( $params['id'] ?? 'tab'.preg_replace("/[^A-Za-z0-9]/", '', $tTitle) );
 
 			$tabString = '<li '.$tClick.' '.$tClass.' '.$tStyle.'><a href="#'.$tabId.'">' . $tTitle . '</a></li>';
 			if( isset( $params['position'] ) ) {
@@ -42,7 +43,7 @@ use Bitweaver\KernelTools;
 
 			$tabType = BitBase::getParameter( $params, 'tabtype', 'tab' );
 
-			$ret = '<div class="'.$tabType.'-pane" id="'.$tabId.'">'; 
+			$ret = '<div class="'.$tabType.'-pane" id="'.$tabId.'">';
 			$ret .= $content;
 			$ret .= '</div>';
 

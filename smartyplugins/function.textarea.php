@@ -15,7 +15,7 @@ namespace Bitweaver\Plugins;
  * Type: function 
  * Name: textarea 
  * ------------------------------------------------------------- 
- */ 
+ */
 function smarty_function_textarea( $pParams, &$pSmartyTemplate ) {
 	global $gBitSystem, $gContent, $gLibertySystem, $gBitSmarty;
 

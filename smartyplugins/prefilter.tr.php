@@ -20,7 +20,7 @@ function smarty_prefilter_tr( $source ) {
 	//
 	// correction: in order to match when a variable is inside {tr} tags.
 	// Example: {tr}The newsletter was sent to {$sent} email addresses{/tr},
-	// and where there are parameters with {tr} take away the smarty comments 
+	// and where there are parameters with {tr} take away the smarty comments
 	// {* *} in case they have tr tags
 	return( preg_replace_callback( '#(?s)(\{tr[^\}]*\})(.+?)\{/tr\}#', '_translate_lang', preg_replace ( '#(?s)\{\*.*?\*\}#', '', $source ) ) );
 }
@@ -55,21 +55,20 @@ function _translate_lang( $pKey ) {
 	// Explanation why this doesn't work:
 	//  - case 1
 	//    returning stuff like {tr}waiting for {$number} ratings{/tr}
-	//    will get translated by block.tr.php but only after the {$number} has 
+	//    will get translated by block.tr.php but only after the {$number} has
 	//    been interpreted and we will end up with master strings like:
 	//    waiting for 4 ratings
 	//    waiting for 5 ratings
 	//    waiting for 6 ratings
 	//
 	//  - case 2
-	//    this should be fine since it has been translated and the {tr} blocks 
+	//    this should be fine since it has been translated and the {tr} blocks
 	//    have been removed i.e. block.tr.php won't be called anymore
 	//
 	//  - case 3
-	//    this will leave everything as is. this will work as well, but only if 
+	//    this will leave everything as is. this will work as well, but only if
 	//    there is no {$var} in the string - see case 1
 	// --- xing
-
 
 	// if the entire string in {tr} is a variable, we pass it on to block.tr.php
 	// e.g. {tr}{$menu.menu_title}{/tr} in top_bar.tpl
@@ -80,8 +79,8 @@ function _translate_lang( $pKey ) {
 		// no parameters set for block.tr.php
 		$trans = $gBitLanguage->translate( $pKey[2] );
 		return $trans;
-	} else {
+	}
 		// perhaps there are parameters set for block.tr.php
 		return $pKey[1].$pKey[2]."{/tr}";
-	}
+
 }

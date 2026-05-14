@@ -7,6 +7,7 @@
  * Set-up
  */
 namespace Bitweaver\Themes;
+
 use Bitweaver\BitCache;
 use Bitweaver\BitSingleton;
 use Bitweaver\Users\RoleUser;
@@ -34,13 +35,13 @@ class BitThemes extends BitSingleton {
 	// Auxiliary Javascript and Css Files
 	public $mAuxFiles = [
 		'js'  => [],
-		'css' => []
+		'css' => [],
 	];
 
 	// Raw Javascript and Css Files
 	public $mRawFiles = [
 		'js'  => [],
-		'css' => []
+		'css' => [],
 	];
 	public $mUnloadFiles = [];
 
@@ -103,7 +104,6 @@ class BitThemes extends BitSingleton {
 			define( 'THEMES_STYLE_PATH', $this->getStylePath() );
 		}
 	}
-
 
 	/*
 	 * load up all style related information
@@ -231,7 +231,7 @@ class BitThemes extends BitSingleton {
 		if( empty( $pStyle )) {
 			$pStyle = $this->getStyle();
 		}
-        return CONFIG_PKG_URL.'themes/'.$pStyle.'/';
+		return CONFIG_PKG_URL.'themes/'.$pStyle.'/';
 	}
 
 	/**
@@ -401,7 +401,6 @@ class BitThemes extends BitSingleton {
 		return $cachedir;
 	}
 
-
 	// }}}
 	// {{{ =================== Layout ====================
 	/**
@@ -441,7 +440,7 @@ class BitThemes extends BitSingleton {
 
 	public function displayLayoutColumn( string $pColumn ): void {
 		if( $colHtml = $this->fetchLayoutColumn( $pColumn ) ) {
-            print $colHtml;
+			print $colHtml;
 		}
 	}
 
@@ -493,7 +492,7 @@ class BitThemes extends BitSingleton {
 						} else {
 							$explosion = explode( '/', $r['module_rsrc'] );
 							$template = \array_pop( $explosion );
-							
+
 							// using $module_rows, $module_params and $module_title is deprecated. please use $moduleParams hash instead
 							global $module_rows, $module_params, $module_title, $gBitLanguage;
 
@@ -549,11 +548,11 @@ class BitThemes extends BitSingleton {
 					}
 				}
 			}
-			if( !empty( $ret ) && ($pColumn == 'l' || $pColumn == 'r') ) { 
+			if( !empty( $ret ) && ($pColumn == 'l' || $pColumn == 'r') ) {
 				$ret = '<div class="panel-group col-xs-12">'.$ret.'</div>';
 			}
 		}
-        return $ret;
+		return $ret;
 	}
 
 	/**
@@ -870,7 +869,6 @@ class BitThemes extends BitSingleton {
 		return $ret;
 	}
 
-
 	// }}}
 	// {{{ =================== Modules ====================
 	/**
@@ -1157,7 +1155,7 @@ class BitThemes extends BitSingleton {
 					if( $h ) {
 						while (($file = readdir($h)) !== false) {
 							// match on legacy module files which require a prefix
-						    if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
+							if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
 								$this->mModules[$pDir][$pPrefix][ucfirst( $key )]["bitpackage:$key/$file"] = [
 									'title'    => str_replace( '_', ' ', $match[1] ),
 									'template' => $file,
@@ -1186,7 +1184,7 @@ class BitThemes extends BitSingleton {
 						$h = opendir( $loc );
 						if( $h ) {
 							while (($file = readdir($h)) !== false) {
-							    if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
+								if ( preg_match( "/^$pPrefix(.*)\.tpl$/", $file, $match )) {
 									$this->mModules[$pDir][$pPrefix][ucfirst( $key )]["bitpackage:temp/$key/$file"] = [
 										'title'    => str_replace( '_', ' ', $match[1] ),
 										'template' => $file,
@@ -1286,7 +1284,6 @@ class BitThemes extends BitSingleton {
 		return $ret;
 	}
 
-
 	// }}}
 	// {{{ =================== Custom Modules ====================
 	/**
@@ -1341,9 +1338,9 @@ class BitThemes extends BitSingleton {
 	public function getCustomModule( string $pName ): array {
 		if( !empty( $pName )) {
 			return $this->mDb->getRow( "SELECT * FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", [$pName] );
-		} else {
-			return [];
 		}
+			return [];
+
 	}
 
 	/**
@@ -1380,12 +1377,11 @@ class BitThemes extends BitSingleton {
 			return true;
 		} elseif( strpos( $pMixed, "bitpackage:" ) !== false ) {
 			return false;
-		} else {
+		}
 			$result = $this->mDb->getOne( "SELECT `name` FROM `".BIT_DB_PREFIX."themes_custom_modules` WHERE `name`=?", [ $pMixed ]);
 			return !empty( $result );
-		}
-	}
 
+	}
 
 	// }}}
 	// {{{ =================== Javascript and CSS related Methods ====================
@@ -1523,7 +1519,7 @@ class BitThemes extends BitSingleton {
 	public function isAjaxLoaded( string $pAjaxLib ): bool {
 		if( !empty( $this->mAjaxLibs ) && !empty( $pAjaxLib )) {
 			return \in_array( strtolower( $pAjaxLib ), \array_keys( $this->mAjaxLibs ));
-		} else { return false; }
+		}   return false;
 	}
 
 	/**
@@ -1540,11 +1536,11 @@ class BitThemes extends BitSingleton {
 		$anti = $mid = $post = [];
 //debug vd($gBitSystem->mPackages);
 		foreach( $gBitSystem->mPackages as $package => $info ) {
-        if( !empty( $info['path'] )) {
+		if( !empty( $info['path'] )) {
 				$file = "{$info['path']}templates/{$pFilename}.tpl";
 				$out = "bitpackage:{$package}/{$pFilename}.tpl";
 				if( is_readable( $file )) {
-                    if( \in_array( $package, $prepend )) {
+					if( \in_array( $package, $prepend )) {
 						$anti[] = $out;
 					} elseif( \in_array( $package, $append )) {
 						$post[] = $out;
@@ -1814,7 +1810,7 @@ class BitThemes extends BitSingleton {
 
 			$ret = $this->mThemeCache->getCacheUrl( $cachefile );
 		}
-        return $ret;
+		return $ret;
 	}
 
 	/**
@@ -1987,9 +1983,8 @@ class BitThemes extends BitSingleton {
 
 		if( !empty( $pFile ) && !empty( $pType ) && !empty( $fileHash[$pType] )) {
 			return \in_array( $pFile, $fileHash[$pType] );
-		} else { return false; }
+		}   return false;
 	}
-
 
 	// }}}
 	// {{{ =================== Miscellaneous Stuff ====================
@@ -2144,7 +2139,6 @@ class BitThemes extends BitSingleton {
 		return $ret;
 	}
 
-
 	// }}}
 	// {{{ =================== Deprecated code ====================
 	// deprecated stuff and temporary place holders
@@ -2188,7 +2182,7 @@ function themes_feedback_to_html( $params ) {
 	}
 	$feedback = '';
 	$i = 0;
-	$color = isset( $hash['color'] )?$hash['color']:"000000";
+	$color = $hash['color']??"000000";
 	foreach( $hash as $key => $val ) {
 		if( $val ) {
 			$keys = [ 'warning', 'success', 'error', 'important', 'note' ];
@@ -2228,7 +2222,7 @@ function themes_feedback_to_html( $params ) {
 				/* unfortunately this plugin was written a little strictly and so it expects all params to be display text
 				 * to allow setting of a background color we have to exclude that param when rendering out the html
 				 * otherwise we'll render the color as text. -wjames5
-				 */ 
+				 */
 				if ( $key != 'color' ) {
 					if( \is_array( $val ) ) {
 						foreach( $val as $text ) {

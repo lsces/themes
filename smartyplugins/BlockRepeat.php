@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
 use Smarty\Exception;
@@ -27,10 +28,10 @@ class BlockRepeat implements BlockHandlerInterface {
 	public function handle( $params, $content, Template $template, &$repeat): string {
 		global $gBitSmarty;
 		if( !empty( $content ) ) {
-			$intCount = intval( $params['count'] );
+			$intCount = (int) ( $params['count'] );
 			if( $intCount < 0 ) {
 				throw new Exception(
-					"block: negative 'count' parameter" ); 
+					"block: negative 'count' parameter", );
 			}
 
 			$strRepeat = str_repeat( $content, $intCount );

@@ -14,14 +14,14 @@ namespace Bitweaver\Plugins;
  * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
  */
 function smarty_modifier_display_duration( $pDuration ) {
-	$units = array(
+	$units = [
 		'month'  => 60 * 60 * 24 * 7 * 4,
 		'week'   => 60 * 60 * 24 * 7,
 		'day'    => 60 * 60 * 24,
 		'hour'   => 60 * 60,
 		'min'    => 60,
 		'sec'    => 1,
-	);
+	];
 
 	foreach( $units as $unit => $secs ) {
 		$duration[$unit] = 0;

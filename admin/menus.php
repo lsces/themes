@@ -9,41 +9,41 @@ require_once( KERNEL_PKG_INCLUDE_PATH."simple_form_functions_lib.php" );
 //$gBitSystem->setOnloadScript('initDragDrop();');
 $gBitSystem->verifyPermission( 'p_admin' );
 
-$formMenuSettings = array(
+$formMenuSettings = [
 // this feature is obsolete since we now have this in a module
 //	'site_top_bar' => array(
 //		'label' => 'Top bar menu',
 //		'note' => 'Here you can enable or disable the menubar at the top of the page (available in most themes). Before you disable this bar, please make sure you have some means of navigation set up to access at least the administration page.',
 //	),
-	'site_top_bar_dropdown' => array(
+	'site_top_bar_dropdown' => [
 		'label' => 'Dropdown menu',
 		'note' => 'Use the CSS driven dropdown menus in the top bar. Compatibility and further reading can be found at <a class="external" href="http://www.htmldog.com/articles/suckerfish/dropdowns/">Suckerfish Dropdowns</a>.',
-	),
-	'site_hide_my_top_bar_link' => array(
+	],
+	'site_hide_my_top_bar_link' => [
 		'label' => 'Hide "My" Link',
 		'note' => 'Hide the <strong>My &lt;sitename&gt;</strong> link from users that are not logged in.',
-	),
-);
+	],
+];
 $gBitSmarty->assign( 'formMenuSettings',$formMenuSettings );
 
-$formMenuJsSettings = array(
-	'site_top_bar_js' => array(
+$formMenuJsSettings = [
+	'site_top_bar_js' => [
 		'label' => 'Enhance Dropdown with Javascript',
 		'note' => 'This small javascript will delay the menu slightly making it easier to navigate. Also you can apply below effects. Please see <a class="external" href="http://www.twinhelix.com">TwinHelix</a> for details.',
-	),
-	'site_top_bar_js_fade' => array(
+	],
+	'site_top_bar_js_fade' => [
 		'label' => 'Fade Effect',
 		'note' => 'Fade in menu dropdown elements.',
-	),
-	'site_top_bar_js_swipe' => array(
+	],
+	'site_top_bar_js_swipe' => [
 		'label' => 'Swipe Effect',
 		'note' => 'Sweep the menu from the top down.',
-	),
-	'site_top_bar_js_clip' => array(
+	],
+	'site_top_bar_js_clip' => [
 		'label' => 'Clip Effect',
 		'note' => 'Similar to the swipe effect.',
-	),
-);
+	],
+];
 
 if( !empty( $_REQUEST['menu_settings'] ) ) {
 	foreach( array_keys( $formMenuSettings ) as $item ) {
@@ -89,5 +89,5 @@ if( $gBitSystem->isFeatureActive( 'site_top_bar_dropdown' ) ) {
 	$gBitSmarty->assign( 'formMenuJsSettings',$formMenuJsSettings );
 }
 
-$gBitSystem->display( 'bitpackage:themes/admin_themes_menus.tpl', 'Themes Manager' , array( 'display_mode' => 'admin' ));
+$gBitSystem->display( 'bitpackage:themes/admin_themes_menus.tpl', 'Themes Manager' , [ 'display_mode' => 'admin' ]);
 ?>

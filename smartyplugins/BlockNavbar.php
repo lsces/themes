@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
 
@@ -20,7 +21,7 @@ class BlockNavbar implements BlockHandlerInterface {
 
 	public function handle( $params, $content, Template $template, &$repeat): string {
 		global $gBitSmarty;
-		
+
 		$links = $this->smarty_block_navbar_get_links( $content );
 		$gBitSmarty->assign( 'links',$links );
 		return $gBitSmarty->fetch( 'bitpackage:kernel/navbar.tpl' );

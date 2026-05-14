@@ -43,7 +43,7 @@ $gBitInstaller->registerSchemaIndexes( THEMES_PKG_NAME, $indices );
 
 // ### Sequences
 $sequences = [
-	'themes_layouts_module_id_seq' => [ 'start' => 1 ]
+	'themes_layouts_module_id_seq' => [ 'start' => 1 ],
 ];
 $gBitInstaller->registerSchemaSequences( THEMES_PKG_NAME, $sequences );
 

@@ -32,7 +32,7 @@ class cssLib extends BitBase {
 
 	function browse_css($path) {
 		if (!is_file($path)) {
-			return array("error" => "No such file : $path");
+			return ["error" => "No such file : $path"];
 		}
 
 		$meat = implode("", file($path));
@@ -59,10 +59,10 @@ class cssLib extends BitBase {
 		$repl[6] = "#000000";
 
 		$res = preg_replace($find, $repl, $meat);
-		return array(
+		return [
 			"error" => '',
-			"content" => split("\n", $res)
-		);
+			"content" => split("\n", $res),
+		];
 	}
 
 	function parse_css($data) {

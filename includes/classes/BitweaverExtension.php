@@ -1,6 +1,7 @@
 <?php
 
 namespace Bitweaver\Themes;
+
 use Bitweaver\KernelTools;
 use Smarty\Exception;
 use Smarty\Extension\Base;
@@ -22,87 +23,86 @@ class BitweaverExtension extends Base {
 		$this->initialize();
 	}
 
-    protected function initialize() {
-        // Include helper functions
+	protected function initialize() {
+		// Include helper functions
 //        require_once __DIR__ . '/includes/helper_functions.php';
 
-        // Scan and include function files
-        $this->scanAndIncludeFunctionFiles();
-        $this->scanAndIncludeModifierFiles();
-    }
+		// Scan and include function files
+		$this->scanAndIncludeFunctionFiles();
+		$this->scanAndIncludeModifierFiles();
+	}
 
-    protected function scanAndIncludeFunctionFiles() {
-        global $gBitSmarty;
+	protected function scanAndIncludeFunctionFiles() {
+		global $gBitSmarty;
 		$directory = THEMES_PKG_PATH . 'smartyplugins/';
-        $pattern = $directory . 'function.*.php';
+		$pattern = $directory . 'function.*.php';
 
-        $files = glob($pattern);
-        if ($files === false) {
-            throw new Exception("Failed to scan directory for function files.");
-        }
+		$files = glob($pattern);
+		if ($files === false) {
+			throw new Exception("Failed to scan directory for function files.");
+		}
 
-        foreach ($files as $file) {
-            require_once $file;
-            $basename = basename($file);
-            $functionName = str_replace('function.', '', $basename);
-            $functionName = str_replace('.php', '', $functionName);
-            $this->callbacks[$functionName]['name'] = 'Smarty\\smarty_function_' . $functionName;
-            $this->callbacks[$functionName]['loaded'] = true;
+		foreach ($files as $file) {
+			require_once $file;
+			$basename = basename($file);
+			$functionName = str_replace('function.', '', $basename);
+			$functionName = str_replace('.php', '', $functionName);
+			$this->callbacks[$functionName]['name'] = 'Smarty\\smarty_function_' . $functionName;
+			$this->callbacks[$functionName]['loaded'] = true;
 			if ( is_callable('Bitweaver\\Plugins\\smarty_function_' . $functionName )) {
 				$gBitSmarty->registerPlugin ('function', $functionName, 'Bitweaver\\Plugins\\smarty_function_' . $functionName );
 			}
-        }
-    }
+		}
+	}
 
-
-    protected function scanAndIncludeModifierFiles() {
+	protected function scanAndIncludeModifierFiles() {
 		global $gBitSmarty;
 		$directory = THEMES_PKG_PATH . 'smartyplugins/';
-        $pattern = $directory . 'modifier.*.php';
+		$pattern = $directory . 'modifier.*.php';
 
-        $files = glob($pattern);
-        if ($files === false) {
-            throw new Exception("Failed to scan directory for function files.");
-        }
+		$files = glob($pattern);
+		if ($files === false) {
+			throw new Exception("Failed to scan directory for function files.");
+		}
 
-        foreach ($files as $file) {
-            require_once $file;
-            $basename = basename($file);
-            $functionName = str_replace('modifier.', '', $basename);
-            $functionName = str_replace('.php', '', $functionName);
-            $this->callbacks[$functionName]['name'] = 'smarty_modifier_' . $functionName;
-            $this->callbacks[$functionName]['loaded'] = true;
+		foreach ($files as $file) {
+			require_once $file;
+			$basename = basename($file);
+			$functionName = str_replace('modifier.', '', $basename);
+			$functionName = str_replace('.php', '', $functionName);
+			$this->callbacks[$functionName]['name'] = 'smarty_modifier_' . $functionName;
+			$this->callbacks[$functionName]['loaded'] = true;
 			if ( is_callable('BitWeaver\\Plugins\\smarty_modifier_' . $functionName)) {
 				$gBitSmarty->registerPlugin ('modifier', $functionName, 'BitWeaver\\Plugins\\smarty_modifier_' . $functionName );
 			}
-        }
-    }
+		}
+	}
 
-    public function getModifierCompiler(string $modifier): ?\Smarty\Compile\Modifier\ModifierCompilerInterface {
+	public function getModifierCompiler(string $modifier): ?\Smarty\Compile\Modifier\ModifierCompilerInterface {
 
 		if (isset($this->modifiers[$modifier])) {
 			return $this->modifiers[$modifier] ?? null;
 		}
 
-        switch ($modifier) {
+		switch ($modifier) {
 //			case 'add_link_ticket':		$this->modifiers[$modifier] = new \Bitweaver\Plugins\AddLinkTicket(); break;
 			case 'tr': 					$this->modifiers[$modifier] = new \Bitweaver\Plugins\PreTr();
 //			case 'bit_short_datetime':	$this->modifiers[$modifier] = new \Bitweaver\Plugins\BitShortDatetime();
-        }
+		}
 
 		return $this->modifiers[$modifier] ?? null;
 	}
 
 	public function getModifierCallback(string $modifierName) {
 //		if (!isset($this->modifiers[$modifierName])) {
-            if (!isset($this->callbacks[$modifierName])) {
-                switch ($modifierName) {
-                    case 'highlight':			return [$this, 'smarty_modifier_highlight'];
-                    case 'implode':				return [$this, 'smarty_modifier_implode'];
-                    case 'extension_loaded':	return [$this, 'smarty_modifier_extension_loaded'];
-                    case 'function_exists':		return [$this, 'smarty_modifier_function_exists'];
-                    case 'basename':			return [$this, 'smarty_modifier_basename'];
-                    case 'strpos':				return [$this, 'smarty_modifier_function_strpos'];
+			if (!isset($this->callbacks[$modifierName])) {
+				switch ($modifierName) {
+					case 'highlight':			return [$this, 'smarty_modifier_highlight'];
+					case 'implode':				return [$this, 'smarty_modifier_implode'];
+					case 'extension_loaded':	return [$this, 'smarty_modifier_extension_loaded'];
+					case 'function_exists':		return [$this, 'smarty_modifier_function_exists'];
+					case 'basename':			return [$this, 'smarty_modifier_basename'];
+					case 'strpos':				return [$this, 'smarty_modifier_function_strpos'];
 					case 'http_build_query':	return [$this, 'smarty_modifier_http_build_query'];
 					case 'ucwords':				return [$this, 'smarty_modifier_ucwords'];
 					case 'is_object':			return [$this, 'smarty_modifier_is_object'];
@@ -112,7 +112,7 @@ class BitweaverExtension extends Base {
 					case 'is_readable':			return [$this, 'smarty_modifier_is_readable'];
 					case 'ucfirst':				return [$this, 'smarty_modifier_ucfirst'];
 					case 'html_entity_decode':	return [$this, 'smarty_modifier_html_entity_decode'];
-                }
+				}
 			} else {
 				if ( !$this->callbacks[$modifierName]['loaded'] ) {
 				}
@@ -135,12 +135,11 @@ class BitweaverExtension extends Base {
 //			case 'minifind':		$this->functionHandlers[$functionName] = new \Bitweaver\Plugins\MiniFind(); break;
 //			case 'pagination':		$this->functionHandlers[$functionName] = new \Bitweaver\Plugins\Pagination(); break;
 //			case 'jspopup':			$this->functionHandlers[$functionName] = new \Bitweaver\Plugins\JsPopup(); break;
-	    }
-        return $this->functionHandlers[$functionName] ?? null;
-    }
+		}
+		return $this->functionHandlers[$functionName] ?? null;
+	}
 
 	public function getBlockHandler(string $blockTagName): ?\Smarty\BlockHandler\BlockHandlerInterface {
-
 
 		switch ($blockTagName) {
 			case 'bitmodule':	$this->blockHandlers[$blockTagName] = new \Bitweaver\Plugins\BlockBitModule(); break;
@@ -237,7 +236,7 @@ class BitweaverExtension extends Base {
 			}
 			$source = $highlight;
 			$wordList = "<div class=\"wordlist\">$wordList</div>";
-			$gBitSmarty->assign( 'highlightWordList', $wordList ?? ''); 
+			$gBitSmarty->assign( 'highlightWordList', $wordList ?? '');
 		}
 		return $source;
 	}
@@ -268,7 +267,6 @@ class BitweaverExtension extends Base {
 	public function smarty_modifier_basename( $file ) {
 		return basename( $file, $suffix = "");
 	}
-
 
 	public function smarty_modifier_extension_loaded( $ext ) {
 		return extension_loaded( $ext );

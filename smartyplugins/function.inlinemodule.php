@@ -7,7 +7,6 @@ namespace Bitweaver\Plugins;
  * @subpackage plugins
  */
 
-
 /**
  * Usage: add to the body of any .tpl file
  * Example: {inlinemodule file="bitpackage:wiki/mod_last_modif_pages.tpl" rows="50"}

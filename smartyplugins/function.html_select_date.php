@@ -1,7 +1,5 @@
 <?php
 namespace Bitweaver\Plugins;
-use Bitweaver\KernelTools;
-use Bitweaver\BitDate;
 
 /**
  * Smarty plugin
@@ -159,7 +157,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 			foreach ([
 							'Y' => 'Year',
 							'm' => 'Month',
-							'd' => 'Day'
+							'd' => 'Day',
 						] as $_elementKey => $_elementName) {
 				$_variableName = '_' . strtolower($_elementName);
 				$$_variableName =
@@ -170,7 +168,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 			foreach ([
 							'Y' => 'Year',
 							'm' => 'Month',
-							'd' => 'Day'
+							'd' => 'Day',
 						] as $_elementKey => $_elementName) {
 				$_variableName = '_' . strtolower($_elementName);
 				$$_variableName = $time[$field_array][$prefix . $_elementName] ?? date($_elementKey);
@@ -205,7 +203,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 	// Note preg_match('!^(\+|\-)\s*(\d+)$!', $end_year, $match) is slower than trim+substr
 	foreach ([
 					'start',
-					'end'
+					'end',
 				] as $key) {
 		$key .= '_year';
 		$t = $$key;
@@ -246,7 +244,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 						$year_id !== null ?
 							($year_id ? $year_id : $_name) :
 							($all_id ? ($all_id . $_name) :
-								$_name)
+								$_name),
 					) . '"';
 			}
 			if ($year_size) {
@@ -254,7 +252,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 			}
 			$_html_years .= $_extra . $extra_attrs . '>' . $option_separator;
 			if (isset($year_empty) || isset($all_empty)) {
-				$_html_years .= '<option value="">' . (isset($year_empty) ? $year_empty : $all_empty) . '</option>' .
+				$_html_years .= '<option value="">' . ($year_empty ?? $all_empty) . '</option>' .
 					$option_separator;
 			}
 			$op = $start_year > $end_year ? -1 : 1;
@@ -282,7 +280,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 					$month_id !== null ?
 						($month_id ? $month_id : $_name) :
 						($all_id ? ($all_id . $_name) :
-							$_name)
+							$_name),
 				) . '"';
 		}
 		if ($month_size) {
@@ -324,7 +322,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 			$_html_days .= ' id="' .
 				smarty_function_escape_special_chars(
 					$day_id !== null ? ($day_id ? $day_id : $_name) :
-						($all_id ? ($all_id . $_name) : $_name)
+						($all_id ? ($all_id . $_name) : $_name),
 				) . '"';
 		}
 		if ($day_size) {
@@ -332,7 +330,7 @@ function smarty_function_html_select_date($params, &$pSmarty) {
 		}
 		$_html_days .= $_extra . $extra_attrs . '>' . $option_separator;
 		if (isset($day_empty) || isset($all_empty)) {
-			$_html_days .= '<option value="">' . (isset($day_empty) ? $day_empty : $all_empty) . '</option>' .
+			$_html_days .= '<option value="">' . ($day_empty ?? $all_empty) . '</option>' .
 				$option_separator;
 		}
 		for ($i = 1; $i <= 31; $i++) {

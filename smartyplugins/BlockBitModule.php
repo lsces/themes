@@ -28,9 +28,9 @@ I fixed that error case. -- mose
  */
 
 namespace Bitweaver\Plugins;
+
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
-use Smarty\Exception;
 
 class BlockBitModule implements BlockHandlerInterface {
 
@@ -43,9 +43,8 @@ class BlockBitModule implements BlockHandlerInterface {
 		$gBitSmarty->assign( 'moduleTag', $moduleTag );
 		if( empty( $content )) {
 			return '';
-		} else {
-			$params['data'] = $content;
 		}
+			$params['data'] = $content;
 
 		if( !empty( $params['name'] ) ) {
 			$params['name'] = preg_replace( "/[^a-zA-Z0-9\\-\\_]/", "", $params['name'] );
@@ -54,7 +53,7 @@ class BlockBitModule implements BlockHandlerInterface {
 
 		$temp = $gBitSmarty->fetch('bitpackage:themes/module.tpl');
 		return $temp;
-		
+
 	}
 
 	public function isCacheable(): bool {

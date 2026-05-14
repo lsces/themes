@@ -21,7 +21,7 @@ function smarty_modifier_plural($word = '', $counter = 0)
 	# What to append to the word to make it plural?
 	$plural_marker = 's';
 
-	# Words ending in [ o ] 
+	# Words ending in [ o ]
 	if(preg_match('/o$/', $word))
 	{
 		$plural_marker = 'es';

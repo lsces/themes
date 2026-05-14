@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver\Plugins;
+
 use Smarty\Resource\Smarty_Resource_Custom;
 
 /**
@@ -46,10 +47,9 @@ class Smarty_Resource__Custom extends Smarty_Resource_Custom {
 		$pTplTime = filemtime( $cacheFile );
 	}
 
-    protected function fetchTimestamp( $pTplName ) {
+	protected function fetchTimestamp( $pTplName ) {
 		return null;
 	}
 
 }
-
 

@@ -22,15 +22,15 @@ function smarty_function_pagination( $params, &$gSmartyTemplate ) {
 	global $gBitSmarty;
 
 	$pgnUrl = $gBitSmarty->getTemplateVars('returnURL');
-    if ( isset( $params['url'] ) ) {
-     	  $pgnUrl = $params['url'];
-        unset( $params['url'] );
-    }
-    if( empty( $pgnUrl ) ) {
-        $pgnUrl = $_SERVER['SCRIPT_NAME'];
+	if ( isset( $params['url'] ) ) {
+		   $pgnUrl = $params['url'];
+		unset( $params['url'] );
+	}
+	if( empty( $pgnUrl ) ) {
+		$pgnUrl = $_SERVER['SCRIPT_NAME'];
 	}
 
-    $gBitSmarty->assign( 'pgnUrl', $pgnUrl );
+	$gBitSmarty->assign( 'pgnUrl', $pgnUrl );
 
 	$pgnVars = '';
 	$pgnHidden = [];
@@ -40,8 +40,8 @@ function smarty_function_pagination( $params, &$gSmartyTemplate ) {
 			$pgnHidden[$form_param] = $form_val;
 		}
 	}
-	
-    $gBitSmarty->assign( 'pgnVars', $pgnVars );
+
+	$gBitSmarty->assign( 'pgnVars', $pgnVars );
 	$gBitSmarty->assign( 'pgnHidden', $pgnHidden );
-    return $gBitSmarty->fetch('bitpackage:kernel/pagination.tpl');
+	return $gBitSmarty->fetch('bitpackage:kernel/pagination.tpl');
 }

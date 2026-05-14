@@ -7,13 +7,14 @@
  */
 
  namespace Bitweaver\Plugins;
+
  use Smarty\Compile\Modifier\ModifierCompilerInterface;
  use Smarty\Compiler\Template;
- 
+
 class AddLinkTicket implements ModifierCompilerInterface {
-    public function __construct() {
-        // Initialization code
-    }
+	public function __construct() {
+		// Initialization code
+	}
 
 	public function compile($params, Template $template) {
 		global $gBitUser;

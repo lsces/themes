@@ -20,7 +20,7 @@ function smarty_modifier_avatarize($user)
   global $gBitSystem, $gBitUser;
   $avatar = $gBitSystem->get_user_avatar($user);
   if( $gBitUser->userNameExists($user) && $gBitSystem->getConfig('users_information','public',$user)=='public') {
-  	$avatar = '<a title="'.$user.'" href="'.USERS_PKG_URL.'index.php?home='.$user.'">'.$avatar.'</a>';
-  } 
-  return $avatar;	
+	$avatar = '<a title="'.$user.'" href="'.USERS_PKG_URL.'index.php?home='.$user.'">'.$avatar.'</a>';
+  }
+  return $avatar;
 }

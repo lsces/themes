@@ -17,8 +17,8 @@ namespace Bitweaver\Plugins;
  */
 function smarty_modifier_quoted($string)
 {
-    $string = str_replace("\n","\n>",$string);
-    return '>'.$string;
+	$string = str_replace("\n","\n>",$string);
+	return '>'.$string;
 }
 
 /* vim: set expandtab: */

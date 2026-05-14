@@ -11,6 +11,6 @@ namespace Bitweaver\Plugins;
  * smarty_function_cookie
  */
 function smarty_function_tk($params, &$gBitSmarty) {
-    global $gBitUser;
+	global $gBitUser;
 	print 'tk='.$gBitUser->mTicket;
 }

@@ -3,7 +3,7 @@
 
 require_once( '../../kernel/includes/setup_inc.php' );
 
-$formModuleFeatures = array(
+$formModuleFeatures = [
 //	'site_collapsible_modules' => array(
 //		'label' => 'Collapsible Modules',
 //		'note' => 'This allows users to collapse modules by clicking on their titles. Can be useful if you use many modules.',
@@ -16,7 +16,7 @@ $formModuleFeatures = array(
 //		'label' => 'Show Module Controls',
 //		'note' => 'Displays module control buttons at the top of modules for easy placement by users.',
 //	),
-);
+];
 $gBitSmarty->assign( 'formModuleFeatures',$formModuleFeatures );
 
 if( !empty( $_REQUEST['module_settings'] )) {

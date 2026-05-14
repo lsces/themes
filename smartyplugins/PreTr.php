@@ -14,6 +14,7 @@
  */
 
 namespace Bitweaver\Plugins;
+
 use Smarty\Compile\Modifier\ModifierCompilerInterface;
 use Smarty\Compiler\Template;
 
@@ -29,7 +30,7 @@ class PreTr implements ModifierCompilerInterface {
 		//
 		// correction: in order to match when a variable is inside  tags.
 		// Example: The newsletter was sent to {$sent} email addresses,
-		// and where there are parameters with  take away the smarty comments 
+		// and where there are parameters with  take away the smarty comments
 		// {* *} in case they have tr tags
 		$ret = preg_replace_callback( '#(?s)(\{tr[^\}]*\})(.+?)\{/tr\}#', [ $this, 'translate_lang' ], preg_replace ( '#(?s)\{\*.*?\*\}#', '', $source ) );
 		return $ret;
@@ -65,21 +66,20 @@ class PreTr implements ModifierCompilerInterface {
 		// Explanation why this doesn't work:
 		//  - case 1
 		//    returning stuff like waiting for {$number} ratings
-		//    will get translated by block.tr.php but only after the {$number} has 
+		//    will get translated by block.tr.php but only after the {$number} has
 		//    been interpreted and we will end up with master strings like:
 		//    waiting for 4 ratings
 		//    waiting for 5 ratings
 		//    waiting for 6 ratings
 		//
 		//  - case 2
-		//    this should be fine since it has been translated and the  blocks 
+		//    this should be fine since it has been translated and the  blocks
 		//    have been removed i.e. block.tr.php won't be called anymore
 		//
 		//  - case 3
-		//    this will leave everything as is. this will work as well, but only if 
+		//    this will leave everything as is. this will work as well, but only if
 		//    there is no {$var} in the string - see case 1
 		// --- xing
-
 
 		// if the entire string in  is a variable, we pass it on to block.tr.php
 		// e.g. {$menu.menu_title} in top_bar.tpl
@@ -90,9 +90,9 @@ class PreTr implements ModifierCompilerInterface {
 			// no parameters set for block.tr.php
 			$trans = $gBitLanguage->translate( $pKey[2] );
 			return $trans;
-		} else {
+		}
 			// perhaps there are parameters set for block.tr.php
 			return $pKey[1].$pKey[2]."";
-		}
+
 	}
 }

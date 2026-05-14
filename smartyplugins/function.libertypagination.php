@@ -28,7 +28,7 @@ namespace Bitweaver\Plugins;
  */
 function smarty_function_libertypagination($params, &$gSmartyTemplate) {
 	global $gBitSmarty;
-	
+
 	if( isset( $params['ihash'] ) && is_array( $params['ihash'] ) ) {
 		$params = array_merge( $params['ihash'], $params );
 		$params['ihash'] = NULL;
@@ -39,10 +39,10 @@ function smarty_function_libertypagination($params, &$gSmartyTemplate) {
 		parse_str( preg_replace( "/.*\?/", "", $params['url'] ), $urlParams );
 		$params = array_merge( $urlParams, $params );
 	}
-	$pgnName = isset( $params['pgnName'] ) ? $params['pgnName'] : ( isset( $params['curPage'] ) ? 'curPage' : 'page' );
+	$pgnName = $params['pgnName'] ?? ( isset( $params['curPage'] ) ? 'curPage' : 'page' );
 	$pgnVars = '';
 
-	$omitParams = array( 'numPages', 'url', $pgnName, 'pgnName', 'ianchor', 'ajaxId' );
+	$omitParams = [ 'numPages', 'url', $pgnName, 'pgnName', 'ianchor', 'ajaxId' ];
 	foreach( $params as $form_param => $form_val ) {
 		if ( !empty( $form_val ) && !in_array( $form_param, $omitParams ) ) {
 			$pgnVars .= ( !empty( $params['ajaxId'] ) ? "&" : "&amp;" ).$form_param."=".$form_val;
@@ -64,11 +64,11 @@ function smarty_function_libertypagination($params, &$gSmartyTemplate) {
 		$gBitSmarty->assign( 'pgnName', $pgnName );
 		$gBitSmarty->assign( 'pgnVars', $pgnVars );
 		$gBitSmarty->assign( 'pgnHidden', $pgnHidden );
-	    $gBitSmarty->assign( 'pgnPages', $pages );
-	    $gBitSmarty->assign( 'numPages', $params['numPages'] );
+		$gBitSmarty->assign( 'pgnPages', $pages );
+		$gBitSmarty->assign( 'numPages', $params['numPages'] );
 		if( !empty( $params['ajaxId'] ) ) {
-		    $gBitSmarty->assign( 'ajaxId', $params['ajaxId'] );
+			$gBitSmarty->assign( 'ajaxId', $params['ajaxId'] );
 		}
-	    return $gBitSmarty->fetch( 'bitpackage:liberty/libertypagination.tpl' );
+		return $gBitSmarty->fetch( 'bitpackage:liberty/libertypagination.tpl' );
 	}
 }
