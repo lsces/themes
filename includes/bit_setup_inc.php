@@ -38,7 +38,7 @@ if( !$gBitThemes->getStyle() ) {
 $gBitSmarty->assign( 'gBitThemes', $gBitThemes );
 
 // load some core javascript files
-$gBitThemes->loadJavascript( UTIL_PKG_PATH.'javascript/bitweaver.js', true, 1 );
+$gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/bitweaver.js', true, 1 );
 $gBitThemes->loadAjax( $gBitSystem->getConfig( 'themes_jquery_hosting', 'jquery' ) );
 
 if( $gBitSystem->isFeatureActive( 'site_fancy_zoom' )) {
