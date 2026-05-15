@@ -4,14 +4,8 @@
 // Initialization
 require_once '../../kernel/includes/setup_inc.php';
 
-if( defined( 'ROLE_MODEL' )) {
-	if( !isset($_REQUEST["roles"] ) ) {
-		$_REQUEST["roles"] = [];
-	}
-} else {
-	if( !isset($_REQUEST["groups"] ) ) {
-		$_REQUEST["groups"] = [];
-	}
+if( !isset($_REQUEST["roles"] ) ) {
+	$_REQUEST["roles"] = [];
 }
 
 if( empty( $_REQUEST['module_package'] ) ) {
@@ -68,14 +62,8 @@ if( isset( $_REQUEST['module_id'] ) && !empty( $_REQUEST['move_module'] )) {
 } elseif( $processForm == 'Center' || $processForm == 'Column' ) {
 	$fAssign = &$_REQUEST['fAssign'];
 
-	if( defined( 'ROLE_MODEL' )) {
-		if( !empty( $_REQUEST['roles'] ) ) {
-			 $fAssign['roles'] = $_REQUEST['roles'];
-		}
-	} else {
-		if( !empty( $_REQUEST['groups'] ) ) {
-			$fAssign['groups'] = $_REQUEST['groups'];
-		}
+	if( !empty( $_REQUEST['roles'] ) ) {
+		$fAssign['roles'] = $_REQUEST['roles'];
 	}
 
 	// either add the module to all available layouts or just the active one
@@ -150,13 +138,8 @@ for( $i = 1; $i < 50; $i++ ) {
 
 $gBitSmarty->assign( 'orders', $orders );
 
-if( defined( 'ROLE_MODEL' )) {
-	$roles = $gBitUser->getAllUserRoles( ROOT_USER_ID );
-	$gBitSmarty->assign( "roles", $roles );
-} else {
-	$groups = $gBitUser->getAllUserGroups( ROOT_USER_ID );
-	$gBitSmarty->assign( "groups", $groups );
-}
+$roles = $gBitUser->getAllUserRoles( ROOT_USER_ID );
+$gBitSmarty->assign( "roles", $roles );
 // we need gBitThemes as well
 $gBitSmarty->assign( "gBitThemes", $gBitThemes );
 

@@ -28,7 +28,7 @@ $themeSettings = [
 	],
 	'site_fancy_zoom' => [
 		'label' => "Enable Fancy Zoom for images",
-		'note'  => "If checked, a Javascript zooms images when clicking on them. This will modify the behaviour when viewing most images. If you are running a commercial site, please read the license notice in /util/javascript/fancyzoom/js-global/FancyZoom.js.",
+		'note'  => "If checked, a Javascript zooms images when clicking on them. This will modify the behaviour when viewing most images. If you are running a commercial site, please read the license notice in /themes/js/fancyzoom/js-global/FancyZoom.js.",
 	],
 	'site_mods_req_admn_grp' => [
 		'label' => 'Modules require membership',

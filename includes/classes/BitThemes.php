@@ -10,6 +10,7 @@ namespace Bitweaver\Themes;
 
 use Bitweaver\BitCache;
 use Bitweaver\BitSingleton;
+use Bitweaver\Users\RolePermUser;
 use Bitweaver\Users\RoleUser;
 use Bitweaver\KernelTools;
 
@@ -600,58 +601,24 @@ class BitThemes extends BitSingleton {
 					break;
 				}
 
-				if ( defined ('ROLE_MODEL') ) {
-					// transform roles to managable array
-					if( empty( $row["roles"] )) {
-						// default is that module is visible at all times
-						$row["visible"] = true;
-						$row["module_roles"] = [];
-					} else {
-						$row['module_roles'] = $this->parseRoles( $row['roles'] );
-
-						if( $gBitUser->isAdmin() ) {
-							if ( $gBitSystem->isFeatureActive('site_mods_req_admn_grp') ) {
-								if( \in_array(1, $row['module_roles']) ) {
-									$row['visible'] = true;
-								}
-							}
-							else {
-								$row["visible"] = true;
-							}
-						} else {
-							// Check for the right roles
-							foreach( $row["module_roles"] as $modRoleId ) {
-								if( $gBitUser->isInRole( $modRoleId )) {
-									$row["visible"] = true;
-									break; // no need to continue looping
-								}
-							}
-						}
-					}
+				if( empty( $row["roles"] )) {
+					$row["visible"] = true;
+					$row["module_roles"] = [];
 				} else {
-					// transform groups to managable array
-					if( empty( $row["groups"] )) {
-						// default is that module is visible at all times
-						$row["visible"] = true;
-						$row["module_groups"] = [];
-					} else {
-						$row['module_groups'] = !empty($row['groups']) ? $this->parseGroups( $row['groups'] ) : null;
-						if( $gBitUser->isAdmin() ) {
-							if ( $gBitSystem->isFeatureActive('site_mods_req_admn_grp') ) {
-								if( \in_array(1, $row['module_groups']) ) {
-									$row['visible'] = true;
-								}
-							}
-							else {
-								$row["visible"] = true;
+					$row['module_roles'] = $this->parseRoles( $row['roles'] );
+					if( $gBitUser->isAdmin() ) {
+						if ( $gBitSystem->isFeatureActive('site_mods_req_admn_grp') ) {
+							if( \in_array(1, $row['module_roles']) ) {
+								$row['visible'] = true;
 							}
 						} else {
-							// Check for the right groups
-							foreach( $row["module_groups"] as $modGroupId ) {
-								if( $gBitUser->isInGroup( $modGroupId )) {
-									$row["visible"] = true;
-									break; // no need to continue looping
-								}
+							$row["visible"] = true;
+						}
+					} else {
+						foreach( $row["module_roles"] as $modRoleId ) {
+							if( $gBitUser->isInRole( $modRoleId )) {
+								$row["visible"] = true;
+								break;
 							}
 						}
 					}
@@ -749,11 +716,7 @@ class BitThemes extends BitSingleton {
 		$layouts = [];
 		$modules = $this->mDb->getAll( "SELECT tl.* FROM `".BIT_DB_PREFIX."themes_layouts` tl ORDER BY ".$this->mDb->convertSortmode( "pos_asc" ));
 		foreach( $modules as $module ) {
-			if( defined ( 'ROLE_MODEL') ) {
-				$module['module_roles'] = $this->parseRoles( $module['roles'] ?? '' );
-			} else {
-				$module['module_groups'] = $this->parseGroups( $module['groups'] ?? '' );
-			}
+			$module['module_roles'] = $this->parseRoles( $module['roles'] ?? '' );
 			$layouts[$module['layout']][$module['layout_area']][] = $module;
 		}
 		ksort( $layouts );
@@ -779,9 +742,8 @@ class BitThemes extends BitSingleton {
 			// nuke existing layout
 			$this->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `layout`=?", [$pToLayout]);
 			// get requested layout
-			$team = defined('ROLE_MODEL') ? 'roles' : 'groups';
 			$layout = $this->mDb->getAll( "
-				SELECT `title`, `layout_area`, `module_rows`, `module_rsrc`, `params`, `cache_time`, `$team`, `pos`
+				SELECT `title`, `layout_area`, `module_rows`, `module_rsrc`, `params`, `cache_time`, `roles`, `pos`
 				FROM `".BIT_DB_PREFIX."themes_layouts` WHERE `layout`=?", [$pFromLayout] );
 			foreach( $layout as $module ) {
 				$module['layout'] = $pToLayout;
@@ -899,12 +861,8 @@ class BitThemes extends BitSingleton {
 
 		if( !empty( $pHash['roles'] ) && \is_array( $pHash['roles'] )) {
 			$pHash['store']['roles'] = implode( ' ', $pHash['roles'] );
-		} elseif( !empty( $pHash['groups'] ) && \is_array( $pHash['groups'] )) {
-			$pHash['store']['groups'] = implode( ' ', $pHash['groups'] );
-		} elseif (defined('ROLE_MODEL') ) {
-			$pHash['store']['roles'] = null;
 		} else {
-			$pHash['store']['groups'] = null;
+			$pHash['store']['roles'] = null;
 		}
 
 		if( !empty( $pHash['config'] ) ) {
@@ -2271,9 +2229,7 @@ function themes_content_display( object $pContent ): void {
 	if( !empty( $theme ) && $theme != DEFAULT_THEME ) {
 		$gBitThemes->setStyle( $theme );
 		if( !is_object( $gQueryUser ) ) {
-			$userClass = $gBitSystem->getConfig( 'user_class', 'BitPermUser' );
-			require_once USERS_PKG_CLASS_PATH.$userClass.'.php';
-			$gQueryUser = new $userClass( $pContent->getField( 'user_id' ) );
+			$gQueryUser = new RolePermUser( $pContent->getField( 'user_id' ) );
 			$gQueryUser->load();
 			$gBitSmarty->assign( 'gQueryUser', $gQueryUser );
 		}
@@ -2306,8 +2262,7 @@ function themes_content_list( $pContent, $pListHash ) {
 	if( !empty( $theme ) && $theme != DEFAULT_THEME ) {
 		$gBitThemes->setStyle( $theme );
 		if( !is_object( $gQueryUser ) ) {
-			$userClass = $gBitSystem->getConfig( 'user_class', 'BitPermUser' );
-			$gQueryUser = new $userClass( $pListHash['user_id'] );
+			$gQueryUser = new RolePermUser( $pListHash['user_id'] );
 			$gQueryUser->load();
 			$gBitSmarty->assign( 'gQueryUser', $gQueryUser );
 		}
