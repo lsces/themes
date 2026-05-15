@@ -53,7 +53,7 @@ function smarty_function_jspack( $pParams, &$gBitSmarty ) {
 			 *                in the script, boolean.
 			 *                default: false.
 			 */
-			require_once( UTIL_PKG_PATH.'javascript/class.JavaScriptPacker.php' );
+			require_once( THEMES_PKG_INCLUDE_PATH.'class.JavaScriptPacker.php' );
 			$packer = new JavaScriptPacker( file_get_contents( $jsfile ), 'Normal', TRUE, FALSE );
 			$bitCache->writeCacheFile( $cachefile, $packer->pack() );
 		}
