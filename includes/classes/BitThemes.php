@@ -768,38 +768,6 @@ class BitThemes extends BitSingleton {
 	}
 
 	/**
-	 * transform groups string to handy array
-	 *
-	 * @param string $pParseString either space separated list of groups or serialised array
-	 * @return array of groups
-	 */
-	public function parseGroups( string $pParseString ): array {
-		$ret = [];
-		// convert groups string to hash
-		if( !empty($pParseString) && preg_match( '/[A-Za-z]/', $pParseString )) {
-			// old style serialized group names
-			if( $grps = @unserialize( $pParseString )) {
-				foreach( $grps as $grp ) {
-					global $gBitUser;
-					if( !( $groupId = \array_search( $grp, $gBitUser->mGroups ))) {
-						if( $gBitUser->isAdmin() ) {
-							$ret[] = $gBitUser->groupExists( $grp );
-						}
-					}
-
-					if( @$this->verifyId( $groupId )) {
-						$ret[] = $groupId;
-					}
-				}
-			}
-		} else {
-			// new imploded style
-			$ret = explode( ' ', $pParseString ?? '' );
-		}
-		return $ret;
-	}
-
-	/**
 	 * transform roles string to handy array
 	 *
 	 * @param string $pParseString either space separated list of roles or serialised array
