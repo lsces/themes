@@ -1,0 +1,815 @@
+/* eslint-env qunit */
+import EventTarget from '../../src/js/event-target.js';
+import VolumeControl from '../../src/js/control-bar/volume-control/volume-control.js';
+import MuteToggle from '../../src/js/control-bar/mute-toggle.js';
+import VolumeBar from '../../src/js/control-bar/volume-control/volume-bar.js';
+import PlayToggle from '../../src/js/control-bar/play-toggle.js';
+import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
+import Slider from '../../src/js/slider/slider.js';
+import PictureInPictureToggle from '../../src/js/control-bar/picture-in-picture-toggle.js';
+import FullscreenToggle from '../../src/js/control-bar/fullscreen-toggle.js';
+import ControlBar from '../../src/js/control-bar/control-bar.js';
+import SeekBar from '../../src/js/control-bar/progress-control/seek-bar.js';
+import RemainingTimeDisplay from '../../src/js/control-bar/time-controls/remaining-time-display.js';
+import TestHelpers from './test-helpers.js';
+import document from 'global/document';
+import window from 'global/window';
+import sinon from 'sinon';
+
+QUnit.module('Controls', {
+  beforeEach(assert) {
+    this.clock = sinon.useFakeTimers();
+  },
+  afterEach(assert) {
+    this.clock.restore();
+  }
+});
+
+QUnit.test('should hide volume and mute toggle control if it\'s not supported', function(assert) {
+  assert.expect(2);
+
+  const player = TestHelpers.makePlayer();
+
+  player.tech_.featuresVolumeControl = false;
+  player.tech_.featuresMuteControl = false;
+
+  const volumeControl = new VolumeControl(player);
+  const muteToggle = new MuteToggle(player);
+
+  assert.ok(volumeControl.hasClass('vjs-hidden'), 'volumeControl is not hidden');
+  assert.ok(muteToggle.hasClass('vjs-hidden'), 'muteToggle is not hidden');
+
+  player.dispose();
+  volumeControl.dispose();
+  muteToggle.dispose();
+});
+
+QUnit.test('should show replay icon when video playback ended', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player);
+
+  player.trigger('ended');
+
+  assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
+
+  player.dispose();
+  playToggle.dispose();
+});
+
+QUnit.test('should show replay icon when video playback ended and replay option is set to true', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player, {replay: true});
+
+  player.trigger('ended');
+
+  assert.ok(playToggle.hasClass('vjs-ended'), 'playToogle is in the ended state');
+
+  player.dispose();
+  playToggle.dispose();
+});
+
+QUnit.test('should not show the replay icon when video playback ended', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+
+  const playToggle = new PlayToggle(player, {replay: false});
+
+  player.trigger('ended');
+
+  assert.equal(playToggle.hasClass('vjs-ended'), false, 'playToogle is not in the ended state');
+
+  player.dispose();
+  playToggle.dispose();
+});
+
+QUnit.test('should test and toggle volume control on `loadstart`', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  player.tech_.featuresVolumeControl = true;
+  player.tech_.featuresMuteControl = true;
+
+  const volumeControl = new VolumeControl(player);
+  const muteToggle = new MuteToggle(player);
+
+  assert.equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl is hidden initially');
+  assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle is hidden initially');
+
+  player.tech_.featuresVolumeControl = false;
+  player.tech_.featuresMuteControl = false;
+  player.trigger('loadstart');
+
+  assert.equal(volumeControl.hasClass('vjs-hidden'), true, 'volumeControl does not hide itself');
+  assert.equal(muteToggle.hasClass('vjs-hidden'), true, 'muteToggle does not hide itself');
+
+  player.tech_.featuresVolumeControl = true;
+  player.tech_.featuresMuteControl = true;
+  player.trigger('loadstart');
+
+  assert.equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl does not show itself');
+  assert.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
+
+  player.dispose();
+  volumeControl.dispose();
+  muteToggle.dispose();
+});
+
+QUnit.test('calculateDistance should use changedTouches, if available', function(assert) {
+  const player = TestHelpers.makePlayer();
+
+  player.tech_.featuresVolumeControl = true;
+
+  const slider = new Slider(player);
+
+  document.body.appendChild(slider.el_);
+  slider.el_.style.position = 'absolute';
+  slider.el_.style.width = '200px';
+  slider.el_.style.left = '0px';
+
+  const event = {
+    pageX: 10,
+    changedTouches: [{
+      pageX: 100
+    }]
+  };
+
+  assert.equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
+
+  player.dispose();
+  slider.dispose();
+});
+
+QUnit.test("SeekBar doesn't set scrubbing on mouse down, only on mouse move", function(assert) {
+  const player = TestHelpers.makePlayer();
+  const scrubbingSpy = sinon.spy(player, 'scrubbing');
+  const seekBar = new SeekBar(player);
+  const doc = new EventTarget();
+
+  player.duration(0);
+
+  // mousemove is listened to on the document.
+  // Specifically, we check the ownerDocument of the seekBar's bar.
+  // Therefore, we want to mock it out to be able to trigger mousemove
+  seekBar.bar.dispose();
+  seekBar.bar.el_ = new EventTarget();
+  seekBar.bar.el_.ownerDocument = doc;
+
+  seekBar.trigger('mousedown');
+  assert.ok(scrubbingSpy.calledWith(), 'called scrubbing as a getter');
+  assert.notOk(scrubbingSpy.calledWith(true), 'did not set scrubbing true');
+
+  player.scrubbing(false);
+
+  scrubbingSpy.resetHistory();
+
+  doc.trigger('mousemove');
+  assert.ok(scrubbingSpy.calledWith(), 'called scrubbing as a getter');
+  assert.ok(scrubbingSpy.calledWith(true), 'did set scrubbing true');
+
+  seekBar.dispose();
+  player.dispose();
+});
+
+QUnit.test('SeekBar should be filled on 100% when the video/audio ends', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const seekBar = player.controlBar.progressControl.seekBar;
+  const oldRAF = window.requestAnimationFrame;
+  const oldCAF = window.cancelAnimationFrame;
+
+  window.requestAnimationFrame = (fn) => window.setTimeout(fn, 1);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+
+  player.triggerReady();
+  player.duration(1.5);
+
+  this.clock.tick(30);
+  player.trigger('timeupdate');
+  this.clock.tick(1);
+
+  assert.equal(seekBar.duration_, 1.5, 'SeekBar duration should equal player duration');
+  assert.equal(seekBar.currentTime_, 0, 'SeekBar current time should be zero on start');
+  assert.equal(seekBar.getPercent(), 0, 'SeekBar percent should be zero on start');
+
+  this.clock.tick(30);
+  player.currentTime(0.75);
+  player.trigger('timeupdate');
+  this.clock.tick(1);
+
+  assert.equal(seekBar.currentTime_, 0.75, 'SeekBar currentTime should equal player currentTime');
+  assert.equal(seekBar.getPercent(), 0.5, 'SeekBar percent equal to 50%');
+
+  this.clock.tick(30);
+  player.currentTime(1.495);
+  player.trigger('timeupdate');
+  this.clock.tick(1);
+  player.currentTime(1.5);
+  // The following 'timeupdate' should be wiped out by the throttle function!
+  player.trigger('timeupdate');
+  // The following 'ended' shouldn't be wiped out by the throttle function!
+  player.trigger('ended');
+  this.clock.tick(1);
+
+  assert.equal(seekBar.currentTime_, 1.5, 'SeekBar currentTime should equal player currentTime');
+  assert.equal(seekBar.getPercent(), 1, 'SeekBar percent equal to 100%');
+  player.dispose();
+
+  window.requestAnimationFrame = oldRAF;
+  window.cancelAnimationFrame = oldCAF;
+});
+
+QUnit.test('SeekBar keyboard increment is configurable', function(assert) {
+  const player = TestHelpers.makePlayer({
+    controlBar: {
+      progressControl: {
+        seekBar: {
+          stepSeconds: 2,
+          pageMultiplier: 4
+        }
+      }
+    }
+  });
+
+  const ctSpy = sinon.spy(player, 'currentTime');
+
+  player.duration(100);
+  player.currentTime(10);
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowRight'});
+  // 10 + 2
+  assert.ok(ctSpy.calledWith(12), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageUp'});
+  // 12 + (2 * 4)
+  assert.ok(ctSpy.calledWith(20), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowLeft'});
+  // 20 - 2
+  assert.ok(ctSpy.calledWith(18), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageDown'});
+  // 18 - (2 * 4)
+  assert.ok(ctSpy.calledWith(10), 'seeked configured amount with multiplier');
+
+  player.dispose();
+});
+
+QUnit.test('SeekBar keyboard increment is configurable at runtime', function(assert) {
+  const player = TestHelpers.makePlayer({});
+
+  const ctSpy = sinon.spy(player, 'currentTime');
+
+  player.duration(100);
+  player.currentTime(10);
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowRight'});
+  // 10 + 5
+  assert.ok(ctSpy.calledWith(15), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageUp'});
+  // 15 + (5 * 12)
+  assert.ok(ctSpy.calledWith(75), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowLeft'});
+  // 75 - 5
+  assert.ok(ctSpy.calledWith(70), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageDown'});
+  // 70 - (5 * 12)
+  assert.ok(ctSpy.calledWith(10), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.options().stepSeconds = 3;
+  player.controlBar.progressControl.seekBar.options().pageMultiplier = 3;
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowRight'});
+  // 10 + 3
+  assert.ok(ctSpy.calledWith(13), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageUp'});
+  // 13 + (3 * 3)
+  assert.ok(ctSpy.calledWith(22), 'seeked configured amount with multiplier');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'ArrowLeft'});
+  // 22 - 3
+  assert.ok(ctSpy.calledWith(19), 'seeked configured amount');
+  ctSpy.resetHistory();
+
+  player.controlBar.progressControl.seekBar.trigger({type: 'keydown', key: 'PageDown'});
+  // 19 - (3 * 3)
+  assert.ok(ctSpy.calledWith(10), 'seeked configured amount with multiplier');
+
+  player.dispose();
+});
+
+QUnit.test('Seek bar percent should represent scrub location if we are scrubbing on mobile and have a pending seek time', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const seekBar = player.controlBar.progressControl.seekBar;
+
+  player.duration(100);
+  seekBar.pendingSeekTime(20);
+
+  assert.equal(seekBar.getPercent(), 0.2, 'seek bar percent set correctly to pending seek time');
+
+  seekBar.pendingSeekTime(50);
+
+  assert.equal(seekBar.getPercent(), 0.5, 'seek bar percent set correctly to next pending seek time');
+});
+
+QUnit.test('playback rate button is hidden by default', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer();
+  const playbackRate = new PlaybackRateMenuButton(player);
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is hidden');
+
+  player.dispose();
+  playbackRate.dispose();
+});
+
+QUnit.test('playback rate button is not hidden if playback rates are set', function(assert) {
+  assert.expect(1);
+
+  const player = TestHelpers.makePlayer({
+    playbackRates: [1, 2, 3]
+  });
+  const playbackRate = new PlaybackRateMenuButton(player);
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') === -1, 'playbackRate is not hidden');
+
+  player.dispose();
+  playbackRate.dispose();
+});
+
+QUnit.test('should show or hide playback rate menu button on playback rates change', function(assert) {
+  const rates = [1, 2, 3];
+  const norates = [];
+  let playbackRatesReturnValue = rates;
+  const player = TestHelpers.makePlayer();
+
+  player.playbackRates = () => playbackRatesReturnValue;
+
+  const playbackRate = new PlaybackRateMenuButton(player);
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') === -1, 'playbackRate is not hidden');
+
+  playbackRatesReturnValue = norates;
+
+  player.trigger('playbackrateschange');
+
+  assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is hidden');
+
+  player.dispose();
+  playbackRate.dispose();
+});
+
+QUnit.test('Picture-in-Picture control text should be correct when enterpictureinpicture and leavepictureinpicture are triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.isInPictureInPicture(true);
+  player.trigger('enterpictureinpicture');
+  assert.equal(pictureInPictureToggle.controlText(), 'Exit Picture-in-Picture', 'Control Text is correct while switching to Picture-in-Picture mode');
+
+  player.isInPictureInPicture(false);
+  player.trigger('leavepictureinpicture');
+  assert.equal(pictureInPictureToggle.controlText(), 'Picture-in-Picture', 'Control Text is correct while switching back to normal mode');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control enabled property value should be correct when enterpictureinpicture and leavepictureinpicture are triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
+
+  if ('pictureInPictureEnabled' in document && player.disablePictureInPicture() === false) {
+    player.isInPictureInPicture(true);
+    player.trigger('enterpictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an enterpictureinpicture event');
+
+    player.isInPictureInPicture(false);
+    player.trigger('leavepictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an leavepictureinpicture event');
+  } else {
+    player.isInPictureInPicture(true);
+    player.trigger('enterpictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an enterpictureinpicture event');
+
+    player.isInPictureInPicture(false);
+    player.trigger('leavepictureinpicture');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an leavepictureinpicture event');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control enabled property value should be correct when loadedmetadata is triggered', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after creation');
+
+  if ('pictureInPictureEnabled' in document && player.disablePictureInPicture() === false) {
+    player.trigger('loadedmetadata');
+    assert.equal(pictureInPictureToggle.enabled_, true, 'pictureInPictureToggle button should be enabled after triggering an loadedmetadata event');
+  } else {
+    player.trigger('loadedmetadata');
+    assert.equal(pictureInPictureToggle.enabled_, false, 'pictureInPictureToggle button should be disabled after triggering an loadedmetadata event');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control is hidden when the source is audio', function(assert) {
+  const player = TestHelpers.makePlayer({});
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.src({src: 'example.mp4', type: 'video/mp4'});
+  player.trigger('loadedmetadata');
+
+  if (document.exitPictureInPicture) {
+    assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden initially');
+  } else {
+    assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden if PiP is not supported');
+  }
+
+  player.src({src: 'example1.mp3', type: 'audio/mp3'});
+  player.trigger('loadedmetadata');
+  assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden whenh the source is audio');
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Picture-in-Picture control is displayed if docPiP is enabled', function(assert) {
+  const player = TestHelpers.makePlayer({
+    disablePictureInPicture: true,
+    enableDocumentPictureInPicture: true
+  });
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+  const testPiPObj = {};
+
+  if (!window.documentPictureInPicture) {
+    window.documentPictureInPicture = testPiPObj;
+  }
+
+  player.src({src: 'example.mp4', type: 'video/mp4'});
+  player.trigger('loadedmetadata');
+
+  if (document.exitPictureInPicture) {
+    assert.notOk(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+  } else {
+    assert.ok(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden if PiP is not supported');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+  if (window.documentPictureInPicture === testPiPObj) {
+    delete window.documentPictureInPicture;
+  }
+});
+
+QUnit.test('Picture-in-Picture control should only be displayed if the browser supports it', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const pictureInPictureToggle = new PictureInPictureToggle(player);
+
+  player.trigger('loadedmetadata');
+
+  if (document.exitPictureInPicture) {
+    // Browser that does support PiP
+    assert.false(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is not hidden');
+  } else {
+    // Browser that does not support PiP
+    assert.true(pictureInPictureToggle.hasClass('vjs-hidden'), 'pictureInPictureToggle button is hidden');
+  }
+
+  player.dispose();
+  pictureInPictureToggle.dispose();
+});
+
+QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function(assert) {
+  const player = TestHelpers.makePlayer({controlBar: false});
+  const fullscreentoggle = new FullscreenToggle(player);
+
+  // make the fullscreenchange handler doesn't trigger
+  player.off(player.fsApi_.fullscreenchange, player.boundDocumentFullscreenChange_);
+
+  player.isFullscreen(true);
+  player.trigger('fullscreenchange');
+  assert.equal(fullscreentoggle.controlText(), 'Exit Fullscreen', 'Control Text is correct while switching to fullscreen mode');
+
+  player.isFullscreen(false);
+  player.trigger('fullscreenchange');
+  assert.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
+
+  player.dispose();
+  fullscreentoggle.dispose();
+});
+
+QUnit.test('Clicking MuteToggle when volume is above 0 should toggle muted property and not change volume', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const muteToggle = new MuteToggle(player);
+
+  assert.equal(player.volume(), 1, 'volume is above 0');
+  assert.equal(player.muted(), false, 'player is not muted');
+
+  muteToggle.handleClick();
+
+  assert.equal(player.volume(), 1, 'volume is same');
+  assert.equal(player.muted(), true, 'player is muted');
+
+  player.dispose();
+  muteToggle.dispose();
+});
+
+QUnit.test('Clicking MuteToggle when volume is 0 and muted is false should set volume to lastVolume and keep muted false', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const muteToggle = new MuteToggle(player);
+
+  player.volume(0);
+  assert.equal(player.lastVolume_(), 1, 'lastVolume is set');
+  assert.equal(player.muted(), false, 'player is muted');
+
+  muteToggle.handleClick();
+
+  assert.equal(player.volume(), 1, 'volume is set to lastVolume');
+  assert.equal(player.muted(), false, 'muted remains false');
+
+  player.dispose();
+  muteToggle.dispose();
+});
+
+QUnit.test('Clicking MuteToggle when volume is 0 and muted is true should set volume to lastVolume and sets muted to false', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const muteToggle = new MuteToggle(player);
+
+  player.volume(0);
+  player.muted(true);
+  player.lastVolume_(0.5);
+
+  muteToggle.handleClick();
+
+  assert.equal(player.volume(), 0.5, 'volume is set to lastVolume');
+  assert.equal(player.muted(), false, 'muted is set to false');
+
+  player.dispose();
+  muteToggle.dispose();
+});
+
+QUnit.test('Clicking MuteToggle when volume is 0, lastVolume is less than 0.1, and muted is true sets volume to 0.1 and muted to false', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const muteToggle = new MuteToggle(player);
+
+  player.volume(0);
+  player.muted(true);
+  player.lastVolume_(0.05);
+
+  muteToggle.handleClick();
+
+  // `Number.prototype.toFixed()` is used here to circumvent rounding issues
+  assert.equal(player.volume().toFixed(1), (0.1).toFixed(1), 'since lastVolume is less than 0.1, volume is set to 0.1');
+  assert.equal(player.muted(), false, 'muted is set to false');
+
+  player.dispose();
+  muteToggle.dispose();
+});
+
+QUnit.test('ARIA value of VolumeBar should start at 100', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const volumeBar = new VolumeBar(player);
+
+  this.clock.tick(1);
+
+  assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
+
+  player.dispose();
+  volumeBar.dispose();
+});
+
+QUnit.test('Muting with MuteToggle should set ARIA value of VolumeBar to 0', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const volumeBar = new VolumeBar(player);
+  const muteToggle = new MuteToggle(player);
+
+  this.clock.tick(1);
+
+  assert.equal(player.volume(), 1, 'Volume is 1');
+  assert.equal(player.muted(), false, 'Muted is false');
+  assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 100, 'ARIA value of VolumeBar is 100');
+
+  muteToggle.handleClick();
+
+  // Because `volumechange` is triggered asynchronously, it doesn't end up
+  // getting fired on `player` in the test environment, so we run it
+  // manually.
+  player.trigger('volumechange');
+
+  assert.equal(player.volume(), 1, 'Volume remains 1');
+  assert.equal(player.muted(), true, 'Muted is true');
+  assert.equal(volumeBar.el_.getAttribute('aria-valuenow'), 0, 'ARIA value of VolumeBar is 0');
+
+  player.dispose();
+  muteToggle.dispose();
+  volumeBar.dispose();
+});
+
+QUnit.test('controlbar children to false individually, does not cause an assertion', function(assert) {
+  const defaultChildren = ControlBar.prototype.options_.children;
+
+  defaultChildren.forEach((childName) => {
+    const options = {controlBar: {}};
+
+    options.controlBar[childName] = false;
+
+    const player = TestHelpers.makePlayer(options);
+
+    this.clock.tick(1000);
+    player.triggerReady();
+    player.dispose();
+    assert.ok(true, `${childName}: false. did not cause an assertion`);
+  });
+});
+
+QUnit.test('all controlbar children to false, does not cause an assertion', function(assert) {
+  const defaultChildren = ControlBar.prototype.options_.children;
+  const options = {controlBar: {}};
+
+  defaultChildren.forEach((childName) => {
+    options.controlBar[childName] = false;
+  });
+
+  const player = TestHelpers.makePlayer(options);
+
+  this.clock.tick(1000);
+  player.triggerReady();
+  player.dispose();
+  assert.ok(true, 'did not cause an assertion');
+});
+
+QUnit.test('Remaing time negative sign can be optional', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+
+  const rtd1 = new RemainingTimeDisplay(player);
+  const rtd2 = new RemainingTimeDisplay(player, {displayNegative: false});
+
+  this.clock.tick(1);
+
+  assert.ok(rtd1.el().textContent.indexOf('-') > 0, 'Value is negative by default');
+  assert.equal(rtd2.el().textContent.indexOf('-'), -1, 'Value is positive with option');
+
+  rtd1.dispose();
+  rtd2.dispose();
+  player.dispose();
+});
+
+QUnit.test('Current time display shouldn\'t flash zero on seek', function(assert) {
+  const player = TestHelpers.makePlayer({ techOrder: ['html5'] });
+  const currentTimeDisplay = player.controlBar.currentTimeDisplay;
+  const spy = sinon.spy(currentTimeDisplay, 'updateTextNode_');
+
+  player.ended = () => false;
+  player.currentTime = () => 10;
+
+  currentTimeDisplay.updateContent({
+    target: {
+      pendingSeekTime: () => null
+    }
+  });
+
+  this.clock.tick(1);
+
+  assert.ok(spy.calledWith(10), 'control was updated with currentTime');
+  assert.notOk(spy.calledWith(null), 'control was not updated with null');
+  assert.notStrictEqual(currentTimeDisplay.formattedTime_, '0:00', 'display text not set to 0:00');
+
+});
+
+QUnit.module('SmartTV UI Updates (Progress Bar & Time Display)', function(hooks) {
+  let player;
+  let seekBar;
+  let currentTimeDisplay;
+
+  hooks.beforeEach(function() {
+    player = TestHelpers.makePlayer({
+      spatialNavigation: { enabled: true },
+      disableSeekWhileScrubbingOnSTV: true,
+      controlBar: {
+        progressControl: {
+          seekBar: {
+            stepSeconds: 5
+          }
+        }
+      }
+    });
+
+    seekBar = player.controlBar.progressControl.seekBar;
+    currentTimeDisplay = player.controlBar.getChild('currentTimeDisplay');
+
+    player.duration(100);
+  });
+
+  hooks.afterEach(function() {
+    player.dispose();
+  });
+
+  QUnit.test('Step forward updates seek bar progress and current-time display', function(assert) {
+    player.currentTime(40);
+    seekBar.stepForward();
+
+    assert.equal(
+      seekBar.pendingSeekTime(),
+      45,
+      'pendingSeekTime should be 45 (40 + 5) after stepForward'
+    );
+
+    assert.equal(
+      seekBar.getPercent(),
+      0.45,
+      'Seek bar progress should reflect 45% progress after stepForward'
+    );
+
+    assert.equal(
+      currentTimeDisplay.formattedTime_,
+      '0:45',
+      'Current-time-display should update to 45s after stepForward'
+    );
+  });
+
+  QUnit.test('Step back updates seek bar progress and current-time display', function(assert) {
+    player.currentTime(40);
+    seekBar.stepBack();
+
+    assert.equal(
+      seekBar.pendingSeekTime(),
+      35,
+      'pendingSeekTime should be 35 (40 - 5) after stepBack'
+    );
+
+    assert.equal(
+      seekBar.getPercent(),
+      0.35,
+      'Seek bar progress should reflect 35% progress after stepBack'
+    );
+
+    assert.equal(
+      currentTimeDisplay.formattedTime_,
+      '0:35',
+      'Current-time-display should update to 35s after stepBack'
+    );
+  });
+
+  QUnit.test('Pressing enter finalizes the seek and updates UI', function(assert) {
+    player.currentTime(40);
+    seekBar.stepForward();
+
+    seekBar.handleAction();
+
+    assert.equal(
+      seekBar.pendingSeekTime(),
+      null,
+      'pendingSeekTime should be reset to null after seeking'
+    );
+
+    assert.equal(
+      seekBar.getPercent(),
+      0.45,
+      'Seek bar progress should remain at 45% after seeking'
+    );
+
+    assert.equal(
+      currentTimeDisplay.formattedTime_,
+      '0:45',
+      'Current-time-display should remain at 45s after seeking'
+    );
+  });
+
+  QUnit.test('Resets pendingSeekTime when SmartTV focus moves away without confirmation', function(assert) {
+    const userSeekSpy = sinon.spy(seekBar, 'userSeek_');
+
+    seekBar.trigger({ type: 'keydown', key: 'ArrowUp' });
+    assert.ok(seekBar.pendingSeekTime() !== null, 'pendingSeekTime should be set after ArrowUp keydown');
+    seekBar.trigger({ type: 'keydown', key: 'ArrowLeft' });
+    assert.equal(seekBar.pendingSeekTime(), null, 'pendingSeekTime should be reset when SeekBar loses focus');
+    assert.ok(userSeekSpy.calledWith(player.currentTime()), 'userSeek_ should be called with current player time');
+    userSeekSpy.restore();
+  });
+});
