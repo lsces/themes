@@ -42,8 +42,8 @@ $gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/bitweaver.js', true, 1 );
 $gBitThemes->loadAjax( $gBitSystem->getConfig( 'themes_jquery_hosting', 'jquery' ) );
 
 if( $gBitSystem->isFeatureActive( 'site_fancy_zoom' )) {
-	$gBitThemes->loadJavascript( UTIL_PKG_PATH.'javascript/fancyzoom/js-global/FancyZoom.js', true, 80 );
-	$gBitThemes->loadJavascript( UTIL_PKG_PATH.'javascript/fancyzoom/js-global/FancyZoomHTML.js', true, 81 );
+	$gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/fancyzoom/js-global/FancyZoom.js', true, 80 );
+	$gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/fancyzoom/js-global/FancyZoomHTML.js', true, 81 );
 	$gBitSystem->setOnloadScript( 'setupZoom();' );
 }
 
