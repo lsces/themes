@@ -1,6 +1,7 @@
 <?php
 namespace Bitweaver\Plugins;
 
+use Bitweaver\KernelTools;
 /**
  * Smarty plugin
  * @package Smarty
@@ -21,7 +22,7 @@ function smarty_function_required( $pParams, &$pSmarty=NULL ) {
 	$ret = \Bitweaver\Plugins\smarty_function_biticon( $biticon );
 
 	if( !empty( $pParams['legend'] )) {
-		$ret = "<p>$ret ".tra( "Elements marked with this symbol are required." )."</p>";
+		$ret = "<p>$ret ".KernelTools::tra( "Elements marked with this symbol are required." )."</p>";
 	}
 	return $ret;
 }

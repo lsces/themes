@@ -1,6 +1,7 @@
 <?php
 namespace Bitweaver\Plugins;
 
+use Bitweaver\KernelTools;
 /**
  * Smarty plugin
  * @package Smarty
@@ -37,7 +38,7 @@ function smarty_modifier_truncate($string, $length = 80, $etc = '...', $break_wo
 			$fragment = preg_replace('/\s+(\S+)?$/', '', $fragment);
 		}
 		if (!empty($divId)) {
-			$etc = "<span  style='display:inline;' id='dyn_".$divId."_display'><a class='truncate' onclick='javascript:toggle_dynamic_var(\"$divId\");' title='".tra('Click to see the full text')."'>$etc</a></span>";
+			$etc = "<span  style='display:inline;' id='dyn_".$divId."_display'><a class='truncate' onclick='javascript:toggle_dynamic_var(\"$divId\");' title='".KernelTools::tra('Click to see the full text')."'>$etc</a></span>";
 			$etc .= "<span style='display:none;' id='dyn_".$divId."_edit'>".substr($string, strlen($fragment))."</span>";
 		}
 		return $fragment.$etc;

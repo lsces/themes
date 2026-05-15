@@ -1,4 +1,5 @@
 <?php
+use Bitweaver\KernelTools;
 //
 // (c) 2006 bitweaver.org - GNU LGPL
 //
@@ -82,7 +83,7 @@ if( !empty( $_REQUEST['update_menus'] ) ) {
 	}
 
 	// need to reload page to apply settings
-	bit_redirect( THEMES_PKG_URL."admin/menus.php" );
+	KernelTools::bit_redirect( THEMES_PKG_URL."admin/menus.php" );
 }
 
 if( $gBitSystem->isFeatureActive( 'site_top_bar_dropdown' ) ) {

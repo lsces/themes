@@ -48,7 +48,7 @@ use Bitweaver\KernelTools;
  *			- {smartlink ititle="Page Name" isort="title" iorder="desc" idefault=1}<br>
  *				setting iorder and idefault here, makes this link sort in a descending order by default (iorder)<br>
  *				and it is highlighted when $isort_mode ( or $_REQUEST['sort_mode'] ) is not set (idefault)<br>
- * Note Be careful if ititle is generated dynamically since it is passed through tra() by default, use itra to override<br>
+ * Note Be careful if ititle is generated dynamically since it is passed through KernelTools::tra() by default, use itra to override<br>
  */
 function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 	global $gBitSystem;
@@ -174,7 +174,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 	//		}
 			$booticon = [
 				'iname' => $hash['booticon'],
-				'iexplain' => $hash['ititle'], // use untranslated ititle - booticon has a tra()
+				'iexplain' => $hash['ititle'], // use untranslated ititle - booticon has a KernelTools::tra()
 			];
 			if( !empty( $hash['iforce'] ) ) {
 				$booticon['iforce'] = $hash['iforce'];
@@ -188,7 +188,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 			$ibiticon = [
 				'ipackage' => $tmp[0],
 				'iname' => $tmp[1],
-				'iexplain' => $hash['ititle'], // use untranslated ititle - biticon has a tra()
+				'iexplain' => $hash['ititle'], // use untranslated ititle - biticon has a KernelTools::tra()
 			];
 			if( !empty( $hash['iforce'] ) ) {
 				$ibiticon['iforce'] = $hash['iforce'];

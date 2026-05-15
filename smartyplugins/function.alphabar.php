@@ -1,6 +1,7 @@
 <?php
 namespace Bitweaver\Plugins;
 
+use Bitweaver\KernelTools;
 /**
  * Smarty plugin
  * @package Smarty
@@ -54,7 +55,7 @@ function smarty_function_alphabar( $params, &$gBitSmarty ) {
 	}
 
 	if( !empty( $params['iall'] ) ) {
-		$ret .= '<a href="'.$url.'?char='.urlencode( strtolower( 'All' ) ).$url_params.'">'.tra( 'All' ).'</a> ';
+		$ret .= '<a href="'.$url.'?char='.urlencode( strtolower( 'All' ) ).$url_params.'">'.KernelTools::tra( 'All' ).'</a> ';
 	}
 	$ret .= '</div>';
 

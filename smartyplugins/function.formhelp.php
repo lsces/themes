@@ -18,7 +18,7 @@ use Bitweaver\KernelTools;
  *			- note		(optional)	words that are displayed, can also be an array, where: 'key: value'<br /> is printed
  *									only displayed if site_form_help is enabled
  *			- link		(optional)	provide a link to an internal page (avoids the problem with links being inerpreted
- *									prematurely by the tra() function
+ *									prematurely by the KernelTools::tra() function
  *									<package>/<path to file>/<title>
  *			- package	(optional)	creates a page to 'Package'.ucfirst( $package ) and takes precedence over $page, should both be set.
  *									only dispalyed if help is enabled

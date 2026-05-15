@@ -1,6 +1,7 @@
 <?php
 namespace Bitweaver\Plugins;
 
+use Bitweaver\KernelTools;
 /**
  * @package Smarty
  * @subpackage plugins
@@ -31,9 +32,9 @@ function smarty_modifier_display_duration( $pDuration ) {
 		}
 	}
 
-	$ret  = !empty( $duration['month'] ) ? $duration['month'].tra( 'month(s)' ).' ' : '';
-	$ret .= !empty( $duration['week'] )  ? $duration['week'] .tra( 'week(s)' ).' '  : '';
-	$ret .= !empty( $duration['day'] )   ? $duration['day']  .tra( 'day(s)' ).' '   : '';
+	$ret  = !empty( $duration['month'] ) ? $duration['month'].KernelTools::tra( 'month(s)' ).' ' : '';
+	$ret .= !empty( $duration['week'] )  ? $duration['week'] .KernelTools::tra( 'week(s)' ).' '  : '';
+	$ret .= !empty( $duration['day'] )   ? $duration['day']  .KernelTools::tra( 'day(s)' ).' '   : '';
 	$ret .= str_pad( $duration['hour'], 2, 0, STR_PAD_LEFT ).':'.str_pad( $duration['min'], 2, 0, STR_PAD_LEFT ).':'.str_pad( $duration['sec'], 2, 0, STR_PAD_LEFT );
 	return $ret;
 }

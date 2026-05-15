@@ -1,6 +1,7 @@
 <?php
 namespace Bitweaver\Plugins;
 
+use Bitweaver\KernelTools;
 /**
  * Smarty plugin
  * @package Smarty
@@ -34,7 +35,7 @@ function smarty_function_moduleinc($pParams, &$gBitSmarty) {
 		// each module is different for each language because of the strings
 		$cacheDir = TEMP_PKG_PATH.'modules/cache/';
 		if( !is_dir( $cacheDir )) {
-			mkdir_p( $cacheDir );
+			KernelTools::mkdir_p( $cacheDir );
 		}
 		$cachefile = $cacheDir.'_custom.'.$gBitLanguage->mLanguage.'.'.$template.'.tpl.cache';
 

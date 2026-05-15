@@ -2,6 +2,7 @@
 namespace Bitweaver\Plugins;
 
 use Smarty\Resource\Smarty_Resource_Custom;
+use Bitweaver\KernelTools;
 
 /**
  * Smarty plugin
@@ -26,7 +27,7 @@ class Smarty_Resource__Custom extends Smarty_Resource_Custom {
 		// each module is different for each language because of the strings
 		$cacheDir = TEMP_PKG_PATH.'modules/cache/';
 		if( !is_dir( $cacheDir )) {
-			mkdir_p( $cacheDir );
+			KernelTools::mkdir_p( $cacheDir );
 		}
 		list( $package, $template ) = explode(  '/', $pTplName );
 		$cacheFile = $cacheDir.'_custom.'.$gBitLanguage->mLanguage.'.'.$template.'.tpl.cache';

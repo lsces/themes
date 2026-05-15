@@ -2,6 +2,7 @@
 namespace Bitweaver\Plugins;
 
 use Bitweaver\BitCache;
+use Bitweaver\KernelTools;
 
 /**
  * Smarty plugin
@@ -61,6 +62,6 @@ function smarty_function_jspack( $pParams, &$gBitSmarty ) {
 		$defer = !empty( $pParams['defer'] ) ? " defer='".$pParams['defer']."'" : "";
 		return '<script'.$defer.' src="'.$bitCache->getCacheUrl( $cachefile ).'"></script>';
 	}
-		return "<!-- ".tra( 'not a valid file: ' ).$pParams['ifile']." -->";
+		return "<!-- ".KernelTools::tra( 'not a valid file: ' ).$pParams['ifile']." -->";
 
 }

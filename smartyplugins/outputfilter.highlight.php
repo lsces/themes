@@ -26,6 +26,7 @@
  *           patched by mose <mose@feu.org>
  * -------------------------------------------------------------
  */
+use Bitweaver\KernelTools;
 function smarty_output_highlight( $source, $gBitSmarty ) {
 	global $gBitSystem;
 	if( $gBitSystem->isFeatureActive( 'themes_output_highlighting' ) ) {
@@ -92,7 +93,7 @@ function smarty_output_highlight( $source, $gBitSmarty ) {
 				//$wordArr = split( " ", urldecode( $words ) );
 				//vd($wordArr);
 				$i = 0;
-				$wordList = tra( "Highlighted words" ).': ';
+				$wordList = KernelTools::tra( "Highlighted words" ).': ';
 				foreach( $wordArr as $word ) {
 					$wordList .= '<span style="font-weight:bold;padding:0 0.3em;color:black;background-color:'.$colorArr[$i].';">'.$word.'</span> ';
 					$highlight = preg_replace( "/(".preg_quote( $word, '/' ).")/si", '<span style="font-weight:bold;color:black;background-color:'.$colorArr[$i++].';">$1</span>', $highlight );
