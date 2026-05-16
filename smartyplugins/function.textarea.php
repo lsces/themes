@@ -92,6 +92,15 @@ function smarty_function_textarea( $pParams, &$pSmartyTemplate ) {
 		$gBitSmarty->assign('textarea_style', 'style="'.$style.'"');
 	}
 	$gBitSmarty->assign('textarea_class', 'class="form-control '.$class.'"');
+
+	if( !empty( $pParams['edit'] )
+		&& strpos( $class, 'wysiwyg' ) !== false
+		&& $gBitSystem->isPackageActive( 'ckeditor' )
+		&& function_exists( 'ckeditor_code_wiki_to_pre' )
+	) {
+		$gBitSmarty->assign( 'textarea_edit', ckeditor_code_wiki_to_pre( $pParams['edit'] ) );
+	}
+
 	$ret = $gBitSmarty->fetch("bitpackage:liberty/edit_textarea.tpl");
 	if( is_object( $gContent ) ) {
 		if( $formatGuid = $gContent->getField( 'format_guid' ) ) {
