@@ -29,7 +29,7 @@ use Smarty\Template;
 class BlockForm implements BlockHandlerInterface {
 
 	public function handle( $pParams, $pContent, Template $template, &$repeat): string {
-		global $gBitSystem, $gSniffer;
+		global $gBitSystem, $gBitUser, $gSniffer;
 
 		if( !empty($pContent) ) {
 			if ( $template ) {
@@ -100,7 +100,10 @@ class BlockForm implements BlockHandlerInterface {
 
 				$onsub = !empty( $onsubmit ) ? " onsubmit=\"$onsubmit\"" : '';
 				$ret = '<form action="'.$url.( !empty( $pParams['ianchor'] ) ? '#'.$pParams['ianchor'] : '' ).'" '.$atts.$onsub.'>';
-				$ret .= isset( $legend ) ? "<fieldset>$legend" : '';		// adding the div makes it easier to be xhtml compliant
+				$ret .= isset( $legend ) ? "<fieldset>$legend" : '';
+				if( is_object( $gBitUser ) && $gBitUser->isRegistered() ) {
+					$ret .= '<input type="hidden" name="tk" value="'.$gBitUser->mTicket.'" />';
+				}
 				$ret .= $pContent;
 				$ret .= isset( $legend ) ? '</fieldset>' : '';			// close the open tags
 				$ret .= '</form>';

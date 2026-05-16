@@ -362,7 +362,7 @@ class JavaScriptPacker {
 		return "{" . $this->buffer . ";";
 	}
 	function _insertFastEncode($match) {
-		return "{$encode=" . $this->buffer . ";";
+		return "{$match}" . $this->buffer . ";";
 	}
 
 	// mmm.. ..which one do i need ??
@@ -390,7 +390,7 @@ class JavaScriptPacker {
 		if ($charCode >= $this->_encoding) {
 			$res = $this->_encode62((int)($charCode / $this->_encoding));
 		}
-		$charCode = $charCode % $this->_encoding;
+		$charCode %= $this->_encoding;
 
 		if ($charCode > 35)
 			return $res . chr($charCode + 29);
@@ -399,7 +399,7 @@ class JavaScriptPacker {
 	}
 
 	// use high-ascii values
-	// characters: ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿À�?ÂÃÄÅÆÇÈÉÊËÌ�?Î�?�?ÑÒÓÔÕÖ×ØÙÚÛÜ�?Þßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ
+	// characters: ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿À�?ÂÃÄÅÆÇÈÉÊËÌ�?Î�?�?ÑÒÓÔÕÖ×ØÙÚÛÜ�?Þßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ
 	function _encode95($charCode) {
 		$res = "";
 		if ($charCode >= $this->_encoding)
@@ -501,15 +501,15 @@ class JavaScriptPacker {
 
 	 // zero encoding
 	 // characters: 0123456789
-	 var $JSFUNCTION_encode10 = "function($charCode) {
+	 var $JSFUNCTION_encode10 = 'function($charCode) {
     return $charCode;
-}";//;';
+}';
 
 	 // inherent base36 support
 	 // characters: 0123456789abcdefghijklmnopqrstuvwxyz
-	 var $JSFUNCTION_encode36 = "function($charCode) {
+	 var $JSFUNCTION_encode36 = 'function($charCode) {
     return $charCode.toString(36);
-}";//;';
+}';
 
 	// hitch a ride on base36 and add the upper case alpha characters
 	// characters: 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
@@ -519,7 +519,7 @@ class JavaScriptPacker {
 }';
 
 	// use high-ascii values
-	// characters: ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿À�?ÂÃÄÅÆÇÈÉÊËÌ�?Î�?�?ÑÒÓÔÕÖ×ØÙÚÛÜ�?Þßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ
+	// characters: ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿À�?ÂÃÄÅÆÇÈÉÊËÌ�?Î�?�?ÑÒÓÔÕÖ×ØÙÚÛÜ�?Þßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ
 	var $JSFUNCTION_encode95 = 'function($charCode) {
     return ($charCode < _encoding ? \'\' : arguments.callee($charCode / _encoding)) +
         String.fromCharCode($charCode % _encoding + 161);
@@ -712,11 +712,7 @@ class ParseMaster {
 
 	}
 	function _unescapeBis() {
-		if (!empty($this->_escaped[$this->buffer["i"]])) {
-			 $temp = $this->_escaped[$this->buffer["i"]];
-		} else {
-			$temp = "";
-		}
+		$temp = ( !empty( $this->_escaped[$this->buffer["i"]] ) ) ? $this->_escaped[$this->buffer["i"]] : "";
 		$this->buffer["i"]++;
 		return $this->buffer["escapeChar"] . $temp;
 	}
@@ -725,4 +721,3 @@ class ParseMaster {
 		return preg_replace($this->ESCAPE, "", $string);
 	}
 }
-?>
