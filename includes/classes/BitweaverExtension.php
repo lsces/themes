@@ -2,7 +2,6 @@
 
 namespace Bitweaver\Themes;
 
-use Bitweaver\KernelTools;
 use Smarty\Exception;
 use Smarty\Extension\Base;
 
@@ -70,10 +69,11 @@ class BitweaverExtension extends Base {
 			$basename = basename($file);
 			$functionName = str_replace('modifier.', '', $basename);
 			$functionName = str_replace('.php', '', $functionName);
-			$this->callbacks[$functionName]['name'] = 'smarty_modifier_' . $functionName;
+			$callable = 'Bitweaver\\Plugins\\smarty_modifier_' . $functionName;
+			$this->callbacks[$functionName]['name'] = $callable;
 			$this->callbacks[$functionName]['loaded'] = true;
-			if ( is_callable('BitWeaver\\Plugins\\smarty_modifier_' . $functionName)) {
-				$gBitSmarty->registerPlugin ('modifier', $functionName, 'BitWeaver\\Plugins\\smarty_modifier_' . $functionName );
+			if ( is_callable( $callable )) {
+				$gBitSmarty->registerPlugin( 'modifier', $functionName, $callable );
 			}
 		}
 	}
@@ -85,7 +85,6 @@ class BitweaverExtension extends Base {
 		}
 
 		switch ($modifier) {
-//			case 'add_link_ticket':		$this->modifiers[$modifier] = new \Bitweaver\Plugins\AddLinkTicket(); break;
 			case 'tr': 					$this->modifiers[$modifier] = new \Bitweaver\Plugins\PreTr();
 //			case 'bit_short_datetime':	$this->modifiers[$modifier] = new \Bitweaver\Plugins\BitShortDatetime();
 		}
@@ -94,32 +93,26 @@ class BitweaverExtension extends Base {
 	}
 
 	public function getModifierCallback(string $modifierName) {
-//		if (!isset($this->modifiers[$modifierName])) {
-			if (!isset($this->callbacks[$modifierName])) {
-				switch ($modifierName) {
-					case 'highlight':			return [$this, 'smarty_modifier_highlight'];
-					case 'implode':				return [$this, 'smarty_modifier_implode'];
-					case 'extension_loaded':	return [$this, 'smarty_modifier_extension_loaded'];
-					case 'function_exists':		return [$this, 'smarty_modifier_function_exists'];
-					case 'basename':			return [$this, 'smarty_modifier_basename'];
-					case 'strpos':				return [$this, 'smarty_modifier_function_strpos'];
-					case 'http_build_query':	return [$this, 'smarty_modifier_http_build_query'];
-					case 'ucwords':				return [$this, 'smarty_modifier_ucwords'];
-					case 'is_object':			return [$this, 'smarty_modifier_is_object'];
-					case 'floor':				return [$this, 'smarty_modifier_floor'];
-					case 'is_a':				return [$this, 'smarty_modifier_is_a'];
-					case 'is_file':				return [$this, 'smarty_modifier_is_file'];
-					case 'is_readable':			return [$this, 'smarty_modifier_is_readable'];
-					case 'ucfirst':				return [$this, 'smarty_modifier_ucfirst'];
-					case 'html_entity_decode':	return [$this, 'smarty_modifier_html_entity_decode'];
-				}
-			} else {
-				if ( !$this->callbacks[$modifierName]['loaded'] ) {
-				}
-				return [$this, $this->callbacks[$modifierName]['name']];
+		if (!isset($this->callbacks[$modifierName])) {
+			switch ($modifierName) {
+				case 'extension_loaded':	return 'extension_loaded';
+				case 'function_exists':		return 'function_exists';
+				case 'basename':			return 'basename';
+				case 'strpos':				return 'strpos';
+				case 'http_build_query':	return 'http_build_query';
+				case 'ucwords':				return 'ucwords';
+				case 'is_object':			return 'is_object';
+				case 'floor':				return 'floor';
+				case 'is_a':				return 'is_a';
+				case 'is_file':				return 'is_file';
+				case 'is_readable':			return 'is_readable';
+				case 'ucfirst':				return 'ucfirst';
+				case 'html_entity_decode':	return 'html_entity_decode';
 			}
-			return null;
-//		}
+		} else {
+			return $this->callbacks[$modifierName]['name'];
+		}
+		return null;
 	}
 
 	public function getFunctionHandler(string $functionName): ?\Smarty\FunctionHandler\FunctionHandlerInterface {
@@ -158,161 +151,4 @@ class BitweaverExtension extends Base {
 		return $this->blockHandlers[$blockTagName] ?? null;
 	}
 
-	/**
-	* Smarty plugin
-	* @package Smarty
-	* @subpackage plugins
-	*/
-	public function smarty_modifier_highlight( $source ) {
-		global $gBitSystem, $gBitSmarty;
-		// Skip out if nothing to highlight
-		if ( empty($_REQUEST['highlight']) ) return $source;
-
-		if( $gBitSystem->isFeatureActive( 'themes_output_highlighting' ) ) {
-			// This array is used to choose colours for supplied highlight terms
-			$colorArr = [ '#ffffcc', '#ffcccc', '#a0ffff', '#ffccff', '#ccffcc' ];
-
-			// don't highlight characters that are used as replacements
-			$find = [
-				"!(\s|^)%(\s|$)!",
-				"!(\s|^)#(\s|$)!",
-				"!(\s|^)@(\s|$)!",
-				"!(\s|^):(\s|$)!",
-				"!(\s|^)&(\s|$)!",
-			];
-
-			$words = trim( preg_replace( $find, "$1$2", urldecode( $_REQUEST['highlight'] ?? '' )));
-			if( empty( $words )) {
-				return $source;
-			}
-
-			$highlight = $source;
-
-			// extraction patterns and their replacements
-			$patterns = [
-				// scripts
-				"!<script[^>]+>.*?</script>!is"           => "@@@##########:#########%:#########&@@@",
-				// maketoc
-				"!<div class=.?maketoc[^>]*>.*?</div>!si" => "@@@##########:#########%:#########@@@@",
-				// html tags
-				"'<[\/\!]*?[^<>]*?>'si"                   => "@@@##########:#########%:#########:@@@",
-			];
-
-			ksort( $patterns );
-
-			foreach( $patterns as $pattern => $replace ) {
-				preg_match_all( $pattern, $highlight, $match );
-				$matches[$replace] = $match[0];
-				$highlight = preg_replace( $pattern, $replace, $highlight );
-			}
-
-			// Wrap all the highlight words with a colourful span
-			$wordArr = [];
-			$pattern = '#"([^"]*)"#';
-			if( preg_match_all( $pattern, $words, $ms ) ) {
-				$wordArr = $ms[1];
-				// remove the words we've just dealt with
-				$words = preg_replace( $pattern, "", $words );
-			}
-
-			$words = preg_replace( "!\s+!", " ", $words );
-			if( !empty( $words ) ) {
-				$wordArr = array_merge( $wordArr, explode( ' ', strip_tags($words) ) );
-			}
-
-			$i = 0;
-			$wordList = KernelTools::tra( "Highlighted words" ).': ';
-			foreach ( $wordArr as $word ) {
-				$wordList .= '<span style="font-weight:bold;color:black;background-color:'.$colorArr[$i].';">'.$word.'</span> ';
-				$highlight = preg_replace( "/(".preg_quote( $word, '/' ).")/si", '<span style="font-weight:bold;color:black;background-color:'.$colorArr[$i++].';">$1</span>', $highlight );
-			}
-
-			krsort( $patterns );
-
-			foreach( $patterns as $pattern ) {
-				foreach( $matches[$pattern] as $insert ) {
-					$highlight = preg_replace( "!{$pattern}!", $insert, $highlight, 1 );
-				}
-			}
-			$source = $highlight;
-			$wordList = "<div class=\"wordlist\">$wordList</div>";
-			$gBitSmarty->assign( 'highlightWordList', $wordList ?? '');
-		}
-		return $source;
-	}
-
-	/**
-	 * smarty_modifier_bit_short_date
-	 */
-	public function smarty_modifier_bit_short_date( $pString ) {
-		global $gBitSystem;
-		return \Bitweaver\Plugins\smarty_modifier_bit_date_format( $pString, $gBitSystem->get_short_date_format(), '%d %b %Y' );
-	}
-
-	/**
-	 * PHP core functions reenabled in smarty5 templates 
-	 * 
-	 */
-	public function smarty_modifier_implode( $array, $glue = '' ) {
-		if (!is_array($array)) {
-			return $array;
-		}
-		return join($array, $glue);
-	}
-
-	public function smarty_modifier_file_exists( $file ) {
-		return file_exists($file);
-	}
-
-	public function smarty_modifier_basename( $file ) {
-		return basename( $file, $suffix = "");
-	}
-
-	public function smarty_modifier_extension_loaded( $ext ) {
-		return extension_loaded( $ext );
-	}
-
-	public function smarty_modifier_function_exists( $func ) {
-		return function_exists($func);
-	}
-
-	public function smarty_modifier_function_strpos ( $haystack, $needle ) {
-		return strpos( $haystack, $needle );
-	}
-
-	public function smarty_modifier_http_build_query ( $data ) {
-		return http_build_query( $data );
-	}
-
-	public function smarty_modifier_ucwords ( $string ) {
-		return ucwords( $string ?? '' );
-	}
-
-	public function smarty_modifier_is_object ( $string ) {
-		return is_object( $string ?? '' );
-	}
-
-	public function smarty_modifier_floor ( $num ) {
-		return floor( $num ?? 0 );
-	}
-
-	public function smarty_modifier_is_a ( object|string $hash, $class ) {
-		return is_a( $hash, $class );
-	}
-
-	public function smarty_modifier_is_file ( string $file ) {
-		return is_file( $file );
-	}
-
-	public function smarty_modifier_is_readable ( string $file ) {
-		return is_readable( $file );
-	}
-
-	public function smarty_modifier_ucfirst ( string $file ) {
-		return ucfirst( $file );
-	}
-
-	public function smarty_modifier_html_entity_decode ( string $file ) {
-		return html_entity_decode( $file );
-	}
 }
