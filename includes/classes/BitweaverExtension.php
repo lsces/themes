@@ -46,10 +46,14 @@ class BitweaverExtension extends Base {
 			$basename = basename($file);
 			$functionName = str_replace('function.', '', $basename);
 			$functionName = str_replace('.php', '', $functionName);
-			$this->callbacks[$functionName]['name'] = 'Smarty\\smarty_function_' . $functionName;
+			$callable = 'Bitweaver\\Plugins\\smarty_function_' . $functionName;
+			if (!is_callable($callable)) {
+				$callable = 'smarty_function_' . $functionName;
+			}
+			$this->callbacks[$functionName]['name'] = $callable;
 			$this->callbacks[$functionName]['loaded'] = true;
-			if ( is_callable('Bitweaver\\Plugins\\smarty_function_' . $functionName )) {
-				$gBitSmarty->registerPlugin ('function', $functionName, 'Bitweaver\\Plugins\\smarty_function_' . $functionName );
+			if ( is_callable( $callable )) {
+				$gBitSmarty->registerPlugin('function', $functionName, $callable);
 			}
 		}
 	}
@@ -70,12 +74,30 @@ class BitweaverExtension extends Base {
 			$functionName = str_replace('modifier.', '', $basename);
 			$functionName = str_replace('.php', '', $functionName);
 			$callable = 'Bitweaver\\Plugins\\smarty_modifier_' . $functionName;
+			if (!is_callable($callable)) {
+				$callable = 'smarty_modifier_' . $functionName;
+			}
 			$this->callbacks[$functionName]['name'] = $callable;
 			$this->callbacks[$functionName]['loaded'] = true;
 			if ( is_callable( $callable )) {
 				$gBitSmarty->registerPlugin( 'modifier', $functionName, $callable );
 			}
 		}
+	}
+
+	public function __call(string $name, array $arguments) {
+		if (str_starts_with($name, 'smarty_modifier_')) {
+			$modifierName = substr($name, strlen('smarty_modifier_'));
+			if (isset($this->callbacks[$modifierName])) {
+				return ($this->callbacks[$modifierName]['name'])(...$arguments);
+			}
+		} elseif (str_starts_with($name, 'smarty_function_')) {
+			$functionName = substr($name, strlen('smarty_function_'));
+			if (isset($this->callbacks[$functionName])) {
+				return ($this->callbacks[$functionName]['name'])(...$arguments);
+			}
+		}
+		throw new \BadMethodCallException("Method {$name} does not exist on " . static::class);
 	}
 
 	public function getModifierCompiler(string $modifier): ?\Smarty\Compile\Modifier\ModifierCompilerInterface {
