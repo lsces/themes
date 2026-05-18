@@ -81,11 +81,6 @@ function smarty_function_textarea( $pParams, &$pSmartyTemplate ) {
 			break;
 		}
 	}
-	// We control hieght here when bnspell is on so as to be able to not
-	// lose the rest of the style on the textarea.
-	if ($gBitSystem->isPackageActive('bnspell')) {
-		$style .= (empty($style) ? '' : ';').'height:'.$pParams['rows'].'em;';
-	}
 	$gBitSmarty->assign('textarea_attributes', $attributes);
 
 	if (!empty($style)) {

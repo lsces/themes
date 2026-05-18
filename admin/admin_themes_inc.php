@@ -2,10 +2,6 @@
 use \Bitweaver\KernelTools;
 
 $themeSettings = [
-	'site_use_jscalendar' => [
-		'label' => 'Enable JSCalendar',
-		'note'  => 'If checked, a calendar popup allows for easily selecting a date using an appealing interface.',
-	],
 	'themes_collapsible_modules' => [
 		'label' => 'Collapsible modules',
 		'note'  => 'This allows users to collapse modules by clicking on their titles. Can be useful if you use many modules.',

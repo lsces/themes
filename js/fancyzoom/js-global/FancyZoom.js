@@ -35,10 +35,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-// {{{ BITMOD
-// Modifications to make it work with bitweaver:
-// rename setOpacity to _setOpacity to avoid conflicts with mochikit.
-// }}} BITMOD
 
 
 var includeCaption = true; // Turn on the "caption" feature, and write out the caption HTML

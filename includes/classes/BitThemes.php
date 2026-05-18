@@ -30,7 +30,6 @@ class BitThemes extends BitSingleton {
 	// an array with style information
 	public $mStyles = [];
 
-	// Ajax libraries needed by current Ajax framework (MochiKit libs, etc.)
 	public $mAjaxLibs = [];
 
 	// Auxiliary Javascript and Css Files
@@ -1332,7 +1331,7 @@ class BitThemes extends BitSingleton {
 	/**
 	 * Load Ajax libraries
 	 *
-	 * @param string $pAjaxLib Name of the library we want to use e.g.: prototype or mochikit
+	 * @param string $pAjaxLib Name of the library we want to use e.g.: jquery or jquerylocal
 	 * @param array $pLibHash Array of additional libraries we need to load
 	 * @param array $pLibPath Array of additional libraries we need to load
 	 * @param boolean $pPack Set to true if you want to pack the javascript file
@@ -1347,10 +1346,6 @@ class BitThemes extends BitSingleton {
 			// set the javascript lib path if not set yet
 			if( empty( $pLibPath )) {
 				switch( $ajaxLib ) {
-					case 'mochikit':
-						$pLibPath = UTIL_PKG_PATH."javascript/MochiKit/";
-						$pos = 100;
-						break;
 					case 'jquerylocal':
 						$pLibPath = UTIL_PKG_PATH."javascript/jquery/";
 						$pos = 100;
@@ -1368,54 +1363,21 @@ class BitThemes extends BitSingleton {
 				$bootstrapSrc = CONFIG_PKG_PATH.'themes/bootstrap/js/bootstrap'.$jqueryMin.'.js';
 				switch( $ajaxLib ) {
 					case 'jquery':
-						$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
 						$jqueryVersion = $gBitSystem->getConfig( 'jquery_version', '3.5.1' );
-						$jqueryUiVersion = $gBitSystem->getConfig( 'jquery_ui_version', '1.12.1' );
-						$jqueryTheme = $gBitSystem->getConfig( 'jquery_theme', 'smoothness' );
 						$jquerySrc = '//ajax.googleapis.com/ajax/libs/jquery/'.$jqueryVersion.'/jquery'.$jqueryMin.'.js';
-						$jqueryUiSrc = '//ajax.googleapis.com/ajax/libs/jqueryui/'.$jqueryUiVersion.'/jquery-ui'.$jqueryMin.'.js';
 						$this->mRawFiles['js'][] = $jquerySrc;
-						$this->mRawFiles['js'][] = $jqueryUiSrc;
-						$this->mRawFiles['css'][] = '//ajax.googleapis.com/ajax/libs/jqueryui/'.$jqueryUiVersion.'/themes/'.$jqueryTheme.'/jquery-ui.min.css';
 						// bootstrap needs to load after jquery
 						if( file_exists( $bootstrapSrc ) ) {
 							$this->mRawFiles['js'][] = $bootstrapSrc;
 						}
-
 						$gBitSmarty->assign( 'jquerySrc', $jquerySrc );
 						break;
 					case 'jquerylocal':
 						$joined = false;
 						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-3.7.1.js', false, $pos++, $joined );
-//						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-ui-14.1.js', false, $pos++, $joined );
-//						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-migrate-3.5.2.js', false, $pos++, $joined );
 						$this->loadJavascript( THEMES_PKG_PATH.'js/bootstrap.js', false, $pos++, $joined );
 						$this->loadJavascript( THEMES_PKG_PATH.'js/bootstrap-cookie-consent.js', false, $pos++, $joined );
 						$this->loadCss( THEMES_PKG_PATH.'css/colourstrap-full.css', false, $pos++, $joined );
-//						$this->loadCss( THEMES_PKG_PATH.'js/jquery-ui'.$jqueryMin.'.css', false, $pos++, $joined );
-						break;
-					case 'jqueryold':
-						$joined = false;
-						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-ui-1.10.3.custom'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/bootstrap'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/js/moment'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/datetimepicker/js/bootstrap-datetimepicker'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/assets/numeric-1.2.6.min.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/assets/bezier.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/jquery.signaturepad'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'formvalidation/dist/js/formValidation'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadJavascript( EXTERNAL_LIBS_PATH.'formvalidation/dist/js/framework/bootstrap'.$jqueryMin.'.js', false, $pos++, $joined );
-						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap/colourstrap/colourstrap.css', false, $pos++, $joined );
-						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap/colourstrap/colourstrap-icons.css', false, $pos++, $joined );
-						$this->loadCss( EXTERNAL_LIBS_PATH.'bootstrap/datetimepicker/css/bootstrap-datetimepicker'.$jqueryMin.'.css', false, $pos++, $joined );
-						$this->loadCSs( EXTERNAL_LIBS_PATH.'bootstrap/signature-pad/assets/jquery.signaturepad.css', false, $pos++, $joined );
-						$this->loadCss( EXTERNAL_LIBS_PATH.'formvalidation/dist/css/formValidation'.$jqueryMin.'.css', false, $pos++, $joined );
-						break;
-					case 'mochikit':
-						$this->loadJavascript( $pLibPath.'Base.js', false, $pos++ );
-						$this->loadJavascript( $pLibPath.'Async.js', false, $pos++ );
-						$this->loadJavascript( UTIL_PKG_PATH.'javascript//MochiKitBitAjax.js', false, $pos++, $joined );
 						break;
 					case 'yui':
 						$this->loadJavascript( $pLibPath.'yuiloader-dom-event/yuiloader-dom-event.js', false, $pos++ );
@@ -1762,20 +1724,6 @@ class BitThemes extends BitSingleton {
 				if( !empty( $this->mRawFiles[$pType] )) {
 					if( $key = \array_search( $file, $this->mRawFiles[$pType] )) {
 						unset( $this->mRawFiles[$pType][$key] );
-					}
-				}
-			}
-		}
-
-		// remove conflicting files
-		if( !empty( $pType ) && !empty( $this->mAuxFiles[$pType] )) {
-			if( $pType = 'js' ) {
-				// prototype is loaded for a reason. we'll remove mochikit
-				if( $this->isAjaxLoaded( 'prototype' ) && $this->isAjaxLoaded( 'mochikit' )) {
-					foreach( $this->mAuxFiles[$pType] as $key => $js ) {
-						if( strstr( $js, 'Mochi' )) {
-							unset( $this->mAuxFiles[$pType][$key] );
-						}
 					}
 				}
 			}
