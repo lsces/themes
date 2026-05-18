@@ -178,33 +178,3 @@ class BitSmarty extends \Smarty\Smarty {
 		$this->setCacheDir( $cacheDir );
 	}
 }
-
-/**
- * add_link_ticket This will insert a ticket on all template URL's that have GET parameters.
- *
- * @param array $pTplSource source of template
- * @access public
- * @return string ammended template source
- */
-function add_link_ticket( $pTplSource ) {
-	global $gBitUser;
-
-	if( is_object( $gBitUser ) && $gBitUser->isRegistered() ) {
-		$from = '#href="(.*PKG_URL.*php)\?(.*)&(.*)"#i';
-		$to = 'href="\\1?\\2&amp;tk={$gBitUser->mTicket}&\\3"';
-		$pTplSource = preg_replace( $from, $to, $pTplSource );
-		$from = '#<form([^>]*)>#i';
-		// div tag is for stupid XHTML compliance.
-		$to = '<form\\1><div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}" /></div>';
-		$pTplSource = preg_replace( $from, $to, $pTplSource );
-		if( strpos( $pTplSource, '{form}' )) {
-			$pTplSource = str_replace( '{form}', '{form}<div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}" /></div>', $pTplSource );
-		} elseif( strpos( $pTplSource, '{form ' ) ) {
-			$from = '#\{form(\}| [^\}]*)\}#i';
-			$to = '{form\\1}<div style="display:inline"><input type="hidden" name="tk" value="{$gBitUser->mTicket}" /></div>';
-			$pTplSource = preg_replace( $from, $to, $pTplSource );
-		}
-	}
-
-	return $pTplSource;
-}
