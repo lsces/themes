@@ -11,7 +11,7 @@
 		{foreach name=PkgLayouts from=$layouts item=layout key=module_package}
 
 			{if !$module_package || $module_package == 'kernel'}
-				{assign var=tabTitle value="Default"|tra}
+				{assign var=tabTitle value="Default"}
 			{else}
 				{assign var=tabTitle value=$module_package|capitalize}
 			{/if}
