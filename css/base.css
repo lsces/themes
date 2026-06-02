@@ -307,4 +307,10 @@ transition: all .2s ease;
 @media print {
 a[href]:after { content: none !important; }
 }
+
+/* Explicit odd/even row classes — for listings with multi-row entries
+   where nth-of-type striping cannot distinguish visual pairs */
+tr.odd	{ background-color: #f9f9f9; }
+tr.even	{ background-color: #ffffff; }
+
 /* vim: set ts=40: */
