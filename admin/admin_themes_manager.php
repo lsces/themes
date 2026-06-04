@@ -42,7 +42,7 @@ $stylesList = $gBitThemes->getStylesList( '', false, $subDirs );
 $gBitSmarty->assign( "stylesList", $stylesList );
 
 $subDirs = [ 'style_info' ];
-$iconStyles = $gBitThemes->getStylesList( CONFIG_PKG_PATH."iconsets/", false, $subDirs );
+$iconStyles = $gBitThemes->getStylesList( UTIL_PKG_PATH."iconsets/", false, $subDirs );
 $gBitSmarty->assign( "iconStyles", $iconStyles );
 
 $styleLayouts = $gBitThemes->getStyleLayouts();

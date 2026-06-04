@@ -6,18 +6,15 @@
 
 	<div class="body">
 		<p class="help">
-			{tr}Very much work in progress, but getting there ... need to update the ross reference with current icon names rather than the desktop standard Tango ones!{/tr}<br />
-			Source of Fontawesome <a class="external" href="http://fortawesome.github.io/Font-Awesome/">on GitHub</a> for the monochrome icons.<br />
-			The font-awesome-to-png python script is used to create an image set for easier handling with the array display.<br />
-			<a class="external" href="http://www.famfamfam.com/lab/icons/silk/">Original source of the silk icon set</a> for full colour icons.<br />
-			This is enhanced by the <a class="external" href="http://www.fatcow.com/free-icons">FatCow extended icon set</a> which also provides 32x32 versions of the silk library<br />
-			See the <a href="/wiki/colourstrap">Colourstrap information page</a> for more data on replacing Bootstraps monochrome icons with traditional colour ones.
+			Icon sets use <a class="external" href="https://specifications.freedesktop.org/icon-naming-spec/latest/">freedesktop icon naming</a>.
+			The active set is <strong>tango</strong>, built from <a class="external" href="https://gitlab.com/tango-project/tango-icon-theme">Tango3</a> with raster sizes at 16px (small), 24px (medium) and 32px (large), plus scalable SVGs.
+			SVGs are served automatically when no raster file exists for the requested size.
 		</p>
 		<table class="table data">
 			<tr>
 				{foreach from=$iconList item=icons key=iconStyle}
 				<th class="width1p" colspan="3"><a href="{$smarty.request.SCRIPT_NAME}?icon_style={$iconStyle}">{$iconStyle}</a></th>
-				{/foreach}
+			{/foreach}
 				<th class="width70p;">{tr}Icon name{/tr}</th>
 				<th class="width29p;">{tr}bitweaver uses{/tr}</th>
 			</tr>
@@ -25,25 +22,14 @@
 			{foreach from=$iconNames item=name}
 				<tr class="{cycle values="odd,even"}">
 					{foreach from=$iconList item=icons key=iconStyle}
-					<td {if $gBitSystem->getConfig( 'site_icon_style' ) == $iconStyle}class="prio1"{elseif $iconStyle == $smarty.const.DEFAULT_ICON_STYLE}class="prio2"{/if}>
-						{if $iconList.$iconStyle.$name}
-							{* avoid translation here by not using iexplain *}
-							{biticon istyle=$iconStyle ipackage=icons iname="small/`$iconList.$iconStyle.$name`"}
-						{/if}
-					</td>
-					<td {if $gBitSystem->getConfig( 'site_icon_style' ) == $iconStyle}class="prio1"{elseif $iconStyle == $smarty.const.DEFAULT_ICON_STYLE}class="prio2"{/if}>
-						{if $iconList.$iconStyle.$name}
-							{* avoid translation here by not using iexplain *}
-							{biticon istyle=$iconStyle ipackage=icons iname="large/`$iconList.$iconStyle.$name`"}
-						{/if}
-					</td>
-					<td>
-						{* only show huge size if looking at a particular set *}
-						{if $smarty.request.icon_style && $iconList.$iconStyle.$name}
-							{* avoid translation here by not using iexplain *}
-							{biticon istyle=$iconStyle ipackage=icons iname="huge/`$iconList.$iconStyle.$name`"}
-						{/if}
-					</td>
+					{assign var=tdClass value=($gBitSystem->getConfig('site_icon_style') == $iconStyle) ? 'prio1' : (($iconStyle == $smarty.const.DEFAULT_ICON_STYLE) ? 'prio2' : '')}
+					{if $iconList.$iconStyle.$name}
+					<td class="{$tdClass}">{biticon istyle=$iconStyle ipackage=icons iname=$name isize="small"  iexplain=$name}</td>
+					<td class="{$tdClass}">{biticon istyle=$iconStyle ipackage=icons iname=$name isize="medium" iexplain=$name}</td>
+					<td class="{$tdClass}">{biticon istyle=$iconStyle ipackage=icons iname=$name isize="large"  iexplain=$name}</td>
+					{else}
+					<td class="{$tdClass}"></td><td class="{$tdClass}"></td><td class="{$tdClass}"></td>
+					{/if}
 					{/foreach}
 					
 					<td>

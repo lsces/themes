@@ -76,15 +76,16 @@ $gBitSmarty->assign( "biticon_display_options", $biticon_display_options );
 
 // get the icon styles
 $subDirs = [ 'style_info' ];
-$iconStyles = $gBitThemes->getStylesList( CONFIG_PKG_PATH."styles/icons/", false, $subDirs );
+$iconStyles = $gBitThemes->getStylesList( UTIL_PKG_PATH."iconsets/", false, $subDirs );
 foreach( $iconStyles as $key=>$style ){
 	$iconStyles[$key] = str_replace( "_", " ", $style['style'] );
 }
 $gBitSmarty->assign( "iconStyles", $iconStyles );
 
 $biticon_sizes = [
-	'small' => KernelTools::tra( 'Small' ),
-	'large' => KernelTools::tra( 'Large' ),
+	'small'  => KernelTools::tra( 'Small (16px)' ),
+	'medium' => KernelTools::tra( 'Medium (24px)' ),
+	'large'  => KernelTools::tra( 'Large (32px)' ),
 ];
 $gBitSmarty->assign( "biticon_sizes", $biticon_sizes );
 

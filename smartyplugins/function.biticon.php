@@ -18,13 +18,9 @@ use Bitweaver\KernelTools;
  * @access public
  * @return string|bool Icon name with extension on success, false on failure
  */
-function biticon_first_match( $pDir, $pFilename ) {
+function biticon_first_match( $pDir, $pFilename, $pExtensions = ['png', 'gif', 'jpg'] ) {
 	if( is_dir( $pDir )) {
-		global $gSniffer;
-
-		$extensions = [ 'png', 'gif', 'jpg' ];
-
-		foreach( $extensions as $ext ) {
+		foreach( $pExtensions as $ext ) {
 			if( is_file( $pDir.$pFilename.'.'.$ext ) ) {
 				return $pFilename.'.'.$ext;
 			}
@@ -65,7 +61,7 @@ function biticon_output( $pParams, $pFile ) {
 				$outstr .= ' alt=""';
 			}
 
-			$ommit = [ 'ilocation', 'ipackage', 'ipath', 'iname', 'iexplain', 'iforce', 'istyle', 'iclass' ];
+			$ommit = [ 'ilocation', 'ipackage', 'ipath', 'iname', 'iexplain', 'iforce', 'istyle', 'iclass', 'isize' ];
 			foreach( $pParams as $name => $val ) {
 				if( !in_array( $name, $ommit ) ) {
 					$outstr .= ' '.$name.'="'.$val.'"';
@@ -80,6 +76,12 @@ function biticon_output( $pParams, $pFile ) {
 
 			if( isset( $pParams["onclick"] ) ) {
 				$outstr .=  ' onclick="'.$pParams["onclick"].'"';
+			}
+
+			if( str_ends_with( $pFile, '.svg' ) ) {
+				$svgSizes = ['small' => 16, 'medium' => 24, 'large' => 32];
+				$px = $svgSizes[$pParams['isize'] ?? 'small'] ?? 16;
+				$outstr .= " width=\"$px\" height=\"$px\"";
 			}
 
 			$outstr .= " />";
@@ -167,19 +169,30 @@ function smarty_function_biticon( $pParams, $pSmall = false ) {
 		return $ret;
 	}
 
-	// first deal with most common scenario: icon style ( a selected iconset from config/iconsets/ )
+	// first deal with most common scenario: icon style ( a selected iconset from util/iconsets/ )
 	if( $pParams['ipackage'] == 'icons' ) {
 		// get the current icon style
 		// istyle is a private parameter!!! - only used on theme manager page for icon preview!!!
 		// violators will be poked with soft cushions by the Cardinal himself!!!
 		$icon_style = !empty( $pParams['istyle'] ) ? $pParams['istyle'] : $gBitSystem->getConfig( 'site_icon_style', DEFAULT_ICON_STYLE );
 
-		if( false !== ( $matchFile = biticon_first_match( CONFIG_PKG_PATH."iconsets/$icon_style".$pParams['ipath'], $pParams['iname'] ))) {
-			return biticon_output( $pParams, CONFIG_PKG_URL."iconsets/$icon_style".$pParams['ipath'].$matchFile );
+		if( false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/$icon_style".$pParams['ipath'], $pParams['iname'] ))) {
+			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/$icon_style".$pParams['ipath'].$matchFile );
 		}
 
-		if( $icon_style != DEFAULT_ICON_STYLE && false !== ( $matchFile = biticon_first_match( CONFIG_PKG_PATH."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'], $pParams['iname'] ))) {
-			return biticon_output( $pParams, CONFIG_PKG_URL."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'].$matchFile );
+		if( $icon_style != DEFAULT_ICON_STYLE && false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'], $pParams['iname'] ))) {
+			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'].$matchFile );
+		}
+
+		// SVG fallback: raster not found, try scalable/ directory
+		$isize = trim( $pParams['ipath'], '/' );
+		if( false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/$icon_style/scalable/", $pParams['iname'], ['svg'] ))) {
+			$pParams['isize'] = $isize;
+			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/$icon_style/scalable/".$matchFile );
+		}
+		if( $icon_style != DEFAULT_ICON_STYLE && false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/".DEFAULT_ICON_STYLE."/scalable/", $pParams['iname'], ['svg'] ))) {
+			$pParams['isize'] = $isize;
+			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/".DEFAULT_ICON_STYLE."/scalable/".$matchFile );
 		}
 
 		// if that didn't work, we'll try liberty

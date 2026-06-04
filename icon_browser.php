@@ -56,7 +56,7 @@ $gBitSmarty->assign( 'iconUsage', $iconUsage );
 
 $iconList = [];
 $iconNames = [];
-$iconThemes = ( !empty( $_REQUEST['icon_style'] ) ) ? [ $_REQUEST['icon_style'] ] : scandir( CONFIG_PKG_PATH . "iconsets/" );
+$iconThemes = ( !empty( $_REQUEST['icon_style'] ) ) ? [ $_REQUEST['icon_style'] ] : scandir( UTIL_PKG_PATH . "iconsets/" );
 
 foreach( $iconThemes as $iconStyle ) {
 	if( $icons = icon_fetcher( $iconStyle ) ) {
@@ -74,12 +74,24 @@ $gBitSystem->display( 'bitpackage:themes/icon_browser.tpl', KernelTools::tra( 'I
 function icon_fetcher( $pStyle = DEFAULT_ICON_STYLE ) {
 	$ret = [];
 	if( strpos( $pStyle, '.' ) !== 0 && $pStyle != 'CVS' ) {
-		$stylePath = CONFIG_PKG_PATH."iconsets/".$pStyle;
+		$stylePath = UTIL_PKG_PATH."iconsets/".$pStyle;
+
+		// Primary: scalable SVGs give the most complete name list
+		if( is_dir( $stylePath."/scalable" )) {
+			foreach( scandir( $stylePath."/scalable" ) as $icon ) {
+				if( preg_match( "#\.svg$#", $icon )) {
+					$name = substr( $icon, 0, -4 );
+					$ret[$name] = $name;
+				}
+			}
+		}
+
+		// Supplement with large PNGs not covered by scalable
 		if( is_dir( $stylePath."/large" )) {
-			$handle = opendir( $stylePath."/large" );
-			while( false !== ( $icon = readdir( $handle ))) {
+			foreach( scandir( $stylePath."/large" ) as $icon ) {
 				if( preg_match( "#\.png$#", $icon ) && !preg_match( "#^process-working\.#", $icon )) {
-					$ret[str_replace( ".png", "", $icon )] = str_replace( ".png", "", $icon );
+					$name = substr( $icon, 0, -4 );
+					$ret[$name] ??= $name;
 				}
 			}
 		}
