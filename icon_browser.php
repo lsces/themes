@@ -55,8 +55,7 @@ $iconUsage = [
 	"dialog-warning"                 => "Warning",
 	"dialog-error"                   => "Error",
 	"dialog-information"             => "Information / announcement",
-	"dialog-cancel"                  => "Cancel",
-	"process-stop"                   => "Stop / cancel / disable",
+	"process-stop"                   => "Stop / cancel / disable / unsubscribed",
 	"emblem-important"               => "Required / flagged / asterisk",
 	// Communication
 	"internet-mail"                  => "Email / envelope / inbox",
@@ -76,9 +75,8 @@ $iconUsage = [
 	"preferences-system-network-proxy" => "Telephone / contact",
 	// Emblems
 	"emblem-favorite"                => "Bookmark / tag / favourite",
-	"emblem-shared"                  => "Shared / unlocked",
-	"emblem-symbolic-link"           => "Link",
-	"emblem-downloads"               => "Download emblem",
+	"emblem-shared"                  => "Shared / unlocked (boards: moved topic)",
+	"emblem-symbolic-link"           => "Link / moved thread",
 	"emblem-photos"                  => "Photos emblem",
 	// Media
 	"camera-photo"                   => "Camera / photo",
@@ -150,7 +148,7 @@ function icon_fetcher( $pStyle = DEFAULT_ICON_STYLE ) {
 	if( strpos( $pStyle, '.' ) !== 0 && $pStyle != 'CVS' ) {
 		$stylePath = UTIL_PKG_PATH."iconsets/".$pStyle;
 
-		// Primary: scalable SVGs give the most complete name list
+		// Iconsets are SVG-only: list from scalable/
 		if( is_dir( $stylePath."/scalable" )) {
 			foreach( scandir( $stylePath."/scalable" ) as $icon ) {
 				if( preg_match( "#\.svg$#", $icon )) {
@@ -160,15 +158,6 @@ function icon_fetcher( $pStyle = DEFAULT_ICON_STYLE ) {
 			}
 		}
 
-		// Supplement with large PNGs not covered by scalable
-		if( is_dir( $stylePath."/large" )) {
-			foreach( scandir( $stylePath."/large" ) as $icon ) {
-				if( preg_match( "#\.png$#", $icon ) && !preg_match( "#^process-working\.#", $icon )) {
-					$name = substr( $icon, 0, -4 );
-					$ret[$name] ??= $name;
-				}
-			}
-		}
 	}
 	ksort( $ret );
 	return $ret;

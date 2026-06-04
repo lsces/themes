@@ -172,22 +172,13 @@ function smarty_function_biticon( $pParams, $pSmall = false ) {
 		// violators will be poked with soft cushions by the Cardinal himself!!!
 		$icon_style = !empty( $pParams['istyle'] ) ? $pParams['istyle'] : $gBitSystem->getConfig( 'site_icon_style', DEFAULT_ICON_STYLE );
 
-		if( false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/$icon_style".$pParams['ipath'], $pParams['iname'] ))) {
-			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/$icon_style".$pParams['ipath'].$matchFile );
-		}
-
-		if( $icon_style != DEFAULT_ICON_STYLE && false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'], $pParams['iname'] ))) {
-			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/".DEFAULT_ICON_STYLE.$pParams['ipath'].$matchFile );
-		}
-
-		// SVG fallback: raster not found, try scalable/ directory
-		$isize = trim( $pParams['ipath'], '/' );
+		// Iconsets are SVG-only: serve from scalable/ at ipath-derived dimensions.
+		// ipath (/small/, /medium/, /large/) is preserved for cache key differentiation.
+		$pParams['isize'] = trim( $pParams['ipath'], '/' );
 		if( false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/$icon_style/scalable/", $pParams['iname'], ['svg'] ))) {
-			$pParams['isize'] = $isize;
 			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/$icon_style/scalable/".$matchFile );
 		}
 		if( $icon_style != DEFAULT_ICON_STYLE && false !== ( $matchFile = biticon_first_match( UTIL_PKG_PATH."iconsets/".DEFAULT_ICON_STYLE."/scalable/", $pParams['iname'], ['svg'] ))) {
-			$pParams['isize'] = $isize;
 			return biticon_output( $pParams, UTIL_PKG_URL."iconsets/".DEFAULT_ICON_STYLE."/scalable/".$matchFile );
 		}
 
