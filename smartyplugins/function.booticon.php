@@ -20,7 +20,7 @@ namespace Bitweaver\Plugins;
  * @access public
  * @return string Full <img> on success
  */
-function smarty_function_booticon( $pParams ) {
+function smarty_function_biticon( $pParams ) {
 	global $gBitSystem;
 
 	if( empty( $pParams['iforce'] )) {

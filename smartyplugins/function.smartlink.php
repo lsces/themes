@@ -126,7 +126,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 		}
 	}
 
-	$ignore = [ 'iatitle', 'icontrol', 'isort', 'ianchor', 'isort_mode', 'iorder', 'ititle', 'idefault', 'ifile', 'ipackage', 'itype', 'iurl', 'ionclick', 'ibiticon', 'booticon', 'iforce', 'itra' ];
+	$ignore = [ 'iatitle', 'icontrol', 'isort', 'ianchor', 'isort_mode', 'iorder', 'ititle', 'idefault', 'ifile', 'ipackage', 'itype', 'iurl', 'ionclick', 'ibiticon', 'booticon', 'biticon', 'iforce', 'itra' ];
 	// append any other paramters that were passed in
 	foreach( $hash as $key => $val ) {
 		if( !empty( $val ) && !in_array( $key, $ignore ) ) {
@@ -168,18 +168,17 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 		$ret = '<a class="icon" '.$atitle.' '.( !empty( $pParams['ionclick'] ) ? 'onclick="'.$pParams['ionclick'].'" ' : '' ).'href="'.$url.$url_params.( !empty( $pParams['ianchor'] ) ? '#'.$pParams['ianchor'] : '' ).'">';
 
 		// if we want to display an icon instead of text, do that
-		if( isset( $hash['booticon'] ) ) {
-	//		if( !empty( $tmp[2] )) {
-	//			$tmp[1] .= "/".$tmp[2];
-	//		}
-			$booticon = [
-				'iname' => $hash['booticon'],
-				'iexplain' => $hash['ititle'], // use untranslated ititle - booticon has a KernelTools::tra()
+		if( isset( $hash['biticon'] ) || isset( $hash['booticon'] ) ) {
+			$iname = $hash['biticon'] ?? $hash['booticon'];
+			$biticon = [
+				'ipackage' => 'icons',
+				'iname'    => $iname,
+				'iexplain' => $hash['ititle'],
 			];
 			if( !empty( $hash['iforce'] ) ) {
-				$booticon['iforce'] = $hash['iforce'];
+				$biticon['iforce'] = $hash['iforce'];
 			}
-			$ret .= smarty_function_booticon( $booticon );
+			$ret .= smarty_function_biticon( $biticon );
 		} elseif( isset( $hash['ibiticon'] ) ) {
 			$tmp = explode( '/', $hash['ibiticon'] );
 			if( !empty( $tmp[2] )) {
@@ -199,7 +198,7 @@ function smarty_function_smartlink( $pParams, &$pSmarty=NULL ) {
 		}
 
 		if( isset( $sorticon ) ) {
-			$ret .= '&nbsp;'.smarty_function_booticon( $sorticon );
+			$ret .= '&nbsp;'.smarty_function_biticon( $sorticon );
 		}
 		$ret .= '</a>';
 	}
