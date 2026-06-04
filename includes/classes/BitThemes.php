@@ -1377,7 +1377,7 @@ class BitThemes extends BitSingleton {
 						$this->loadJavascript( THEMES_PKG_PATH.'js/jquery-3.7.1.js', false, $pos++, $joined );
 						$this->loadJavascript( THEMES_PKG_PATH.'js/bootstrap.js', false, $pos++, $joined );
 						$this->loadJavascript( THEMES_PKG_PATH.'js/bootstrap-cookie-consent.js', false, $pos++, $joined );
-						$this->loadCss( THEMES_PKG_PATH.'css/colourstrap-full.css', false, $pos++, $joined );
+						$this->loadCss( THEMES_PKG_PATH.'css/bootstrap.css', false, $pos++, $joined );
 						break;
 					case 'yui':
 						$this->loadJavascript( $pLibPath.'yuiloader-dom-event/yuiloader-dom-event.js', false, $pos++ );

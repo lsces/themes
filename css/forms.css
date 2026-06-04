@@ -20,3 +20,8 @@ html[dir='rtl'] .forminput input[type="checkbox"] {float:right;}*/
 .clear                 {clear:both;}
 .display.confirm .body {width:450px; margin:0 auto;}
 .formfeedback		   {clear:both;}
+
+/* Bootstrap .radio/.checkbox default to display:block with no width constraint;
+   constrain to 90% to prevent them stretching full width in BW layouts */
+.radio,
+.checkbox           { width: 90%; }
