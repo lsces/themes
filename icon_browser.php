@@ -61,7 +61,7 @@ $iconUsage = [
 	// Communication
 	"internet-mail"                  => "Email / envelope / inbox",
 	"internet-group-chat"            => "Comment / discussion",
-	"mail-attachment"                => "Attachment / paperclip",
+	"stock_attach"                   => "Attachment / paperclip / assign",
 	"network-transmit"               => "Upload / send / RSS feed",
 	"network-receive"                => "Download",
 	// Auth and permissions
@@ -118,6 +118,8 @@ $iconUsage = [
 	"pdf"                            => "PDF",
 	"silhouette"                     => "Anonymous / silhouette user",
 ];
+// MAINTENANCE NOTE: when an icon iname is changed in any template or plugin,
+// update $iconUsage above to match, then run ?used_only=1 to verify coverage.
 $gBitSmarty->assign( 'iconUsage', $iconUsage );
 
 $iconList = [];
