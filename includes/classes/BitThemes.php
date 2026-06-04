@@ -132,8 +132,8 @@ class BitThemes extends BitSingleton {
 		$this->loadCss( $this->getStyleCssFile(),        true, 998,	true, true );
 		$this->loadCss( $this->getBrowserStyleCssFile(), true, 999,	true, true );
 		// check for customized CSS file
-		if( file_exists( CONFIG_PKG_PATH.'css/config.css' ) ) {
-			$this->loadCss( CONFIG_PKG_PATH.'css/config.css' );
+		if( file_exists( THEMES_PKG_PATH.'css/config.css' ) ) {
+			$this->loadCss( THEMES_PKG_PATH.'css/config.css' );
 		}
 		$this->mStyles['joined_css'] = $this->joinAuxFiles( 'css' );
 	}
