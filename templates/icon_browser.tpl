@@ -10,6 +10,13 @@
 			The active set is <strong>tango</strong>, built from <a class="external" href="https://gitlab.com/tango-project/tango-icon-theme">Tango3</a> with raster sizes at 16px (small), 24px (medium) and 32px (large), plus scalable SVGs.
 			SVGs are served automatically when no raster file exists for the requested size.
 		</p>
+		<p>
+			{if $usedOnly}
+				{tr}Showing icons in use only.{/tr} <a href="{$smarty.request.SCRIPT_NAME}{if $smarty.request.icon_style}?icon_style={$smarty.request.icon_style}{/if}">{tr}Show all icons{/tr}</a>
+			{else}
+				{tr}Showing all icons.{/tr} <a href="{$smarty.request.SCRIPT_NAME}?used_only=1{if $smarty.request.icon_style}&amp;icon_style={$smarty.request.icon_style}{/if}">{tr}Show used icons only{/tr}</a>
+			{/if}
+		</p>
 		<table class="table data">
 			<tr>
 				{foreach from=$iconList item=icons key=iconStyle}

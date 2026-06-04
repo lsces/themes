@@ -131,9 +131,15 @@ foreach( $iconThemes as $iconStyle ) {
 	}
 }
 
+$usedOnly = !empty( $_REQUEST['used_only'] );
+if( $usedOnly ) {
+	$iconNames = array_intersect_key( $iconNames, $iconUsage );
+}
+
 asort( $iconNames );
 $gBitSmarty->assign( 'iconNames', $iconNames );
 $gBitSmarty->assign( 'iconList', $iconList );
+$gBitSmarty->assign( 'usedOnly', $usedOnly );
 
 $gBitSystem->display( 'bitpackage:themes/icon_browser.tpl', KernelTools::tra( 'Icon Listing' ) , [ 'display_mode' => 'display' ]);
 
