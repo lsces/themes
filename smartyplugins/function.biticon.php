@@ -132,22 +132,18 @@ function smarty_function_biticon( $pParams, $pSmall = false ) {
 
 	// if we don't have an ipath yet, we will set it here
 	if( $pParams['ipath'] == '/' ) {
-		// iforce is generally only set in menus - we might need a parameter to identify menus more accurately
+		$configSize = !empty( $pParams['isize'] ) ? $pParams['isize'] : $gBitSystem->getConfig( 'site_icon_size', 'small' );
 		if( !empty( $pParams['ilocation'] )) {
 			if( $pParams['ilocation'] == 'menu' ) {
-				$pParams['ipath'] .= 'small/';
+				$pParams['ipath'] .= $configSize.'/';
 				$pParams['iforce'] = 'icon_text';
 			} elseif( $pParams['ilocation'] == 'quicktag' ) {
-				$pParams['ipath'] .= 'small/';
+				$pParams['ipath'] .= $configSize.'/';
 				$pParams['iforce'] = 'icon';
 				$pParams['iclass'] = 'quicktag icon';
 			}
 		} else {
-			if( !empty( $pParams['isize'] )) {
-				$pParams['ipath'] .= $pParams['isize'].'/';
-			} else {
-				$pParams['ipath'] .= $gBitSystem->getConfig( 'site_icon_size', 'small' ).'/';
-			}
+			$pParams['ipath'] .= $configSize.'/';
 		}
 	}
 
