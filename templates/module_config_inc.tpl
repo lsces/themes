@@ -12,7 +12,7 @@
 	{if $gBitThemes->isCustomModule( $modInfo.module_rsrc )}
 		{smartlink ititle="Edit" biticon="document-properties" iexplain="Edit" page=custom_modules name=$modInfo.module_rsrc|regex_replace:"!.*\/!":"" action=edit}
 	{/if}
-	{smartlink ititle="Unassign" biticon="edit-delete" iexplain="Delete" ionclick="return confirm('Are you sure you want to remove `$modInfo.name`?');" page=$page move_module=unassign module_package=$module_package module_id=$modInfo.module_id }
+	{smartlink ititle="Unassign" biticon="user-trash" iexplain="Delete" ionclick="return confirm('Are you sure you want to remove `$modInfo.name`?');" page=$page move_module=unassign module_package=$module_package module_id=$modInfo.module_id }
 {/capture}
 
 {strip}

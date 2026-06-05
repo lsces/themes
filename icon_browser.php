@@ -35,7 +35,8 @@ $iconUsage = [
 	"view-refresh"                   => "Refresh",
 	"zoom-in"                        => "Zoom in / magnify",
 	// Edit actions
-	"edit-delete"                    => "Delete / remove",
+	"user-trash"                     => "Delete / remove (dustbin)",
+	"edit-delete"                    => "Delete / remove (cross — kept for reference)",
 	"document-properties"            => "Edit item",
 	"list-add"                       => "Add / new item",
 	"list-remove"                    => "Remove item",
