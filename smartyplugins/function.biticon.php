@@ -18,7 +18,7 @@ use Bitweaver\KernelTools;
  * @access public
  * @return string|bool Icon name with extension on success, false on failure
  */
-function biticon_first_match( $pDir, $pFilename, $pExtensions = ['png', 'gif', 'jpg'] ) {
+function biticon_first_match( $pDir, $pFilename, $pExtensions = ['svg', 'png', 'gif', 'jpg'] ) {
 	if( is_dir( $pDir )) {
 		foreach( $pExtensions as $ext ) {
 			if( is_file( $pDir.$pFilename.'.'.$ext ) ) {
