@@ -20,7 +20,7 @@
 			{jstab title=$tabTitle}
 
 				<div class="floaticon">
-					{smartlink ititle="Edit this Layout" biticon="document-properties" page=layout module_package=$module_package}
+					{smartlink ititle="Edit this Layout" biticon="edit" page=layout module_package=$module_package}
 					{smartlink ititle="Remove this Layout" biticon="user-trash" page=$page remove_layout=$module_package onclick="return confirm('{tr}Are you sure you want to remove this layout? This can not be undone.{/tr}')"}
 				</div>
 

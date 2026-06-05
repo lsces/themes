@@ -37,7 +37,7 @@ $iconUsage = [
 	// Edit actions
 	"user-trash"                     => "Delete / remove (dustbin)",
 	"edit-delete"                    => "Delete / remove (cross — kept for reference)",
-	"document-properties"            => "Edit item",
+	"edit"            => "Edit item",
 	"list-add"                       => "Add / new item",
 	"list-remove"                    => "Remove item",
 	"edit-find"                      => "Search / find",
@@ -48,7 +48,7 @@ $iconUsage = [
 	"document-print"                 => "Print",
 	"document-save"                  => "Save",
 	// Files and content
-	"text-x-generic"                 => "File / list / document",
+	"view-list-text"                 => "File / list / document",
 	"image-x-generic"                => "Image / picture",
 	"folder-open"                    => "Open folder",
 	"folder"                         => "Folder",
