@@ -48,6 +48,7 @@ $iconUsage = [
 	"document-print"                 => "Print",
 	"document-save"                  => "Save",
 	// Files and content
+	"view-list"                      => "List / contacts list",
 	"view-list-text"                 => "File / list / document",
 	"image-x-generic"                => "Image / picture",
 	"folder-open"                    => "Open folder",
@@ -63,6 +64,7 @@ $iconUsage = [
 	// Communication
 	"internet-mail"                  => "Email / envelope / inbox",
 	"internet-group-chat"            => "Comment / discussion",
+	"task-add"                       => "Log a call / add task",
 	"stock_attach"                   => "Attachment / paperclip / assign",
 	"network-transmit"               => "Upload / send / RSS feed",
 	"network-receive"                => "Download",
@@ -70,12 +72,15 @@ $iconUsage = [
 	"lock"                           => "Lock / key / permissions",
 	"emblem-readonly"                => "Hidden / read-only",
 	"emblem-unreadable"              => "Visible / show",
-	// Users
+	// Users and contacts
 	"user-desktop"                   => "User",
 	"user-home"                      => "User home",
 	"system-users"                   => "User group / users",
 	"system-log-out"                 => "Sign out",
 	"preferences-system-network-proxy" => "Telephone / contact",
+	"contact-new-symbolic"           => "Add person / new contact",
+	"address-book-new"               => "Address book",
+	"address-book-new-symbolic"      => "Add business / new address book entry",
 	// Emblems
 	"emblem-favorite"                => "Bookmark / tag / favourite",
 	"emblem-shared"                  => "Shared / unlocked (boards: moved topic)",
