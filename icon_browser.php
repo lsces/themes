@@ -50,6 +50,14 @@ $iconUsage = [
 	// Files and content
 	"view-list"                      => "List / contacts list",
 	"view-list-text"                 => "File / list / document",
+	"view-group"                     => "List assemblies / grouped view",
+	"view-list-tree"                 => "List components / tree view",
+	"view-list-details"              => "List movements / details view",
+	"view-list-icons"                => "Create assembly / icon view",
+	"view-form-table"                => "Stock levels / spreadsheet / table",
+	"view-task-add"                  => "Add movement / add task",
+	"view-task-child-add"            => "Create requisition / add child task",
+	"kt-add-filters"                 => "Create component / add filters",
 	"image-x-generic"                => "Image / picture",
 	"folder-open"                    => "Open folder",
 	"folder"                         => "Folder",
@@ -64,7 +72,6 @@ $iconUsage = [
 	// Communication
 	"internet-mail"                  => "Email / envelope / inbox",
 	"internet-group-chat"            => "Comment / discussion",
-	"task-add"                       => "Log a call / add task",
 	"stock_attach"                   => "Attachment / paperclip / assign",
 	"network-transmit"               => "Upload / send / RSS feed",
 	"network-receive"                => "Download",
