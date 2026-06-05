@@ -61,7 +61,7 @@ function biticon_output( $pParams, $pFile ) {
 				$outstr .= ' alt=""';
 			}
 
-			$ommit = [ 'ilocation', 'ipackage', 'ipath', 'iname', 'iexplain', 'iforce', 'istyle', 'iclass', 'isize', 'width', 'height' ];
+			$ommit = [ 'ilocation', 'ipackage', 'ipath', 'iname', 'iexplain', 'iforce', 'istyle', 'iclass', 'isize' ];
 			foreach( $pParams as $name => $val ) {
 				if( !in_array( $name, $ommit ) ) {
 					$outstr .= ' '.$name.'="'.$val.'"';
@@ -80,8 +80,8 @@ function biticon_output( $pParams, $pFile ) {
 
 			if( str_ends_with( $pFile, '.svg' ) ) {
 				$svgSizes = ['small' => 16, 'medium' => 24, 'large' => 32];
-				$w = $pParams['width'] ?? ($svgSizes[$pParams['isize'] ?? 'small'] ?? 16);
-				$h = $pParams['height'] ?? $w;
+				$h = $svgSizes[$pParams['isize'] ?? 'small'] ?? 16;
+				$w = ($pParams['istyle'] ?? '') === 'flag' ? (int)round( $h * 4 / 3 ) : $h;
 				$outstr .= " width=\"$w\" height=\"$h\"";
 			}
 
