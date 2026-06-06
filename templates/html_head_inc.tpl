@@ -1,11 +1,11 @@
 {strip}
-{if !empty($gBitThemes->mRawFiles.css)}
-	{foreach from=$gBitThemes->mRawFiles.css item=cssFile}
+{if !empty($gBitThemes->mRawUrls.css)}
+	{foreach from=$gBitThemes->mRawUrls.css item=cssFile}
 		<link rel="stylesheet" title="{$style|default:'css'}" nonce="{$cspNonce}" type="text/css" href="{$cssFile}" media="all" />
 	{/foreach}
 {/if}
-{if !empty($gBitThemes->mRawFiles.js)}
-	{foreach from=$gBitThemes->mRawFiles.js item=jsFile}
+{if !empty($gBitThemes->mRawUrls.js)}
+	{foreach from=$gBitThemes->mRawUrls.js item=jsFile}
 		<script nonce="{$cspNonce}" src="{$jsFile}"></script>
 	{/foreach}
 {/if}

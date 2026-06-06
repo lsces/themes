@@ -38,8 +38,16 @@ class BitThemes extends BitSingleton {
 		'css' => [],
 	];
 
-	// Raw Javascript and Css Files
+	// Raw Javascript and Css Files — kept as filesystem paths for stable deduplication.
+	// Never mutated to URL form; see mRawUrls.
 	public $mRawFiles = [
+		'js'  => [],
+		'css' => [],
+	];
+
+	// Per-request URL form of mRawFiles, built by cleanAuxFiles() for template rendering.
+	// Not serialised — rebuilt each request.
+	public $mRawUrls = [
 		'js'  => [],
 		'css' => [],
 	];
@@ -1729,24 +1737,30 @@ class BitThemes extends BitSingleton {
 			}
 		}
 
-		// convert full file path to URL in mRawFiles hash
+		// Build per-request mRawUrls — convert filesystem paths to URL?filemtime for rendering.
+		// mRawFiles is kept as stable paths so isAuxFile() deduplication survives APCu round-trips.
+		$this->mRawUrls[$pType] = [];
 		if( !empty( $this->mRawFiles[$pType] )) {
 			foreach( $this->mRawFiles[$pType] as $pos => $file ) {
 				if ( KernelTools::is_windows() ) {
-					$file = str_replace( '\\', '/',  $file );
-					// Put first forward slash back
-					$file = substr_replace( $file, '\\', 2, 1 );
-					$winBitRootPath = str_replace( '\\', '/',  BIT_ROOT_PATH );
-					// Put first forward slash back
-					$winBitRootPath = substr_replace($winBitRootPath, '\\', 2, 1 );
-					if ( strpos( $file, $winBitRootPath ) !== false ) {
-						$this->mRawFiles[$pType][$pos] = BIT_ROOT_URL.substr( $file, strlen( $winBitRootPath ));
+					$winFile = str_replace( '\\', '/', $file );
+					$winFile = substr_replace( $winFile, '\\', 2, 1 );
+					$winBitRootPath = str_replace( '\\', '/', BIT_ROOT_PATH );
+					$winBitRootPath = substr_replace( $winBitRootPath, '\\', 2, 1 );
+					if ( strpos( $winFile, $winBitRootPath ) !== false ) {
+						$this->mRawUrls[$pType][$pos] = BIT_ROOT_URL.substr( $winFile, strlen( $winBitRootPath ));
+					} else {
+						$this->mRawUrls[$pType][$pos] = $file;
 					}
 				} else if ( strpos( $file, BIT_ROOT_PATH ) !== false ) {
-					$this->mRawFiles[$pType][$pos] = BIT_ROOT_URL.substr( $file, strlen( BIT_ROOT_PATH ));
+					$url = BIT_ROOT_URL.substr( $file, strlen( BIT_ROOT_PATH ));
 					if( file_exists( $file ) && ($cacheTime = filemtime( $file )) ) {
-						$this->mRawFiles[$pType][$pos] .= (strpos('?',$file) ? '&' : '?' ).$cacheTime;
+						$url .= ( strpos( $url, '?' ) !== false ? '&' : '?' ).$cacheTime;
 					}
+					$this->mRawUrls[$pType][$pos] = $url;
+				} else {
+					// Already a URL (e.g. CDN) — use as-is
+					$this->mRawUrls[$pType][$pos] = $file;
 				}
 			}
 		}
