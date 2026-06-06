@@ -39,15 +39,22 @@ function smarty_modifier_bit_date_format( $pString, $format = "%b %e, %Y", $pTra
 
 	if( $gBitUser->getPreference( 'site_display_utc' ) == 'Fixed' && class_exists( 'DateTime' ) ) {
 		date_default_timezone_set( $gBitUser->getPreference( 'site_display_timezone', 'UTC' ) );
-		$dateTimeUser = is_numeric( $pString )
-			? new \DateTime( '@'.(int)$pString )
-			: new \DateTime( $pString );
+		try {
+			$dateTimeUser = is_numeric( $pString )
+				? new \DateTime( '@'.(int)$pString )
+				: new \DateTime( $pString );
+		} catch ( \DateMalformedStringException | \Exception $e ) {
+			return '';
+		}
 		$disptime = strtotime($dateTimeUser->format(DATE_W3C));
 		return $gBitSystem->mServerTimestamp->strftime( $format, $disptime );
 	}
 		$format = $gBitSystem->get_display_offset()
 			? preg_replace( "/ ?%Z/",'', $format )
 			: $format = preg_replace( "/%Z/", "UTC", $format );
+		if( !is_numeric( $pString ) && strtotime( $pString ) === false ) {
+			return '';
+		}
 		$disptime = $gBitSystem->mServerTimestamp->getDisplayDateFromUTC( $pString );
 
 	return $gBitSystem->mServerTimestamp->strftime( $format, $disptime, TRUE );
