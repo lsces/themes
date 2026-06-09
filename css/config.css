@@ -8,10 +8,25 @@ i[onlick] {
 }
 
 .floaticon a,
+.floaticon button.btn-link,
 a.icon,
 img.icon {
 	padding: 0 5px 0 0;
 	font-size: 11pt
+}
+
+.floaticon button.btn-link {
+	background: none;
+	border: none;
+	cursor: pointer
+}
+
+.floaticon .minifind .form-inline > .btn {
+	margin-left: 5px
+}
+
+.floaticon .minifind .form-group {
+	margin-right: 10px
 }
 
 .floaticon {
