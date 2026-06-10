@@ -50,6 +50,7 @@ $iconUsage = [
 	// Files and content
 	"view-list"                      => "List / contacts list",
 	"view-list-text"                 => "File / list / document",
+	"view-grid-symbolic"             => "Kitlocker gallery",
 	"view-group"                     => "List assemblies / grouped view",
 	"view-list-tree"                 => "List components / tree view",
 	"view-list-details"              => "List movements / details view",
