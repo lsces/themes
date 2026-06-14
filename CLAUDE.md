@@ -38,6 +38,13 @@ conflicts. `themes/css/config.css` is the canonical source.
   the submit control. Use `class="minifind"` alone on floaticon filter forms; never add `form-search`.
 - `{strip}` removes whitespace between HTML tags; keep `&bull;` separators inside
   valid `<li>` elements to avoid detachment
+- **`{textarea}` / CKEditor** — omit `id`; the plugin defaults to `LIBERTY_TEXT_AREA` which
+  is what CKEditor searches for. Passing a custom `id` breaks CKEditor attachment.
+  Do NOT wrap `{textarea}` in an outer `form-group`/`{formlabel}`/`{forminput}` — it
+  provides its own via `edit_textarea.tpl`. Pass `label="..."` directly to `{textarea}`.
+  Default field name is `edit`; PHP reads `$_POST['edit']`. Do not pass `name=` unless
+  you also change the PHP to match. PHP must call `invokeServices('content_edit_function')`
+  for CKEditor to load.
 - Per-site footer scripts belong in `kernel/footer_inc.tpl`, NOT `kernel/footer.tpl`.
   `footer_inc.tpl` is picked up by the `mAuxFiles` loop in `html.tpl` reliably.
   `footer.tpl` as a theme override only loads if the active style matches exactly —
