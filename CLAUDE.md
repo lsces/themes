@@ -70,6 +70,13 @@ Column visibility is controlled by feature flags in `kernel_config` checked in `
 The old hardcoded `display_mode != 'edit'` guard in `html.tpl` has been removed — columns now always
 follow these flags. All flags off = columns show on all pages including edit pages.
 
+## Icon sets (tango vs tango5)
+`util/iconsets/tango/` is the default iconset; `tango5/` is a richer superset. The `{biticon}`
+plugin searches the active style first, then falls back to `tango` — it does NOT fall back to
+`tango5`. Any icon used in a template that only exists in `tango5/scalable/` must be copied to
+`tango/scalable/` too, otherwise it silently goes missing on sites using the tango default.
+After copying, add the icon name and purpose to `$iconUsage` in `themes/icon_browser.php`.
+
 ## Site-specific theme overrides (/etc/webstack/domains)
 Each vhosted site has its theme overrides at `/etc/webstack/domains/{site}/themes/{site}/`.
 These are symlinked into `bitweaver5/config/themes/{site}` — e.g.:

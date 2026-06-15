@@ -80,6 +80,8 @@ $iconUsage = [
 	"lock"                           => "Lock / key / permissions",
 	"emblem-readonly"                => "Hidden / read-only",
 	"emblem-unreadable"              => "Visible / show",
+	"password-show-on"               => "Show password (toggle reveal)",
+	"password-show-off"              => "Hide password (toggle conceal)",
 	// Users and contacts
 	"user-desktop"                   => "User",
 	"user-home"                      => "User home",
