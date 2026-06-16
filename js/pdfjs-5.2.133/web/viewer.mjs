@@ -1169,6 +1169,10 @@ class PDFLinkService {
       if (params.has("search")) {
         const query = params.get("search").replaceAll('"', ""),
           phrase = params.get("phrase") === "true";
+        if (query) {
+          PDFViewerApplication.findBar.open();
+          PDFViewerApplication.findBar.findField.value = query;
+        }
         this.eventBus.dispatch("findfromurlhash", {
           source: this,
           query: phrase ? query : query.match(/\S+/g)
