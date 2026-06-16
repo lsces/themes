@@ -374,6 +374,13 @@ small {
 	width: 100%
 }
 
+tr.odd  { background-color: #d3d3d3; }
+tr.even { background-color: #a9a9a9; }
+
+.table-striped > tbody > tr:nth-of-type(odd)  { background-color: #d3d3d3; }
+.table-striped > tbody > tr:nth-of-type(even) { background-color: #a9a9a9; }
+.table-hover > tbody > tr:hover               { background-color: #b8d4e8; }
+
 ul.data {
 	list-style: none;
 	margin: 0;

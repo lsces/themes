@@ -70,6 +70,25 @@ Column visibility is controlled by feature flags in `kernel_config` checked in `
 The old hardcoded `display_mode != 'edit'` guard in `html.tpl` has been removed — columns now always
 follow these flags. All flags off = columns show on all pages including edit pages.
 
+## Standard content header pattern (merg theme)
+The merg theme applies `background-color: #5da7e1` to every `<header>` element. The standard
+pattern for display pages uses a semantic `<header>` with floaticons and breadcrumbs as
+separate included templates (matching the stock assembly pattern):
+
+```html
+<header>
+    {include file="bitpackage:pkg/foo_icons_inc.tpl"}   {* floaticons — float right *}
+    <h1>Title</h1>
+    {include file="bitpackage:pkg/foo_breadcrumb_inc.tpl"}   {* <small> trail *}
+</header>
+```
+
+- `foo_icons_inc.tpl` — contains `<div class="floaticon">` with action icons (edit, delete, etc.)
+- `foo_breadcrumb_inc.tpl` — contains `<small>` with `&rsaquo;`-separated ancestor links
+- Use `<header>` (semantic element), never `<div class="header">` — the latter gets no blue background
+- Do not use a separate `<div class="gallerybar">` or `<nav>` breadcrumb bar above the page;
+  integrate breadcrumbs into `<small>` inside `<header>` instead
+
 ## Icon sets (tango vs tango5)
 `util/iconsets/tango/` is the default iconset; `tango5/` is a richer superset. The `{biticon}`
 plugin searches the active style first, then falls back to `tango` — it does NOT fall back to
