@@ -89,6 +89,26 @@ separate included templates (matching the stock assembly pattern):
 - Do not use a separate `<div class="gallerybar">` or `<nav>` breadcrumb bar above the page;
   integrate breadcrumbs into `<small>` inside `<header>` instead
 
+## pdfjs local patch (themes/js/pdfjs-5.2.133/web/viewer.mjs)
+Standard pdfjs handles `#search=term` in the URL hash by highlighting matches silently but
+does NOT open the findbar UI. A local patch restores that behaviour. Find the block:
+
+```javascript
+if (params.has("search")) {
+    const query = params.get("search").replaceAll('"', ""),
+```
+
+And insert before the `this.eventBus.dispatch("findfromurlhash", ...)` call:
+
+```javascript
+if (query) {
+    PDFViewerApplication.findBar.open();
+    PDFViewerApplication.findBar.findField.value = query;
+}
+```
+
+**Re-apply this patch after any pdfjs version upgrade.**
+
 ## Icon sets (tango vs tango5)
 `util/iconsets/tango/` is the default iconset; `tango5/` is a richer superset. The `{biticon}`
 plugin searches the active style first, then falls back to `tango` — it does NOT fall back to
