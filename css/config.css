@@ -609,3 +609,8 @@ ul.data li.item:last-child {
 .fisheye-flow .gallery-img {
 	flex: 1;
 }
+@media (min-width: 1600px) {
+	.fisheye-flow > [class*="col-"] {
+		width: 16.6667%;
+	}
+}
