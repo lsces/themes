@@ -11,8 +11,7 @@ For role-based visibility, override `top_bar.tpl` in `config/themes/merg/kernel/
 
 ## CSS load order
 `BitThemes::loadStyleData()` loads CSS in this order:
-1. Package CSS (around position 300) — each package's `html_head_inc.tpl`; also
-   `config/css/config.css` (old duplicate of themes/css/config.css — see note below)
+1. Package CSS (around position 300) — each package's `html_head_inc.tpl`
 2. `themes/css/config.css` — position 300 (default); canonical floaticon/icon/actionicon rules
 3. Style CSS (`getStyleCssFile()`, position 998) — the active theme's main CSS
 4. Browser CSS (`getBrowserStyleCssFile()`, position 999)
@@ -26,9 +25,15 @@ at position 300. Site theme CSS at position 998 **wins** over this. If a site th
 `.icon { float:left }` (common in older themes for sprite icon layout), it breaks `.floaticon`
 by causing child icons to float left and collapse the container. **Fix**: strip the bare
 `.icon { float:left }` from the site CSS — do not scope it or patch it elsewhere.
-`config/css/config.css` is a stale duplicate of `themes/css/config.css` (slightly older,
-different padding direction); all sites should be audited to confirm it is not causing
-conflicts. `themes/css/config.css` is the canonical source.
+
+## Asset locations
+- **Site-specific images** — `/etc/webstack/domains/{site}/themes/{site}/images/`; referenced
+  in templates as `{$gBitThemes->getStyleUrl()}images/filename.ext`
+- **Cross-site org assets** (RDM logo, cookie-consent images) — `util/images/`; referenced
+  as `{$smarty.const.UTIL_PKG_URL}images/filename.ext` or `/util/images/filename.ext` in CSS
+- **Fonts** — `util/fonts/{family}/`; referenced as `/util/fonts/...` in `@font-face` CSS
+- `config/css/`, `config/js/`, `config/fonts/`, `config/images/` are all dead and removed
+  from servers — do not recreate them
 
 ## Smarty notes
 - `{tr}...{/tr}` for translation in templates; `KernelTools::tra()` in PHP
@@ -118,11 +123,26 @@ After copying, add the icon name and purpose to `$iconUsage` in `themes/icon_bro
 
 ## Site-specific theme overrides (/etc/webstack/domains)
 Each vhosted site has its theme overrides at `/etc/webstack/domains/{site}/themes/{site}/`.
-These are symlinked into `bitweaver5/config/themes/{site}` — e.g.:
+These are symlinked into each site's `config/themes/{site}` — e.g. on servers:
 ```
-/srv/website/bitweaver5/config/themes/merg -> /etc/webstack/domains/merg/themes/merg
+/srv/website/merg/config/themes/merg -> /etc/webstack/domains/merg/themes/merg
 ```
-Typical contents: `kernel/` (top_bar.tpl, top_banner.tpl, etc.), `images/`, site CSS, favicon.
+On the desktop, `bitweaver5/config/themes/` holds symlinks for ALL sites (since the desktop
+switches between sites by changing the DB in `config_inc.php`).
+
+Typical contents: `kernel/` (top_bar.tpl, top_banner.tpl, bot_bar.tpl, etc.), `images/`, site CSS, favicon.
 Any template in this path overrides the package default via Smarty's `bitpackage:` resource lookup.
-`config/themes/medw` and `config/themes/merg` are both symlinks — never edit the config/themes
-path directly; edit the source in `/etc/webstack/domains/`.
+Never edit the `config/themes/` path directly; edit the source in `/etc/webstack/domains/`.
+
+## Session notes
+
+### 2026-06-17/18 — Theme/asset cleanup
+- Site-specific images moved from `config/images/` to per-site webstack theme `images/` folders
+- Cross-site org assets (RDM logo, cookie-consent) moved to `util/images/`
+- All fonts moved to `util/fonts/`; malformed `@font-face` CSS fixed in graham-ovenden and garage-press
+- `config/css/`, `config/js/`, `config/fonts/`, `config/images/` confirmed dead, removed from servers
+- phpsurgery theme completed: `top_banner.tpl` (banner div with background-image logo),
+  footer CSS to match lsces pattern (lightgrey), Bootstrap navbar replacing old Ink framework
+- Navbar centering for anonymous visitors: `{if !$gBitUser->isRegistered()} navbar-center{/if}`
+  added to `<ul class="nav navbar-nav">` in graham-ovenden and garage-press `top_bar.tpl`
+- Gallery `img.thumb` fix in `themes/css/config.css`: `.fisheye-flow img.thumb { width:100%; height:auto; max-width:none; }` — preserves natural aspect ratios, overrides Bootstrap and per-site constraints
