@@ -593,6 +593,12 @@ ul.data li.item:last-child {
 	}
 }
 
+.navbar-nav.navbar-center {
+	float: none;
+	margin: 0 auto;
+	display: table;
+}
+
 .paginator {
 	width: 100%;
 	display: flex;
