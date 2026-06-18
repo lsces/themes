@@ -593,6 +593,20 @@ ul.data li.item:last-child {
 	}
 }
 
+.paginator {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+.paginator ul.pagination,
+.paginator > div.pagination {
+	margin: 0;
+	float: none;
+}
+
 .fisheye-flow {
 	display: flex;
 	flex-wrap: wrap;
