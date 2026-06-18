@@ -620,8 +620,10 @@ ul.data li.item:last-child {
 	flex-direction: column;
 	flex: 1;
 }
-.fisheye-flow .gallery-img {
-	flex: 1;
+.fisheye-flow img.thumb {
+	width: 100%;
+	height: auto;
+	max-width: none;
 }
 @media (min-width: 1600px) {
 	.fisheye-flow > [class*="col-"] {
