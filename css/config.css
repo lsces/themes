@@ -592,3 +592,20 @@ ul.data li.item:last-child {
 		content: none !important;
 	}
 }
+
+.fisheye-flow {
+	display: flex;
+	flex-wrap: wrap;
+}
+.fisheye-flow > [class*="col-"] {
+	display: flex;
+	flex-direction: column;
+}
+.fisheye-flow .gallery-box {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+.fisheye-flow .gallery-img {
+	flex: 1;
+}
