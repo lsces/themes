@@ -51,8 +51,6 @@ $gBitSystem->mOnload[] = 'BitBase.setupShowHide();';
 
 $gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/jquery.innerfade.js', FALSE, 700, FALSE );
 $gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/overlib.js', FALSE, 701, FALSE );
-$gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/haccordion/haccordion.js', FALSE, 702, FALSE );
-// Only used in medw.uk
 
 if( is_readable(CONFIG_PKG_PATH.'theme_setup_inc.php')) {
 	include_once CONFIG_PKG_PATH.'theme_setup_inc.php';
