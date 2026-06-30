@@ -636,3 +636,11 @@ ul.data li.item:last-child {
 		width: 16.6667%;
 	}
 }
+
+.control-label + .checkbox-inline {
+	margin-left: 1em;
+}
+
+.checkbox-inline input[type="checkbox"] {
+	margin-top: 0;
+}
