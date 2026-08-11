@@ -54,6 +54,11 @@ by causing child icons to float left and collapse the container. **Fix**: strip 
   `footer_inc.tpl` is picked up by the `mAuxFiles` loop in `html.tpl` reliably.
   `footer.tpl` as a theme override only loads if the active style matches exactly —
   fragile and easy to miss.
+- **`theme_setup_inc.php`** — optional site-specific PHP loaded by `themes/includes/bit_setup_inc.php`
+  if `CONFIG_PKG_PATH.'theme_setup_inc.php'` exists. Use it to call `$gBitThemes->loadJavascript()`
+  for JS that is only needed on one site (e.g. roundabout on rainbowdigitalmedia, haccordion on medw).
+  Source lives in `/etc/webstack/domains/{site}/theme_setup_inc.php`; `setup-site-links.sh` symlinks
+  it into `config/theme_setup_inc.php` automatically if present.
 
 ## Module / Layout system
 Modules are placed in layout areas via the `THEMES_LAYOUTS` table:
@@ -127,14 +132,38 @@ These are symlinked into each site's `config/themes/{site}` — e.g. on servers:
 ```
 /srv/website/merg/config/themes/merg -> /etc/webstack/domains/merg/themes/merg
 ```
-On the desktop, `bitweaver5/config/themes/` holds symlinks for ALL sites (since the desktop
-switches between sites by changing the DB in `config_inc.php`).
+**Stale as of 2026-08-11** — desktop used to work this way (single shared `bitweaver5/` root,
+switched between sites via `switch-site.sh`), but is now genuinely multi-site like the servers:
+each `/srv/website/{site}/config/themes/{site}` is its own symlink to
+`/etc/webstack/domains/{site}/themes/{site}`, same as the server example above. See
+`reference_desktop_site_architecture` memory.
 
 Typical contents: `kernel/` (top_bar.tpl, top_banner.tpl, bot_bar.tpl, etc.), `images/`, site CSS, favicon.
 Any template in this path overrides the package default via Smarty's `bitpackage:` resource lookup.
 Never edit the `config/themes/` path directly; edit the source in `/etc/webstack/domains/`.
 
 ## Session notes
+
+### 2026-08-11 — Desktop theme/config catches up to June's server cleanup
+Desktop's `config/` had never received the same cleanup the 2026-06-17/18 entry below describes
+for servers — `css/`, `fonts/`, `images/`, `js/` (all confirmed dead there back in June) were
+still sitting as real directories on desktop for all 9 domains, alongside a `bit_setup_inc.php`
+real file. Removed, confirmed absent from srv10 first. Also fixed `config/themes/BlueSky` and
+`config/themes/{site}` — both had been real, independently-drifted per-site copies instead of
+symlinks (see "Stale as of 2026-08-11" note above and `project_theme_symlink_consolidation`
+memory for full detail) — discarding the drifted copies and symlinking to the webstack source
+incidentally fixed a real broken-CSS bug on `garage-press`/`graham-ovenden` (an absolute
+filesystem path had ended up in a CSS `href`, so their stylesheets were never actually loading).
+
+### 2026-06-22/23 — Per-site JS via theme_setup_inc.php; banner/footer tidies
+- rainbowdigitalmedia scrolling banner restored: slide images moved to webstack theme `images/`;
+  `mod_banner_rand.tpl` paths updated; roundabout JS load moved from global `bit_setup_inc.php`
+  to site `theme_setup_inc.php` (was lost when `config/images/` was removed)
+- `theme_setup_inc.php` pattern established: webstack domain dir holds the file,
+  `setup-site-links.sh` auto-symlinks it into `config/`; medw and rainbowdigitalmedia both use it
+- haccordion.js removed from global `bit_setup_inc.php`; moved to medw `theme_setup_inc.php`
+- graham-ovenden `mod_banner_rand.tpl` removed (banner module unused)
+- medw `kernel/footer.tpl` renamed to `footer_inc.tpl` for consistency
 
 ### 2026-06-17/18 — Theme/asset cleanup
 - Site-specific images moved from `config/images/` to per-site webstack theme `images/` folders
