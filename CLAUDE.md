@@ -13,8 +13,12 @@ For role-based visibility, override `top_bar.tpl` in `config/themes/merg/kernel/
 `BitThemes::loadStyleData()` loads CSS in this order:
 1. Package CSS (around position 300) — each package's `html_head_inc.tpl`
 2. `themes/css/config.css` — position 300 (default); canonical floaticon/icon/actionicon rules
-3. Style CSS (`getStyleCssFile()`, position 998) — the active theme's main CSS
-4. Browser CSS (`getBrowserStyleCssFile()`, position 999)
+3. `themes/css/base.css` — position 301 (added 2026-08-11); generic site-chrome layer
+   (`.dropdown-submenu` nested-menu CSS, floaticon/icon rules, spacing utilities). Loads
+   unconditionally for every site — do NOT rely on a site theme's own `@import` for this content,
+   that's exactly the gap that caused the myhomecloud bug below.
+4. Style CSS (`getStyleCssFile()`, position 998) — the active theme's main CSS
+5. Browser CSS (`getBrowserStyleCssFile()`, position 999)
 
 Site-specific CSS lives in `/etc/webstack/domains/{site}/themes/{site}/{site}.css` and is
 the active theme file for that site (position 998). Site theme images go in
@@ -25,6 +29,12 @@ at position 300. Site theme CSS at position 998 **wins** over this. If a site th
 `.icon { float:left }` (common in older themes for sprite icon layout), it breaks `.floaticon`
 by causing child icons to float left and collapse the container. **Fix**: strip the bare
 `.icon { float:left }` from the site CSS — do not scope it or patch it elsewhere.
+
+**`base.css` is still directly `@import`ed by some non-live theme presets** (the 4 legacy
+Bootstrap-2-era presets: cerulean, journal, slate, bootstrap under `/etc/webstack/site-config/themes/`)
+and by `wiki/templates/slideshow.tpl` (a standalone overlay outside the normal cascade) — don't delete
+`base.css` itself, only ever add to it. `themes/css_lib.php`'s legacy `@import`-flattener also
+special-cases and never inlines `base.css` — treat it as permanent, load-bearing infrastructure.
 
 ## Asset locations
 - **Site-specific images** — `/etc/webstack/domains/{site}/themes/{site}/images/`; referenced
@@ -143,6 +153,41 @@ Any template in this path overrides the package default via Smarty's `bitpackage
 Never edit the `config/themes/` path directly; edit the source in `/etc/webstack/domains/`.
 
 ## Session notes
+
+### 2026-08-11 — myhomecloud floaticon/dropdown bug; base.css made generic; colourstrap retired
+Second thread, same day as the entry below. Started from a live report: myhomecloud's floaticons
+rendered present-but-invisible (yet clickable) and the Administration nested dropdown-submenu never
+folded out. Root-caused to two separate gaps, both in `myhomecloud.css`/the wider per-site CSS
+pattern:
+1. **`.dropdown-submenu` nested-dropdown CSS was never generic** — it was hand-copied byte-for-byte
+   into 8 site theme CSS files (`lsces`, `garage-press`, `graham-ovenden`, `phpsurgery`, `rdmcloud`,
+   `merg`, `rainbowdigitalmedia`, `medw`) plus `BlueSky.css`, and `myhomecloud.css` simply never got
+   the copy-paste. Fixed at the root: `.dropdown-submenu` now lives once in `themes/css/base.css`,
+   and `base.css` loads unconditionally for every site at CSS position 301 (new `BitThemes.php` call,
+   right after `config.css`) instead of relying on a per-site `@import` opt-in — see CSS load order
+   above. The 8 duplicate copies removed; the now-redundant `@import base.css` also removed from the
+   4 sites that had it (`medw`, `merg`, `rainbowdigitalmedia`, `timedb`) and from the 4 non-live
+   legacy Bootstrap-2 presets (`cerulean`, `journal`, `slate`, `bootstrap`).
+2. **`myhomecloud.css`'s own `.floaticon img.icon { padding:0 20px; font-size:18pt; }`** — wildly
+   oversized vs the canonical `padding:0 5px 0 0` in config.css/base.css, pushed icons out of the
+   floaticon container's visible area while they stayed in-flow and clickable. Confirmed live by
+   disabling the rule in devtools before removing it. A duplicate of the generic
+   cursor/text-decoration rule was also stripped from the same file.
+
+**Colourstrap retired alongside this**: the standalone `/etc/webstack/site-config/themes/colourstrap/`
+theme (full legacy sprite-icon PNG set, ~500 files) deleted — confirmed dead, unused by any of the 9
+live domains, referenced by nothing. `BlueSky.css`'s own separate hacked `css/colourstrap.css` copy
+(user: "should never have been reloaded in BlueSky") also removed, superseded by loading
+`themes/css/bootstrap.css` directly. See `project_colourstrap_cleanup` memory for what's still open
+(a dropdown colour regression and a `pkg_`-prefixed icon oversizing issue surfaced by this, both
+deliberately deferred — "the themes need a good spring clean... probably a reason for a lot of the
+overrides at one time").
+
+Deployed: themes package + webstack repo, both to srv9 then srv10, confirmed live on both by the
+user. A separate, unrelated find along the way: the 2026-08-11 desktop machine-awareness
+(`IS_LIVE`/`BIT_CACHE_OBJECTS`/`$smarty_force_compile`) config_inc.php changes documented in the
+top-level CLAUDE.md session log had been sitting completed-but-uncommitted in `/etc/webstack` since
+that session — committed and pushed separately before tonight's actual CSS work, now live too.
 
 ### 2026-08-11 — Desktop theme/config catches up to June's server cleanup
 Desktop's `config/` had never received the same cleanup the 2026-06-17/18 entry below describes
