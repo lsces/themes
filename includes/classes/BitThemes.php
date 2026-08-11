@@ -143,6 +143,11 @@ class BitThemes extends BitSingleton {
 		if( file_exists( THEMES_PKG_PATH.'css/config.css' ) ) {
 			$this->loadCss( THEMES_PKG_PATH.'css/config.css' );
 		}
+		// generic site-chrome layer (dropdown-submenu, floaticon, utility classes) —
+		// loads for every site regardless of whether the site theme opts in
+		if( file_exists( THEMES_PKG_PATH.'css/base.css' ) ) {
+			$this->loadCss( THEMES_PKG_PATH.'css/base.css', true, 301, true, true );
+		}
 		$this->mStyles['joined_css'] = $this->joinAuxFiles( 'css' );
 	}
 
