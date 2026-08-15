@@ -152,6 +152,41 @@ Typical contents: `kernel/` (top_bar.tpl, top_banner.tpl, bot_bar.tpl, etc.), `i
 Any template in this path overrides the package default via Smarty's `bitpackage:` resource lookup.
 Never edit the `config/themes/` path directly; edit the source in `/etc/webstack/domains/`.
 
+## The `force` theme tier — shared-across-all-sites templates (in use since 2026-08-15)
+
+`themes/smartyplugins/ResourceBitpackage.php`'s `getTplLocations()` checks locations in this
+order, returning the first that exists:
+
+1. `config/themes/force/<package>/<subdir><template>` and `config/themes/force/<subdir><template>`
+   — **checked before the site theme override**, not between it and the generic default. This
+   means a `force` template wins even over a genuine per-site override — it's a hard override
+   tier, not a fallback.
+2. `<active-style-path>/<package>/<subdir><template>` — the site theme override (the usual
+   `config/themes/{site}/...` path described above).
+3. the package's own default template (e.g. `kernel/templates/bot_bar.tpl`).
+
+`CONFIG_PKG_PATH` (and so `themes/force/`) is per-site, same as every other `config/` path — so a
+genuinely shared "force" template needs the same symlink-fan-out `config/themes/BlueSky` already
+uses: `config/themes/force` in every site directory symlinked straight to one shared location,
+**`/etc/webstack/site-config/themes/force/`**. Not automated by `setup-site-links.sh` (that script
+doesn't touch `config/themes/*` at all, `BlueSky`'s symlink is likewise manual) — wire up new sites
+by hand: `ln -sfn /etc/webstack/site-config/themes/force /srv/website/<site>/config/themes/force`.
+
+**First real use**: `bot_bar.tpl` (the RDM-branding footer bar) was hand-copied nearly identically
+into 11 site theme dirs, with real accidental drift between copies (`http://` vs `https://`,
+`rainbowdigitalmedia.co.uk` vs `.uk`, some missing a `hidden-xs` class or the "LSCES Server
+Information" link) — same shape of bug as the `base.css`/`.dropdown-submenu` duplication fixed
+2026-08-11. Consolidated into `site-config/themes/force/kernel/bot_bar.tpl`, all 11 per-site
+copies deleted. Future edits to this bar happen once, in that one file, and apply everywhere.
+
+**Deploying a `force` template change needs a manual Smarty cache clear** — `/etc/webstack/scripts/
+clear-template-cache.sh` on each affected server. The usual "Smarty auto-recompiles changed .tpl
+via mtime, no manual clear needed" rule (see Session notes below / Claude memory
+`project_smarty_cache`) only covers editing a template that's already resolving from that same
+path — it does **not** cover changing *which* file resolves (adding/removing an override, adding a
+new symlinked tier like this one). Confirmed the hard way: srv9 kept serving stale menu content
+after the `git pull` for this exact reason, until the cache was cleared by hand.
+
 ## Session notes
 
 ### 2026-08-11 — myhomecloud floaticon/dropdown bug; base.css made generic; colourstrap retired
