@@ -130,6 +130,7 @@ class BitweaverExtension extends Base {
 				case 'is_readable':			return 'is_readable';
 				case 'ucfirst':				return 'ucfirst';
 				case 'html_entity_decode':	return 'html_entity_decode';
+				case 'json_decode':			return 'json_decode';
 			}
 		} else {
 			return $this->callbacks[$modifierName]['name'];
