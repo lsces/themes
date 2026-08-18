@@ -16,6 +16,12 @@ $gBitSystem->registerPackage( $pRegisterHash );
 
 define( 'DEFAULT_ICON_STYLE', $gBitSystem->getConfig( 'default_icon_style', 'tango' ) );
 
+// A fresh install has no 'style' preference set at all - BitThemes::getStyle() used to
+// fall back to nothing, leaving the site completely unstyled until an admin manually
+// picked a theme. BlueSky is bitweaver's own generic stock theme, not site-branded, so
+// it's the sensible out-of-the-box default.
+define( 'DEFAULT_STYLE', $gBitSystem->getConfig( 'default_style', 'BlueSky' ) );
+
 $gLibertySystem->registerService(
 	LIBERTY_SERVICE_THEMES,
 	THEMES_PKG_NAME,
@@ -39,7 +45,10 @@ $gBitSmarty->assign( 'gBitThemes', $gBitThemes );
 
 // load some core javascript files
 $gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/bitweaver.js', true, 1 );
-$gBitThemes->loadAjax( $gBitSystem->getConfig( 'themes_jquery_hosting', 'jquery' ) );
+// Default to serving jQuery/bootstrap locally rather than Google's CDN - this stack has
+// no external-CDN dependency anywhere else, and a fresh install with this unset had no
+// styling at all (bootstrap.css is only loaded in the 'jquerylocal' case).
+$gBitThemes->loadAjax( $gBitSystem->getConfig( 'themes_jquery_hosting', 'jquerylocal' ) );
 
 if( $gBitSystem->isFeatureActive( 'site_fancy_zoom' )) {
 	$gBitThemes->loadJavascript( THEMES_PKG_PATH.'js/fancyzoom/js-global/FancyZoom.js', true, 80 );

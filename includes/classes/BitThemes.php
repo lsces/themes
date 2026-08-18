@@ -159,7 +159,7 @@ class BitThemes extends BitSingleton {
 	public function getStyle() {
 		global $gBitSystem;
 		if( empty( $this->mStyle )) {
-			$this->mStyle = $gBitSystem->getConfig( 'style' );
+			$this->mStyle = $gBitSystem->getConfig( 'style', defined( 'DEFAULT_STYLE' ) ? DEFAULT_STYLE : '' );
 		}
 		return $this->mStyle;
 	}
@@ -283,7 +283,7 @@ class BitThemes extends BitSingleton {
 		if( is_dir( $pDir )) {
 			$h = opendir( $pDir );
 			while( $file = readdir( $h )) {
-				if ( is_dir( $pDir."$file" ) && ( $file != '.' && $file != '..' && $file != 'CVS' && $file != 'slideshows' && $file != 'blank' )) {
+				if ( is_dir( $pDir."$file" ) && ( $file != '.' && $file != '..' && $file != 'CVS' && $file != 'slideshows' && $file != 'blank' && $file != 'force' )) {
 					$ret[] = $file;
 				}
 			}
@@ -361,7 +361,7 @@ class BitThemes extends BitSingleton {
 			$h = opendir( $pDir );
 			// cycle through files / dirs
 			while( false !== ( $file = readdir( $h ))) {
-				if ( is_dir( $pDir.$file ) && ( $file != '.' && $file != '..' && $file != 'CVS' && $file != 'slideshows' && $file != 'blank' )) {
+				if ( is_dir( $pDir.$file ) && ( $file != '.' && $file != '..' && $file != 'CVS' && $file != 'slideshows' && $file != 'blank' && $file != 'force' )) {
 					$ret[$file]['style'] = $file;
 					// check if we want to have a look in any subdirs
 					foreach( $subDirs as $dir ) {

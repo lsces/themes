@@ -52,7 +52,7 @@
 						Icon sets must follow the <a class="external" href="https://specifications.freedesktop.org/icon-naming-spec/latest/">freedesktop Icon Naming Specification</a>. The active set is <strong>tango</strong>, sourced from <a class="external" href="https://gitlab.com/tango-project/tango-icon-theme">Tango3</a> (stored in <code>externals/Tango3</code>). Place additional iconsets in <code>util/iconsets/</code>.
 					</p>
 					<p class="help">
-						If you are a developer and you want to view a list of available icons, you can do this with the {smartlink ititle="Icon Browser" ifile="icon_browser.php"}.
+						If you are a developer and you want to view a list of available icons, you can do this with the {smartlink ititle="Icon Browser" ifile="icon_browser.php" ipackage="themes"}.
 					</p>
 
 					<ul>
