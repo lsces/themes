@@ -637,6 +637,35 @@ ul.data li.item:last-child {
 	}
 }
 
+/* ── 5-column grid utility ────────────────────────────────────────────────── */
+
+.col-xs-15,
+.col-sm-15,
+.col-md-15,
+.col-lg-15 {
+	position: relative;
+	min-height: 1px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+.col-xs-15 { width: 20%; float: left; }
+
+@media (min-width: 768px)  { .col-sm-15 { width: 20%; float: left; } }
+@media (min-width: 992px)  { .col-md-15 { width: 20%; float: left; } }
+@media (min-width: 1200px) { .col-lg-15 { width: 20%; float: left; } }
+
+.input-xs {
+	height: 22px;
+	padding: 5px 5px;
+	font-size: 12px;
+	line-height: 1.5;
+	border-radius: 3px;
+}
+
+header.container-fluid#bw-main-header .navbar-nav.navbar-right:last-child {
+	margin-right: 0;
+}
+
 .control-label + .checkbox-inline {
 	margin-left: 1em;
 }
