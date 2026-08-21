@@ -325,4 +325,11 @@ a[href]:after { content: none !important; }
 tr.odd	{ background-color: #f9f9f9; }
 tr.even	{ background-color: #ffffff; }
 
+/* Footer divider bar (kernel/bot_bar.tpl's <hr class="rule">). Box model is
+   generic — do not duplicate into per-site CSS, same rule as the dropdown-
+   submenu block above. Only color/background-color (the bar's actual visible
+   fill, since border-style is deliberately left unset/none) is worth a
+   per-site override to match that site's footer colour scheme. */
+hr.rule	{ height:2px; border:1px; margin:2px 5px; overflow:visible; color:#000; background-color:#000; }
+
 /* vim: set ts=40: */
