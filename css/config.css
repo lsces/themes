@@ -9,10 +9,19 @@ i[onlick] {
 
 .floaticon a,
 .floaticon button.btn-link,
+.icon,
 a.icon,
 img.icon {
-	padding: 0 5px 0 0;
+	padding: 0 0 0 5px;
 	font-size: 11pt
+}
+
+.floaticon .icon-* {
+	font-size: 20px
+}
+
+a.icon .admin {
+	color: orange
 }
 
 .floaticon button.btn-link {
@@ -31,7 +40,8 @@ img.icon {
 
 .floaticon {
 	float: right;
-	text-align: right
+	text-align: right;
+	z-index: 9999
 }
 
 .floaticon form.minifind {
