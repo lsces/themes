@@ -332,4 +332,11 @@ tr.even	{ background-color: #ffffff; }
    per-site override to match that site's footer colour scheme. */
 hr.rule	{ height:2px; border:1px; margin:2px 5px; overflow:visible; color:#000; background-color:#000; }
 
+/* Footer icon-row vertical centering (bitweaver/smarty/adodb/firebird icons
+   on the left, host credit on the right) — same identical values hand-
+   duplicated across every site that has it, missing entirely on others
+   (timedb's own left icons floated up uncentred as a result). Generic. */
+footer .floatleft	{ padding:8px 10px 10px; }
+footer .floatright	{ padding:4px 10px; }
+
 /* vim: set ts=40: */
