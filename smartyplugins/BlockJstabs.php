@@ -23,8 +23,16 @@ use Smarty\Template;
 class BlockJstabs implements BlockHandlerInterface {
 
 	public function handle( $params, $content, Template $template, &$repeat): string {
-		global $gBitSystem, $jsTabLinks;
+		global $gBitSystem, $jsTabLinks, $jsTabLinksStack;
 		if( $repeat ){
+			// Nesting {jstabs} inside a non-first {jstab} (health/view_day.php's Data tab,
+			// found 2026-08-23) silently lost the enclosing level's own already-accumulated
+			// tab links otherwise - $jsTabLinks is one shared global, and this reset used to
+			// stomp on whatever the outer level had built up so far with no way back. Saving
+			// it on a stack here and restoring below (repeat=false) makes nesting safe at any
+			// depth, not just when it happens to be the very first outer tab (the only case
+			// that ever worked by accident before, e.g. contact/edit.tpl).
+			$jsTabLinksStack[] = $jsTabLinks;
 			$jsTabLinks = [];
 		} else {
 			extract( $params );
@@ -54,7 +62,11 @@ class BlockJstabs implements BlockHandlerInterface {
 			$ret .= '</ul><div class="tab-content">'.$content.'</div>';
 			$ret .= '<script nonce="{$cspNonce}">/*<![CDATA[*/ $(\'#'.$tabId.' a\').click(function (e) { e.preventDefault(); $(this).tab(\'show\'); }); '.$setupJs .'/*]]>*/</script> ';
 
-			$jsTabLinks = NULL;
+			// Restore whatever the enclosing {jstabs} level (if any) had already
+			// accumulated before this one started, rather than leaving it NULL - the
+			// save happened above on repeat=true. array_pop() on an empty stack (the
+			// normal non-nested case) returns NULL, same as before.
+			$jsTabLinks = !empty( $jsTabLinksStack ) ? array_pop( $jsTabLinksStack ) : NULL;
 
 			return $ret;
 		}
