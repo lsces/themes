@@ -646,6 +646,7 @@ ul.data li.item:last-child {
 	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: 0.5rem;
+	padding-bottom: 12px;
 }
 .calnav ul.pagination {
 	margin: 0;
@@ -655,7 +656,7 @@ ul.data li.item:last-child {
 .calnav .pagination > li > span,
 .calnav input[type="date"] {
 	display: inline-block;
-	height: 34px;
+	height: 40px;
 	box-sizing: border-box;
 	line-height: 1.42857143;
 }
@@ -663,6 +664,18 @@ ul.data li.item:last-child {
 	padding: 5px 10px;
 	border: 1px solid #ddd;
 	border-radius: 4px;
+}
+/* .calnav-picker: the date-picker <li> - float:left keeps it inline with
+   its Bootstrap-floated a/span siblings (without a float here it drops to
+   the end of the set), deliberately NOT reusing .pagination>li>span (that
+   rule's position:relative was pushing the native picker popup out of
+   place - see package_nav_inc.tpl's own comment). */
+.calnav li.calnav-picker {
+	float: left;
+}
+.calnav li.calnav-picker form {
+	display: inline-block;
+	margin: 0;
 }
 
 .fisheye-flow {
