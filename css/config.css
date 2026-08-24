@@ -635,6 +635,36 @@ ul.data li.item:last-child {
 	float: none;
 }
 
+/* calendar/package_page.php's date-nav bar (package_nav_inc.tpl) - same
+   tidying as .paginator above (zero Bootstrap's own 20px .pagination
+   margin, flex layout instead of floats), plus a shared height for the
+   pagination buttons and the native date-picker input so they line up. */
+.calnav {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+.calnav ul.pagination {
+	margin: 0;
+	float: none;
+}
+.calnav .pagination > li > a,
+.calnav .pagination > li > span,
+.calnav input[type="date"] {
+	display: inline-block;
+	height: 34px;
+	box-sizing: border-box;
+	line-height: 1.42857143;
+}
+.calnav input[type="date"] {
+	padding: 5px 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
 .fisheye-flow {
 	display: flex;
 	flex-wrap: wrap;
