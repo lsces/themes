@@ -70,6 +70,21 @@ overlay outside the normal cascade) — don't delete `base.css` itself, only eve
   `edit_textarea.tpl`. Pass `label="..."` directly to `{textarea}`. Default field name is
   `edit`; PHP reads `$_POST['edit']`. Do not pass `name=` unless you also change the PHP to
   match. PHP must call `invokeServices('content_edit_function')` for CKEditor to load.
+- **Delete confirmation — two conventions, pick by whether the confirm step needs extra input.**
+  Plain `onclick="return confirm('...')"` on the link (or `{smartlink}`'s `ionclick` param, a
+  direct pass-through to the same attribute) is the default: one click, a native browser popup,
+  no extra page load. Used throughout kernel/theme admin UI (`kernel/templates/
+  admin_menu_options.tpl`, `themes/templates/module_config_inc.tpl`/`module_config_role_inc.tpl`,
+  `admin_layout_overview.tpl`) and, as of 2026-08-24, food/stock/contact's own record-delete
+  icons. Reach for `$gBitSystem->confirmDialog()` (kernel `BitSystem.php` — full-page
+  `kernel/confirm.tpl` render, a `cancel`/`confirm` request-param dance in the PHP handler)
+  **only** when the confirmation itself needs to collect something beyond yes/no — the one
+  legitimate live example is `stock/edit_assembly.php`'s delete, which asks whether to also
+  recurse into sub-assemblies. Using `confirmDialog()` for a plain yes/no (found and fixed in
+  `stock/edit_component.php`/`edit_movement.php` the same day) is unearned complexity: an extra
+  full page load for no extra information. The opposite failure — no confirmation at all — is
+  worse: `contact/edit.php`'s Delete Contact fired `expunge=1` immediately on click with neither
+  pattern in place until fixed 2026-08-24.
 - Per-site footer scripts belong in `kernel/footer_inc.tpl`, NOT `kernel/footer.tpl`.
   `footer_inc.tpl` is picked up by the `mAuxFiles` loop in `html.tpl` reliably. `footer.tpl` as
   a theme override only loads if the active style matches exactly — fragile and easy to miss.
