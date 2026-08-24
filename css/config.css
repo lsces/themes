@@ -667,15 +667,11 @@ ul.data li.item:last-child {
 	border: 1px solid #ddd;
 	border-radius: 4px;
 }
-/* The «/» glyphs read small at plain 14px body size - same longstanding
-   niggle as .paginator's own «/» (kernel/templates/pagination.tpl),
-   never fixed there either. Bumped just here rather than touching the
-   shared .paginator/pagination.tpl (sitewide blast radius) - worth
-   applying there too if it comes up again. */
-.calnav-arrow {
-	font-size: 1.3em;
-	vertical-align: middle;
-}
+/* .calnav-arrow: font-size bump shelved 2026-08-24 - grew the whole button
+   without actually reading any clearer. Lester's headed toward proper
+   day/week/month icons with a big blue arrow attached instead of trying to
+   fix the plain «/» glyph - .calnav-arrow stays in the markup as the hook
+   for that, just unstyled for now. */
 /* .calnav-picker: the date-picker <li> - float:left keeps it inline with
    its Bootstrap-floated a/span siblings (without a float here it drops to
    the end of the set), deliberately NOT reusing .pagination>li>span (that
