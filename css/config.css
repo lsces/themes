@@ -652,15 +652,17 @@ ul.data li.item:last-child {
 	margin: 0;
 	float: none;
 }
-.calnav .pagination > li > a,
-.calnav .pagination > li > span,
+/* Buttons (.pagination>li>a/span) deliberately left at Bootstrap's own
+   untouched box model here - explicitly forcing their height introduced a
+   slight vertical text-centering drift (icons were unaffected, text
+   wasn't). 34px is what that untouched box model already computes to
+   (6px+6px padding + 1px+1px border + ~20px line-height) - only the date
+   input needs an explicit height to match it, since a native input has no
+   equivalent padding/line-height of its own to fall back on. */
 .calnav input[type="date"] {
 	display: inline-block;
-	height: 40px;
+	height: 34px;
 	box-sizing: border-box;
-	line-height: 1.42857143;
-}
-.calnav input[type="date"] {
 	padding: 5px 10px;
 	border: 1px solid #ddd;
 	border-radius: 4px;
