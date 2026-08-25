@@ -167,6 +167,30 @@ plugin searches the active style first, then falls back to `tango` — it does N
 `tango/scalable/` too, otherwise it silently goes missing on sites using the tango default.
 After copying, add the icon name and purpose to `$iconUsage` in `themes/icon_browser.php`.
 
+## SVG icons — no conversion, no size variants, just drop the file in
+
+`function.biticon.php`'s file lookup (`biticon_first_match()`) checks extensions in this order:
+**`svg`, `png`, `gif`, `jpg`** — svg wins if present, and a `.svg`/`.png` pair can coexist in the
+same directory with no ambiguity (svg always wins). This applies to both icon lookup paths, not
+just the generic iconset:
+
+- **Generic iconset icons** (edit/delete/add/etc — `ipackage="icons"`, the tango/tango5 case
+  above): `util/iconsets/<style>/scalable/<iname>.svg`. `biticon_output()` sets the `<img>`
+  `width`/`height` automatically from the requested size (`small`→16px, `medium`→24px,
+  `large`→32px, flag-style icons get a 4:3 width) — **no separate 16px/24px/32px raster exports
+  needed**, one `.svg` covers every size.
+- **Package-identifying icons** (`pkg_<pkgname>`, shown on the admin packages grid /
+  `admin.tpl`'s per-package panels): `<pkg>/icons/pkg_<pkgname>.svg` — these are explicitly
+  special-cased to skip the small/medium/large subdir entirely (`ipath` gets stripped down to
+  just `icons/`), so there's no size-variant question at all, just the one file. `food`/`health`
+  had no `icons/` directory whatsoever until `pkg_food.svg`/`pkg_health.svg` were added
+  2026-08-25 (confirmed via `admin/index.php`'s live per-package panels) — several other
+  packages (e.g. `calendar/icons/pkg_calendar.gif`+`.png`) still only have old raster pairs, safe
+  to replace outright with a single `.svg` whenever convenient, not just to add alongside.
+
+No `magick`/ImageMagick conversion step, no multiple exported sizes — an SVG sourced from
+wherever (a normal vector icon site) can be dropped straight into either path as-is.
+
 ## Site-specific theme overrides (`/etc/webstack/domains`)
 
 Each vhosted site has its theme overrides at `/etc/webstack/domains/{site}/themes/{site}/`,
