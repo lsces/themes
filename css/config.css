@@ -657,6 +657,32 @@ ul.data li.item:last-child {
 	margin: 0;
 	float: none;
 }
+/* Kill Bootstrap's own pagination rounding entirely inside .bitnav - the
+   "connected pill" look (rounded only at the very first/last button of a
+   group) reads wrong once a bar has several small independent nav groups
+   rather than one true sequential pager. Higher specificity than
+   bootstrap.css's own .pagination>li:first-child>a rule (one more class),
+   so no !important needed. */
+.bitnav .pagination > li:first-child > a,
+.bitnav .pagination > li:last-child > a,
+.bitnav .pagination > li:first-child > button,
+.bitnav .pagination > li:last-child > button {
+	border-radius: 0;
+}
+/* Shared spacing for a run of independent buttons/links inside one
+   .bitnav pagination group (Day/Calendar next to the date picker, Food
+   Items/Pantry/Receipts as their own row, etc) - .bitnav-item on the first
+   one (needs float:left to sit correctly next to a floated .bitnav-picker
+   sibling, no gap of its own), .bitnav-gap on every one after it. One
+   place to change the gap size, rather than a per-template inline style
+   that drifts (8px here, 4px there). */
+.bitnav-item {
+	float: left;
+}
+.bitnav-gap {
+	float: left;
+	margin-left: 8px;
+}
 /* Buttons (.pagination>li>a/span) deliberately left at Bootstrap's own
    untouched box model here - explicitly forcing their height introduced a
    slight vertical text-centering drift (icons were unaffected, text
@@ -670,7 +696,7 @@ ul.data li.item:last-child {
 	box-sizing: border-box;
 	padding: 5px 10px;
 	border: 1px solid #ddd;
-	border-radius: 4px;
+	border-radius: 0;
 }
 /* Same box model as the date input above, plus vertical-align:middle - a native
    file input's own "Browse"/"No file selected" text otherwise sits low against
@@ -685,7 +711,7 @@ ul.data li.item:last-child {
 	height: 34px;
 	box-sizing: border-box;
 	border: 1px solid #ddd;
-	border-radius: 4px;
+	border-radius: 0;
 	vertical-align: middle;
 }
 .bitnav input[type="file"]::file-selector-button {
@@ -694,7 +720,7 @@ ul.data li.item:last-child {
 	padding: 6px 10px;
 	margin-right: 8px;
 	border: 1px solid #ddd;
-	border-radius: 4px;
+	border-radius: 0;
 	background-color: #fff;
 	color: #337ab7;
 	cursor: pointer;
