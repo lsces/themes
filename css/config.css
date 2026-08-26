@@ -672,6 +672,19 @@ ul.data li.item:last-child {
 	border: 1px solid #ddd;
 	border-radius: 4px;
 }
+/* Same box model as the date input above, plus vertical-align:middle - a native
+   file input's own "Browse"/"No file selected" text otherwise sits low against
+   its pagination-button siblings (a file input has no baseline-alignment
+   equivalent to a date input's own box, so this needed the extra nudge). */
+.bitnav input[type="file"] {
+	display: inline-block;
+	height: 34px;
+	box-sizing: border-box;
+	padding: 5px 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	vertical-align: middle;
+}
 /* Bootstrap only styles .pagination>li>a/span, not >button - a real <button
    type="submit"> is what a toolbar action that isn't just a plain link (Update,
    Print) actually needs, so extend the exact same box model to match. */
