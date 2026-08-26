@@ -657,6 +657,22 @@ ul.data li.item:last-child {
 	margin: 0;
 	float: none;
 }
+/* .bitnav-3col: opt-in modifier for a bar whose middle group should sit truly centred
+   regardless of how wide its two flanking groups are - plain .bitnav's flex
+   justify-content:space-between only equalises the GAPS either side of the middle group,
+   not its actual screen position, so unequal flanking widths (e.g. "Back" vs "Print")
+   pull it off-centre. Grid instead: two equal 1fr side columns plus an auto-width centre
+   column keeps the centre group mathematically centred even with only 2 of the 3 groups
+   present (health/list_item.tpl has no third/right-hand group - the empty 1fr column
+   still holds its width). */
+.bitnav-3col {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+}
+.bitnav-3col > :first-child { justify-self: start; }
+.bitnav-3col > :nth-child(2) { justify-self: center; }
+.bitnav-3col > :last-child { justify-self: end; }
 /* Kill Bootstrap's own pagination rounding entirely inside .bitnav - the
    "connected pill" look (rounded only at the very first/last button of a
    group) reads wrong once a bar has several small independent nav groups
