@@ -635,20 +635,25 @@ ul.data li.item:last-child {
 	float: none;
 }
 
-/* calendar/package_page.php's date-nav bar (package_nav_inc.tpl) - same
-   tidying as .paginator above (zero Bootstrap's own 20px .pagination
-   margin, flex layout instead of floats), plus a shared height for the
-   pagination buttons and the native date-picker input so they line up. */
-.calnav {
+/* .bitnav - generic site-wide nav/toolbar bar (renamed from calendar-only .calnav
+   2026-08-26, first used by calendar/package_page.php's date-nav bar, now also
+   health/report_range.php and health/index.php's Reports section): a Bootstrap
+   .pagination row tidied into a proper toolbar - zero Bootstrap's own 20px
+   .pagination margin, flex layout instead of floats, a shared height for the
+   pagination buttons and the native date-picker input so they line up. Background/
+   border colour deliberately NOT set here - every site has its own bar colour
+   already (see e.g. rdmcloud's own #bw-main-header/#bw-main-footer treatment in
+   /etc/webstack/domains/rdmcloud/themes/rdmcloud/rdmcloud.css), .bitnav there
+   layers the same convention on top of this shared structural rule. */
+.bitnav {
 	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: 0.5rem;
-	padding-bottom: 12px;
 }
-.calnav ul.pagination {
+.bitnav ul.pagination {
 	margin: 0;
 	float: none;
 }
@@ -659,7 +664,7 @@ ul.data li.item:last-child {
    (6px+6px padding + 1px+1px border + ~20px line-height) - only the date
    input needs an explicit height to match it, since a native input has no
    equivalent padding/line-height of its own to fall back on. */
-.calnav input[type="date"] {
+.bitnav input[type="date"] {
 	display: inline-block;
 	height: 34px;
 	box-sizing: border-box;
@@ -667,20 +672,48 @@ ul.data li.item:last-child {
 	border: 1px solid #ddd;
 	border-radius: 4px;
 }
-/* .calnav-arrow: font-size bump shelved 2026-08-24 - grew the whole button
+/* Bootstrap only styles .pagination>li>a/span, not >button - a real <button
+   type="submit"> is what a toolbar action that isn't just a plain link (Update,
+   Print) actually needs, so extend the exact same box model to match. */
+.bitnav .pagination > li > button {
+	position: relative;
+	float: left;
+	padding: 6px 12px;
+	margin-left: -1px;
+	line-height: 1.42857143;
+	color: #337ab7;
+	background-color: #fff;
+	border: 1px solid #ddd;
+}
+.bitnav .pagination > li:first-child > button {
+	margin-left: 0;
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+.bitnav .pagination > li:last-child > button {
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+.bitnav .pagination > li > button:hover,
+.bitnav .pagination > li > button:focus {
+	color: #23527c;
+	background-color: #eee;
+	border-color: #ddd;
+}
+/* .bitnav-arrow: font-size bump shelved 2026-08-24 - grew the whole button
    without actually reading any clearer. Lester's headed toward proper
    day/week/month icons with a big blue arrow attached instead of trying to
-   fix the plain «/» glyph - .calnav-arrow stays in the markup as the hook
+   fix the plain «/» glyph - .bitnav-arrow stays in the markup as the hook
    for that, just unstyled for now. */
-/* .calnav-picker: the date-picker <li> - float:left keeps it inline with
+/* .bitnav-picker: the date-picker <li> - float:left keeps it inline with
    its Bootstrap-floated a/span siblings (without a float here it drops to
    the end of the set), deliberately NOT reusing .pagination>li>span (that
    rule's position:relative was pushing the native picker popup out of
    place - see package_nav_inc.tpl's own comment). */
-.calnav li.calnav-picker {
+.bitnav li.bitnav-picker {
 	float: left;
 }
-.calnav li.calnav-picker form {
+.bitnav li.bitnav-picker form {
 	display: inline-block;
 	margin: 0;
 }
