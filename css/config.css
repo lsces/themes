@@ -675,15 +675,33 @@ ul.data li.item:last-child {
 /* Same box model as the date input above, plus vertical-align:middle - a native
    file input's own "Browse"/"No file selected" text otherwise sits low against
    its pagination-button siblings (a file input has no baseline-alignment
-   equivalent to a date input's own box, so this needed the extra nudge). */
+   equivalent to a date input's own box, so this needed the extra nudge).
+   ::file-selector-button IS a real, styleable pseudo-element in current
+   Firefox/Chrome/Safari (not OS chrome, despite how it used to be) - restyled
+   here to match the other pagination buttons rather than left at its default
+   grey OS-button look. */
 .bitnav input[type="file"] {
 	display: inline-block;
 	height: 34px;
 	box-sizing: border-box;
-	padding: 5px 10px;
 	border: 1px solid #ddd;
 	border-radius: 4px;
 	vertical-align: middle;
+}
+.bitnav input[type="file"]::file-selector-button {
+	height: 34px;
+	box-sizing: border-box;
+	padding: 6px 10px;
+	margin-right: 8px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background-color: #fff;
+	color: #337ab7;
+	cursor: pointer;
+}
+.bitnav input[type="file"]::file-selector-button:hover {
+	background-color: #eee;
+	color: #23527c;
 }
 /* Bootstrap only styles .pagination>li>a/span, not >button - a real <button
    type="submit"> is what a toolbar action that isn't just a plain link (Update,
