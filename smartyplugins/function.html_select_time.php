@@ -50,8 +50,8 @@ function smarty_function_html_select_time($params, &$gBitSmarty)
 	extract($params);
 
 	$date = new BitDate(0);
-	// sets the offset for the user - necessary because BitDate is a bitwack
-	$offset = $date->get_display_offset();
+	// getDisplayDateFromUTC() resolves its own display offset internally now, correctly
+	// per $time rather than "now" - see kernel/DATETIME.md, 2026-08-31.
 	$disptime = $date->getDisplayDateFromUTC( $time );
 	$html_result = '';
 
