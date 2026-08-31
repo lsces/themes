@@ -37,17 +37,20 @@ function smarty_modifier_bit_date_format( $pString, $format = "%b %e, %Y", $pTra
 		$format = KernelTools::tra( $pTraFormat );
 	}
 
-	if( $gBitUser->getPreference( 'site_display_utc' ) == 'Fixed' && class_exists( 'DateTime' ) ) {
-		date_default_timezone_set( $gBitUser->getPreference( 'site_display_timezone', 'UTC' ) );
+	if( $gBitUser->getPreference( 'site_display_utc' ) == 'Fixed' ) {
+		// Real per-call DateTimeZone (kernel/DATETIME.md's "Open" TODO) - no
+		// date_default_timezone_set() global mutation. A naive (offset-less) string is
+		// interpreted as already being in this zone, same as the previous ambient-global
+		// approach did; a numeric epoch is always UTC by construction, timezone-independent.
+		$tz = $gBitUser->getUserTimezone();
 		try {
 			$dateTimeUser = is_numeric( $pString )
 				? new \DateTime( '@'.(int)$pString )
-				: new \DateTime( $pString );
+				: new \DateTime( $pString, $tz );
 		} catch ( \DateMalformedStringException | \Exception $e ) {
 			return '';
 		}
-		$disptime = strtotime($dateTimeUser->format(DATE_W3C));
-		return $gBitSystem->mServerTimestamp->strftime( $format, $disptime );
+		return $gBitSystem->mServerTimestamp->strftime( $format, $dateTimeUser->getTimestamp(), false, $tz );
 	}
 		$format = $gBitSystem->get_display_offset()
 			? preg_replace( "/ ?%Z/",'', $format )
