@@ -21,8 +21,8 @@ For role-based visibility, override `top_bar.tpl` in `config/themes/merg/kernel/
 2. `themes/css/config.css` — position 300 (default); canonical floaticon/icon/actionicon rules
 3. `themes/css/base.css` — position 301; generic site-chrome layer (`.dropdown-submenu`
    nested-menu CSS, floaticon/icon rules, spacing utilities). Loads unconditionally for every
-   site — do NOT rely on a site theme's own `@import` for this content, that gap is what caused
-   a real myhomecloud bug (see `CLAUDE.md`'s 2026-08-11 entry).
+   site — do NOT rely on a site theme's own `@import` for this content; a site missing that
+   `@import` is a real, confirmed way to lose this layer's styling.
 4. Style CSS (`getStyleCssFile()`, position 998) — the active theme's main CSS
 5. Browser CSS (`getBrowserStyleCssFile()`, position 999)
 
@@ -75,16 +75,14 @@ overlay outside the normal cascade) — don't delete `base.css` itself, only eve
   direct pass-through to the same attribute) is the default: one click, a native browser popup,
   no extra page load. Used throughout kernel/theme admin UI (`kernel/templates/
   admin_menu_options.tpl`, `themes/templates/module_config_inc.tpl`/`module_config_role_inc.tpl`,
-  `admin_layout_overview.tpl`) and, as of 2026-08-24, food/stock/contact's own record-delete
-  icons. Reach for `$gBitSystem->confirmDialog()` (kernel `BitSystem.php` — full-page
-  `kernel/confirm.tpl` render, a `cancel`/`confirm` request-param dance in the PHP handler)
-  **only** when the confirmation itself needs to collect something beyond yes/no — the one
-  legitimate live example is `stock/edit_assembly.php`'s delete, which asks whether to also
-  recurse into sub-assemblies. Using `confirmDialog()` for a plain yes/no (found and fixed in
-  `stock/edit_component.php`/`edit_movement.php` the same day) is unearned complexity: an extra
-  full page load for no extra information. The opposite failure — no confirmation at all — is
-  worse: `contact/edit.php`'s Delete Contact fired `expunge=1` immediately on click with neither
-  pattern in place until fixed 2026-08-24.
+  `admin_layout_overview.tpl`) and food/stock/contact's own record-delete icons. Reach for
+  `$gBitSystem->confirmDialog()` (kernel `BitSystem.php` — full-page `kernel/confirm.tpl` render,
+  a `cancel`/`confirm` request-param dance in the PHP handler) **only** when the confirmation
+  itself needs to collect something beyond yes/no — the one legitimate live example is
+  `stock/edit_assembly.php`'s delete, which asks whether to also recurse into sub-assemblies.
+  Using `confirmDialog()` for a plain yes/no is unearned complexity: an extra full page load for
+  no extra information. The opposite failure — no confirmation at all — is worse than either: a
+  delete action with neither pattern in place fires immediately on click.
 - Per-site footer scripts belong in `kernel/footer_inc.tpl`, NOT `kernel/footer.tpl`.
   `footer_inc.tpl` is picked up by the `mAuxFiles` loop in `html.tpl` reliably. `footer.tpl` as
   a theme override only loads if the active style matches exactly — fragile and easy to miss.
@@ -182,11 +180,9 @@ just the generic iconset:
 - **Package-identifying icons** (`pkg_<pkgname>`, shown on the admin packages grid /
   `admin.tpl`'s per-package panels): `<pkg>/icons/pkg_<pkgname>.svg` — these are explicitly
   special-cased to skip the small/medium/large subdir entirely (`ipath` gets stripped down to
-  just `icons/`), so there's no size-variant question at all, just the one file. `food`/`health`
-  had no `icons/` directory whatsoever until `pkg_food.svg`/`pkg_health.svg` were added
-  2026-08-25 (confirmed via `admin/index.php`'s live per-package panels) — several other
-  packages (e.g. `calendar/icons/pkg_calendar.gif`+`.png`) still only have old raster pairs, safe
-  to replace outright with a single `.svg` whenever convenient, not just to add alongside.
+  just `icons/`), so there's no size-variant question at all, just the one file. Some packages
+  (e.g. `calendar/icons/pkg_calendar.gif`+`.png`) still only have old raster pairs — safe to
+  replace outright with a single `.svg` whenever convenient, not just to add alongside.
 
 No `magick`/ImageMagick conversion step, no multiple exported sizes — an SVG sourced from
 wherever (a normal vector icon site) can be dropped straight into either path as-is.
@@ -234,5 +230,6 @@ file resolves (adding/removing an override, adding a new symlinked tier like thi
 ## Known limitation / open questions
 
 A dropdown colour regression and a `pkg_`-prefixed icon oversizing issue, both surfaced by the
-2026-08-11 colourstrap retirement (see `CLAUDE.md`), remain deliberately deferred — "the themes
-need a good spring clean... probably a reason for a lot of the overrides at one time."
+colourstrap theme's retirement, remain deliberately deferred — the site theme overrides
+accumulated over time likely have their own reasons that need untangling before a general
+"spring clean" pass is worth attempting. See `CLAUDE.md` for the incident history.
