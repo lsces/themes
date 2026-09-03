@@ -15,6 +15,11 @@ use Bitweaver\KernelTools;
  * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
  */
 function smarty_modifier_display_duration( $pDuration ) {
+	// % (modulo, below) doesn't support float operands - PHP 8.1+ deprecates the implicit
+	// truncation this used to do silently. Whole seconds are already the finest unit this
+	// function ever displays, so rounding a fractional input (e.g. durationMs/1000 producing
+	// 2585.216) here is lossless in practice, not just a deprecation workaround.
+	$pDuration = (int)round( $pDuration );
 	$units = [
 		'month'  => 60 * 60 * 24 * 7 * 4,
 		'week'   => 60 * 60 * 24 * 7,
