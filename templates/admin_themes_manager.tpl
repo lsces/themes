@@ -19,6 +19,7 @@
 			{jstab title="Site Theme"}
 				{legend legend="Pick Site Theme"}
 					{foreach from=$stylesList item=s}
+						<div class="theme-item">
 						<legend {if $style eq $s.style}class="highlight"{/if}>
 							{if $style eq $s.style}
 								{biticon ipackage="icons" iname="dialog-ok" iexplain="Current Theme"}&nbsp;
@@ -42,6 +43,7 @@
 								{/foreach}
 							</ul>
 						{/if}
+						</div>
 					{/foreach}
 				{/legend}
 			{/jstab}
