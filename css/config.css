@@ -851,3 +851,14 @@ header.container-fluid#bw-main-header .navbar-nav.navbar-right:last-child {
 .checkbox-inline input[type="checkbox"] {
 	margin-top: 0;
 }
+
+/* Fisheye film page's featurette list (view_film.tpl) - a stack of one-per-line buttons, a
+   plain .btn's default 6px vertical padding crowded them into each other. Bootstrap-level
+   sizing tweak, not colour - colour lives in the theme's own CSS instead (e.g. rdmcloud-dark.css). */
+.featurette-btn {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.film-featurettes li {
+	margin-bottom: 4px;
+}
