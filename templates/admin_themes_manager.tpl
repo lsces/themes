@@ -27,7 +27,7 @@
 						</legend>
 
 						{if $s.style_info.preview}
-							<a class="floatright" href="{$smarty.const.THEMES_PKG_URL}admin/admin_themes_manager.php?site_style={$s.style}">
+							<a class="pull-right" href="{$smarty.const.THEMES_PKG_URL}admin/admin_themes_manager.php?site_style={$s.style}">
 								<img class="thumb" src="{$s.style_info.preview}" alt="{tr}Theme Preview{/tr}" title="{$s.style}" />
 							</a>
 						{/if}
