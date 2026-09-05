@@ -862,3 +862,13 @@ header.container-fluid#bw-main-header .navbar-nav.navbar-right:last-child {
 .film-featurettes li {
 	margin-bottom: 4px;
 }
+
+/* Same sizing tweak for a music album's track list (view_cd.tpl) - own class, not featurette-btn
+   reused, since colour may need to diverge later even though the tweak itself is identical. */
+.track-btn {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.album-tracks li {
+	margin-bottom: 4px;
+}
