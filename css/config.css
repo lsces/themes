@@ -852,23 +852,33 @@ header.container-fluid#bw-main-header .navbar-nav.navbar-right:last-child {
 	margin-top: 0;
 }
 
-/* Fisheye film page's featurette list (view_film.tpl) - a stack of one-per-line buttons, a
-   plain .btn's default 6px vertical padding crowded them into each other. Bootstrap-level
+/* Sizing tweak for a music album's track list (view_cd.tpl) - a plain .btn's default 6px
+   vertical padding crowded a stack of one-per-line buttons into each other. Bootstrap-level
    sizing tweak, not colour - colour lives in the theme's own CSS instead (e.g. rdmcloud-dark.css). */
-.featurette-btn {
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
-.film-featurettes li {
-	margin-bottom: 4px;
-}
-
-/* Same sizing tweak for a music album's track list (view_cd.tpl) - own class, not featurette-btn
-   reused, since colour may need to diverge later even though the tweak itself is identical. */
 .track-btn {
 	padding-top: 2px;
 	padding-bottom: 2px;
 }
 .album-tracks li {
 	margin-bottom: 4px;
+}
+
+/* Season/Program Episodes/Featurettes/Images tabs (view_season.tpl/
+   view_program_single_season.tpl) - each panel's own edit action (Reload Episodes/Featurettes,
+   Add Image) sits in its own header strip, right-aligned, above the grid - no heading text
+   needed there since the tab label itself already names the section. Deliberately normal
+   document flow (not position:absolute) - an absolutely-positioned icon here used to sit on top
+   of the grid's own top-right thumbnail, blocking it, since nothing reserved real space for it. */
+.fisheye-tab-header {
+	min-height: 24px;
+	text-align: right;
+	margin-bottom: 8px;
+}
+.featurettes-list li {
+	margin-bottom: 4px;
+	list-style: none;
+}
+.featurette-summary {
+	margin: 2px 0 0 0;
+	font-size: 0.9em;
 }
