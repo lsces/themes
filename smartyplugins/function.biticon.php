@@ -79,9 +79,19 @@ function biticon_output( $pParams, $pFile ) {
 			}
 
 			if( str_ends_with( $pFile, '.svg' ) ) {
-				$svgSizes = ['small' => 16, 'medium' => 24, 'large' => 32];
-				$h = $svgSizes[$pParams['isize'] ?? 'small'] ?? 16;
-				$w = ($pParams['istyle'] ?? '') === 'flag' ? (int)round( $h * 4 / 3 ) : $h;
+				if( strstr( $pParams['iname'] ?? '', 'pkg_' ) ) {
+					// Package icons don't have a size variant (see smarty_function_biticon()'s
+					// own pkg_ special case, which strips the small/medium/large path segment) -
+					// match the fixed size every other package's PNG/GIF pkg_ icon already
+					// renders at, rather than falling through to the small/medium/large scale
+					// below (found live: an SVG pkg_ icon was rendering at 16x16 on the packages
+					// admin page while every raster one showed correctly at 48x48).
+					$w = $h = 48;
+				} else {
+					$svgSizes = ['small' => 16, 'medium' => 24, 'large' => 32];
+					$h = $svgSizes[$pParams['isize'] ?? 'small'] ?? 16;
+					$w = ($pParams['istyle'] ?? '') === 'flag' ? (int)round( $h * 4 / 3 ) : $h;
+				}
 				$outstr .= " width=\"$w\" height=\"$h\"";
 			}
 
