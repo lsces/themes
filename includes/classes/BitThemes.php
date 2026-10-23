@@ -84,7 +84,25 @@ class BitThemes extends BitSingleton {
 		return true;
 	}
 
+	// The CSS and JS registered by the end of the packages' setup, not serialised: see snapshotBaseline().
+	public $mAuxFilesBase = null;
+	public $mRawFilesBase = null;
+
+	/**
+	 * Remember the files registered so far. Called when the packages' setup is done and before the page script runs, so that
+	 * what the cached object carries is the site-wide set only. A file a page adds for itself (galleriffic's CSS and JS, ckeditor)
+	 * would otherwise be stored with the object and linked on every page after it until the cache entry expired.
+	 */
+	public function snapshotBaseline(): void {
+		$this->mAuxFilesBase = $this->mAuxFiles;
+		$this->mRawFilesBase = $this->mRawFiles;
+	}
+
 	public function __sleep() {
+		if( $this->mAuxFilesBase !== null ) {
+			$this->mAuxFiles = $this->mAuxFilesBase;
+			$this->mRawFiles = $this->mRawFilesBase;
+		}
 		return [ ...parent::__sleep(), 'mStyles', 'mThemeCache', 'mAjaxLibs', 'mAuxFiles', 'mRawFiles', 'mModules' ];
 	}
 
