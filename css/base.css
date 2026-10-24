@@ -309,4 +309,9 @@ tr.even	{ background-color: #ffffff; }
    per-site override to match that site's footer colour scheme. */
 hr.rule	{ height:2px; border:1px; margin:2px 5px; overflow:visible; color:#000; background-color:#000; }
 
+/* Button row at the foot of a form (<div class="form-group submit">). A template wrapped in {strip} serves its buttons with no
+   whitespace between them, so they butt together; a flex row with a gap spaces them the same whether or not the template is
+   stripped (whitespace between flex items is ignored). Generic — do not repeat in per-site CSS. */
+.form-group.submit	{ display:flex; flex-wrap:wrap; align-items:center; gap:.5em; }
+
 /* vim: set ts=40: */
