@@ -1255,6 +1255,39 @@ BitBase = {
 			elements.push(element);
 		}
 		return elements;
+	},
+
+	/**
+	 * One submit per POST form: a repeat of a form that has just been sent (a double click, an impatient second Enter)
+	 * is dropped, so the server is not asked to make the same edit twice.
+	 *
+	 * The buttons stay enabled, so the first submit still carries the button that was pressed (a disabled button
+	 * would drop its name and value from the POST). The capture listener drops the repeat before the form's own
+	 * onsubmit runs, so a confirm() is not asked twice. The bubble listener marks the form only if that onsubmit let
+	 * the submit through, so a declined confirm() leaves the form usable. The mark clears after 3 seconds, and on a
+	 * back-button return, for the POSTs that never reload the page (a download, a new window).
+	 **/
+	"submitLock": function() {
+		document.addEventListener("submit", function(e) {
+			var f = e.target;
+			if (f && f.hasAttribute && f.hasAttribute("data-submitted")) {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+			}
+		}, true);
+		document.addEventListener("submit", function(e) {
+			var f = e.target;
+			if (!e.defaultPrevented && f && f.method && f.method.toLowerCase() == "post") {
+				f.setAttribute("data-submitted", "1");
+				setTimeout(function() { f.removeAttribute("data-submitted"); }, 3000);
+			}
+		}, false);
+		window.addEventListener("pageshow", function() {
+			var forms = document.querySelectorAll("form[data-submitted]");
+			for (var i = 0; i < forms.length; i++) {
+				forms[i].removeAttribute("data-submitted");
+			}
+		}, false);
 	}
 
 
@@ -1262,6 +1295,7 @@ BitBase = {
 
 // init
 BitBase.init();
+BitBase.submitLock();
 
 
 //-- Slated for removal - as part of the clean up goal everything below is to eventually be removed --//
