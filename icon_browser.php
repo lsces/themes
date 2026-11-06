@@ -125,6 +125,8 @@ $iconUsage = [
 	"audio-x-generic"                => "Music menu",
 	"media-optical"                  => "Physical copies (records, CDs, DVDs)",
 	"view-fullscreen-green"          => "Full screen (episode player, TV browser only)",
+	"media-playback-start-large"     => "Play (green, drawn to fill its box; episode player)",
+	"media-playback-stop-large"      => "Stop (green, drawn to fill its box; episode player)",
 	// Media workflow (fisheyemedia, composed by util/iconsets/tango/make_icons.py)
 	"bwfm-music-add"                 => "Add music collection",
 	"bwfm-music-load"                => "Load album",
