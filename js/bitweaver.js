@@ -1288,6 +1288,76 @@ BitBase = {
 				forms[i].removeAttribute("data-submitted");
 			}
 		}, false);
+	},
+
+	/**
+	 * A "Full screen" button after every <video controls>, for browsers whose own control bar leaves it out (the
+	 * built-in webOS TV browser has none). Added from here so every player, current and future, gets it with no
+	 * template changes. The button follows the video's own visibility, since some pages keep the player hidden until
+	 * Play is pressed.
+	 *
+	 * Uses the video element's own fullscreen request (standard, then webkit, then the iOS-style webkitEnterFullscreen).
+	 * If the browser has none, or refuses, the video fills the browser window instead (.video-fill in base.css);
+	 * Escape or the button puts it back.
+	 **/
+	"videoFullscreen": function() {
+		var fsElement = function() {
+			return document.fullscreenElement || document.webkitFullscreenElement || null;
+		};
+		var fillOff = function(v, btn) {
+			v.classList.remove("video-fill");
+			btn.textContent = "Full screen";
+		};
+		var fillOn = function(v, btn) {
+			v.classList.add("video-fill");
+			btn.textContent = "Exit full screen";
+		};
+		var toggle = function(v, btn) {
+			if (v.classList.contains("video-fill")) {
+				fillOff(v, btn);
+				return;
+			}
+			if (fsElement()) {
+				(document.exitFullscreen || document.webkitExitFullscreen).call(document);
+				return;
+			}
+			var request = v.requestFullscreen || v.webkitRequestFullscreen || v.webkitEnterFullscreen;
+			if (!request) {
+				fillOn(v, btn);
+				return;
+			}
+			try {
+				var result = request.call(v);
+				if (result && result.catch) {
+					result.catch(function() { fillOn(v, btn); });
+				}
+			} catch (e) {
+				fillOn(v, btn);
+			}
+		};
+		document.addEventListener("DOMContentLoaded", function() {
+			var videos = document.querySelectorAll("video[controls]");
+			for (var i = 0; i < videos.length; i++) {
+				(function(v) {
+					var btn = document.createElement("button");
+					btn.type = "button";
+					btn.className = "btn btn-default btn-sm video-fullscreen";
+					btn.textContent = "Full screen";
+					btn.addEventListener("click", function() { toggle(v, btn); }, false);
+					v.parentNode.insertBefore(btn, v.nextSibling);
+					var sync = function() { btn.hidden = (window.getComputedStyle(v).display == "none"); };
+					sync();
+					if (window.MutationObserver) {
+						new MutationObserver(sync).observe(v, { attributes: true, attributeFilter: ["style", "class"] });
+					}
+					document.addEventListener("keydown", function(e) {
+						if (e.key == "Escape" && v.classList.contains("video-fill")) {
+							fillOff(v, btn);
+						}
+					}, false);
+				})(videos[i]);
+			}
+		}, false);
 	}
 
 
@@ -1296,6 +1366,7 @@ BitBase = {
 // init
 BitBase.init();
 BitBase.submitLock();
+BitBase.videoFullscreen();
 
 
 //-- Slated for removal - as part of the clean up goal everything below is to eventually be removed --//
