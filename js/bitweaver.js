@@ -1326,6 +1326,7 @@ BitBase = {
 			var a = active;
 			active = null;
 			a.v.classList.remove("video-fill");
+			document.documentElement.classList.remove("video-fill-page");
 			a.btn.textContent = "Full screen";
 			if (fsElement()) {
 				(document.exitFullscreen || document.webkitExitFullscreen).call(document);
@@ -1337,6 +1338,7 @@ BitBase = {
 		var fillOn = function(v, btn) {
 			enter(v, btn);
 			v.classList.add("video-fill");
+			document.documentElement.classList.add("video-fill-page");
 			btn.textContent = "Exit full screen";
 		};
 		var toggle = function(v, btn) {

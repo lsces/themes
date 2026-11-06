@@ -319,4 +319,5 @@ hr.rule	{ height:2px; border:1px; margin:2px 5px; overflow:visible; color:#000; 
 /* Fallback "full screen" for a <video> in a browser with no fullscreen API (BitBase.videoFullscreen in bitweaver.js):
    fills the browser window. */
 .video-fill{position:fixed;top:0;left:0;width:100vw !important;height:100vh !important;max-width:none !important;max-height:none !important;z-index:9999;background:#000;}
+.video-fill-page,.video-fill-page body{overflow:hidden !important;}
 .video-fullscreen[hidden]{display:none !important;}
