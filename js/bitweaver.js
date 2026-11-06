@@ -1301,24 +1301,47 @@ BitBase = {
 	 * Escape or the button puts it back.
 	 **/
 	"videoFullscreen": function() {
+		// the one video now full screen: {v: video, btn: its button, pushed: it holds a history entry}
+		var active = null;
+		var buttons = [];
 		var fsElement = function() {
 			return document.fullscreenElement || document.webkitFullscreenElement || null;
 		};
-		var fillOff = function(v, btn) {
-			v.classList.remove("video-fill");
-			btn.textContent = "Full screen";
+		// Full screen holds one history entry, so Back (a TV remote's Back key, a browser's Back button) leaves full
+		// screen instead of leaving the page. The entry is released again when full screen ends some other way.
+		var enter = function(v, btn) {
+			if (active) {
+				return;
+			}
+			active = { v: v, btn: btn, pushed: false };
+			try {
+				history.pushState({ bitVideoFs: 1 }, "");
+				active.pushed = true;
+			} catch (e) {}
+		};
+		var leave = function() {
+			if (!active) {
+				return;
+			}
+			var a = active;
+			active = null;
+			a.v.classList.remove("video-fill");
+			a.btn.textContent = "Full screen";
+			if (fsElement()) {
+				(document.exitFullscreen || document.webkitExitFullscreen).call(document);
+			}
+			if (a.pushed && history.state && history.state.bitVideoFs) {
+				history.back();
+			}
 		};
 		var fillOn = function(v, btn) {
+			enter(v, btn);
 			v.classList.add("video-fill");
 			btn.textContent = "Exit full screen";
 		};
 		var toggle = function(v, btn) {
-			if (v.classList.contains("video-fill")) {
-				fillOff(v, btn);
-				return;
-			}
-			if (fsElement()) {
-				(document.exitFullscreen || document.webkitExitFullscreen).call(document);
+			if (active) {
+				leave();
 				return;
 			}
 			var request = v.requestFullscreen || v.webkitRequestFullscreen || v.webkitEnterFullscreen;
@@ -1335,6 +1358,34 @@ BitBase = {
 				fillOn(v, btn);
 			}
 		};
+		var onFullscreenChange = function() {
+			var el = fsElement();
+			if (el) {
+				for (var i = 0; i < buttons.length; i++) {
+					if (buttons[i].v === el) {
+						enter(el, buttons[i].btn);
+					}
+				}
+			} else if (active && !active.v.classList.contains("video-fill")) {
+				leave();
+			}
+		};
+		document.addEventListener("fullscreenchange", onFullscreenChange, false);
+		document.addEventListener("webkitfullscreenchange", onFullscreenChange, false);
+		// Back pops the entry itself: only the video is left to put back
+		window.addEventListener("popstate", function() {
+			if (active) {
+				active.pushed = false;
+				leave();
+			}
+		}, false);
+		// Escape, and 461, the Back key of webOS TVs
+		document.addEventListener("keydown", function(e) {
+			if (active && (e.key == "Escape" || e.keyCode == 461)) {
+				e.preventDefault();
+				leave();
+			}
+		}, false);
 		document.addEventListener("DOMContentLoaded", function() {
 			var videos = document.querySelectorAll("video[controls]");
 			for (var i = 0; i < videos.length; i++) {
@@ -1345,16 +1396,12 @@ BitBase = {
 					btn.textContent = "Full screen";
 					btn.addEventListener("click", function() { toggle(v, btn); }, false);
 					v.parentNode.insertBefore(btn, v.nextSibling);
+					buttons.push({ v: v, btn: btn });
 					var sync = function() { btn.hidden = (window.getComputedStyle(v).display == "none"); };
 					sync();
 					if (window.MutationObserver) {
 						new MutationObserver(sync).observe(v, { attributes: true, attributeFilter: ["style", "class"] });
 					}
-					document.addEventListener("keydown", function(e) {
-						if (e.key == "Escape" && v.classList.contains("video-fill")) {
-							fillOff(v, btn);
-						}
-					}, false);
 				})(videos[i]);
 			}
 		}, false);
