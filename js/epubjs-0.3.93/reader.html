@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ebook</title>
+<style>
+	html, body { height: 100%; margin: 0; font-family: sans-serif; background: #f4f4f4; color: #222; }
+	@media (prefers-color-scheme: dark) { html, body { background: #1e1e1e; color: #ddd; } #bar, #hits { background: #2a2a2a; border-color: #444; } #stage { background: #fff; } }
+	#bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; background: #e8e8e8; border-bottom: 1px solid #ccc; }
+	#bar button, #bar select, #bar input { font-size: 14px; padding: 3px 8px; }
+	#bar input[type=search] { width: 14em; }
+	#bar .grow { flex: 1; }
+	#main { display: flex; height: calc(100% - 44px); }
+	#stage { flex: 1; background: #fff; min-width: 0; }
+	#viewer { height: 100%; }
+	#hits { width: 22em; max-width: 40%; overflow: auto; padding: 6px 10px; background: #ececec; border-left: 1px solid #ccc; font-size: 13px; display: none; }
+	#hits a { display: block; padding: 4px 0; border-bottom: 1px solid rgba(128,128,128,.25); color: inherit; text-decoration: none; cursor: pointer; }
+	#hits a:hover { background: rgba(128,128,128,.2); }
+	#msg { padding: 1em; }
+</style>
+</head>
+<body>
+<div id="bar">
+	<button id="prev" title="Previous page">&laquo;</button>
+	<button id="next" title="Next page">&raquo;</button>
+	<select id="toc" title="Contents"><option value="">Contents</option></select>
+	<button id="smaller" title="Smaller text">A-</button>
+	<button id="larger" title="Larger text">A+</button>
+	<span class="grow"></span>
+	<input type="search" id="q" placeholder="Search the book">
+	<button id="go">Search</button>
+	<span id="count"></span>
+</div>
+<div id="main">
+	<div id="stage"><div id="viewer"></div></div>
+	<div id="hits"></div>
+</div>
+<script src="jszip.min.js"></script>
+<script src="epub.min.js"></script>
+<script src="reader.js"></script>
+</body>
+</html>
