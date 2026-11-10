@@ -12,7 +12,7 @@ Config switches (stored in `kernel_config`, set via Themes > Admin > Menus):
 - `${pkg}_menu_text` — custom dropdown label
 - `${pkg}_menu_position` — sort position
 
-For role-based visibility, override `top_bar.tpl` in `config/themes/merg/kernel/`.
+For role-based visibility, override `top_bar.tpl` in `config/themes/{site}/kernel/`.
 
 ## CSS load order
 
@@ -26,9 +26,9 @@ For role-based visibility, override `top_bar.tpl` in `config/themes/merg/kernel/
 4. Style CSS (`getStyleCssFile()`, position 998) — the active theme's main CSS
 5. Browser CSS (`getBrowserStyleCssFile()`, position 999)
 
-Site-specific CSS lives in `/etc/webstack/domains/{site}/themes/{site}/{site}.css` and is the
+Site-specific CSS lives in `config/themes/{site}/{site}.css` and is the
 active theme file for that site (position 998). Site theme images go in
-`themes/{site}/images/` within that domain dir — referenced via
+`images/` within that folder — referenced via
 `{$gBitThemes->getStyleUrl()}images/`.
 
 **`.floaticon` / `.icon` conflict**: `themes/css/config.css` defines `.floaticon { float:right
@@ -39,18 +39,18 @@ by causing child icons to float left and collapse the container. **Fix**: strip 
 
 **`base.css` is still directly `@import`ed by some non-live theme presets** (the 4 legacy
 Bootstrap-2-era presets: cerulean, journal, slate, bootstrap under
-`/etc/webstack/site-config/themes/`) and by `wiki/templates/slideshow.tpl` (a standalone
+`config/themes/`) and by `wiki/templates/slideshow.tpl` (a standalone
 overlay outside the normal cascade) — don't delete `base.css` itself, only ever add to it.
 `themes/css_lib.php`'s legacy `@import`-flattener also special-cases and never inlines
 `base.css` — treat it as permanent, load-bearing infrastructure.
 
 ## Asset locations
 
-- **Site-specific images** — `/etc/webstack/domains/{site}/themes/{site}/images/`; referenced
+- **Site-specific images** — `config/themes/{site}/images/`; referenced
   in templates as `{$gBitThemes->getStyleUrl()}images/filename.ext`
 - **Cross-site org assets** (RDM logo, cookie-consent images) — `util/images/`; referenced
   as `{$smarty.const.UTIL_PKG_URL}images/filename.ext` or `/util/images/filename.ext` in CSS
-- **Fonts** — `util/fonts/{family}/`; referenced as `/util/fonts/...` in `@font-face` CSS
+- **Fonts** — `util` ships none. A package that needs a font carries it (fisheyemedia's cover lettering is `fisheyemedia/fonts/`); a site's own font sits in its theme folder beside its CSS and is referenced from there in `@font-face`
 - `config/css/`, `config/js/`, `config/fonts/`, `config/images/` are all dead and removed from
   servers — do not recreate them
 
@@ -89,9 +89,8 @@ overlay outside the normal cascade) — don't delete `base.css` itself, only eve
 - **`theme_setup_inc.php`** — optional site-specific PHP loaded by
   `themes/includes/bit_setup_inc.php` if `CONFIG_PKG_PATH.'theme_setup_inc.php'` exists. Use it
   to call `$gBitThemes->loadJavascript()` for JS that is only needed on one site (e.g.
-  roundabout on rainbowdigitalmedia, haccordion on medw). Source lives in
-  `/etc/webstack/domains/{site}/theme_setup_inc.php`; `setup-site-links.sh` symlinks it into
-  `config/theme_setup_inc.php` automatically if present.
+  roundabout on one site, haccordion on another). The file is
+  `config/theme_setup_inc.php`, kept with the site's other overrides.
 
 ## Module / Layout system
 
@@ -116,9 +115,9 @@ Column visibility is controlled by feature flags in `kernel_config`, checked in
 
 All flags off = columns show on all pages including edit pages.
 
-## Standard content header pattern (merg theme)
+## Standard content header pattern
 
-The merg theme applies `background-color: #5da7e1` to every `<header>` element. The standard
+Some themes apply a `background-color` to every `<header>` element. The standard
 pattern for display pages uses a semantic `<header>` with floaticons and breadcrumbs as
 separate included templates (matching the stock assembly pattern):
 
@@ -187,18 +186,15 @@ just the generic iconset:
 No `magick`/ImageMagick conversion step, no multiple exported sizes — an SVG sourced from
 wherever (a normal vector icon site) can be dropped straight into either path as-is.
 
-## Site-specific theme overrides (`/etc/webstack/domains`)
+## Site-specific theme overrides
 
-Each vhosted site has its theme overrides at `/etc/webstack/domains/{site}/themes/{site}/`,
-symlinked into that site's `config/themes/{site}` — same layout on desktop, srv9, and srv10:
-```
-/srv/website/merg/config/themes/merg -> /etc/webstack/domains/merg/themes/merg
-```
+Each site keeps its theme overrides in `config/themes/{site}/`. If you hold the overrides in a
+separate repository, symlink that folder to `config/themes/{site}` and edit the source, not the
+symlink path.
 
 Typical contents: `kernel/` (top_bar.tpl, top_banner.tpl, bot_bar.tpl, etc.), `images/`, site
 CSS, favicon. Any template in this path overrides the package default via Smarty's
-`bitpackage:` resource lookup. Never edit the `config/themes/` path directly; edit the source
-in `/etc/webstack/domains/`.
+`bitpackage:` resource lookup. Edit the real source folder, whichever it is.
 
 ## The `force` theme tier — shared-across-all-sites templates
 
@@ -214,15 +210,12 @@ order, returning the first that exists:
 3. the package's own default template (e.g. `kernel/templates/bot_bar.tpl`).
 
 `CONFIG_PKG_PATH` (and so `themes/force/`) is per-site, same as every other `config/` path — so
-a genuinely shared "force" template needs the same symlink-fan-out `config/themes/BlueSky`
-already uses: `config/themes/force` in every site directory symlinked straight to one shared
-location, **`/etc/webstack/site-config/themes/force/`**. Not automated by
-`setup-site-links.sh` (that script doesn't touch `config/themes/*` at all, `BlueSky`'s symlink
-is likewise manual) — wire up new sites by hand:
-`ln -sfn /etc/webstack/site-config/themes/force /srv/website/<site>/config/themes/force`.
+a genuinely shared "force" template needs the same symlink fan-out that a shared theme uses:
+`config/themes/force` in every site directory symlinked straight to one shared location. Wire up
+new sites by hand: `ln -sfn <shared folder> <site>/config/themes/force`.
 
 **Deploying a `force` template change needs a manual Smarty cache clear** —
-`/etc/webstack/scripts/clear-template-cache.sh` on each affected server. The usual "Smarty
+clearing the Smarty template cache on each affected server. The usual "Smarty
 auto-recompiles a changed .tpl via mtime, no manual clear needed" rule only covers editing a
 template that's already resolving from that same path — it does **not** cover changing *which*
 file resolves (adding/removing an override, adding a new symlinked tier like this one).
