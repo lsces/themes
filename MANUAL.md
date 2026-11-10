@@ -48,7 +48,7 @@ overlay outside the normal cascade) — don't delete `base.css` itself, only eve
 
 - **Site-specific images** — `config/themes/{site}/images/`; referenced
   in templates as `{$gBitThemes->getStyleUrl()}images/filename.ext`
-- **Cross-site org assets** (RDM logo, cookie-consent images) — `util/images/`; referenced
+- **Images shared by every site** — `util/images/`; referenced
   as `{$smarty.const.UTIL_PKG_URL}images/filename.ext` or `/util/images/filename.ext` in CSS
 - **Fonts** — `util` ships none. A package that needs a font carries it (fisheyemedia's cover lettering is `fisheyemedia/fonts/`); a site's own font sits in its theme folder beside its CSS and is referenced from there in `@font-face`
 - `config/css/`, `config/js/`, `config/fonts/`, `config/images/` are all dead and removed from
